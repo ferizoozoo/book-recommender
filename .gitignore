@@ -1,0 +1,13 @@
+# Exclude WebStorm's project configuration folder at the root
+.idea/
+
+# Ex Exclude local npm/yarn caches (generally good practice at root)
+node_modules/
+
+# Exclude compiled TypeScript output (if you put it outside src)
+dist/
+build/
+
+# Exclude environment variables
+.env
+.env.*
