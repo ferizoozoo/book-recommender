@@ -1,32 +1,24 @@
-# Node.js dependencies
-node_modules/
-
-# Build output
-build/
-dist/ # For Vite or other bundlers
-
 # Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.log
+pnpm-debug.log*
+lerna-debug.log*
 
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+node_modules
+dist
+dist-ssr
+*.local
 
-# npm package manager cache
-.npm/
-
-# macOS files
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-
-# Windows files
-Thumbs.db
-
-# WebStorm's frontend specific configuration (if you were to open frontend as a separate project)
-# You might not even need this if you only open the root project in WebStorm
-#.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
