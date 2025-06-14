@@ -1,0 +1,59 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Compose Services (Backend and Frontend)
+        # docker compose build will build all services with a 'build' context
+        run: docker compose build
+
+      - name: Start Docker Compose Services
+        run: docker compose up -d
+
+      # ... (Previous steps for waiting for DB and running backend tests) ...
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          echo "Waiting for PostgreSQL to be ready..."
+          ATTEMPTS=0
+          while ! docker compose exec db pg_isready -U your_database_user; do
+            if [ $ATTEMPTS -ge 30 ]; then
+              echo "PostgreSQL did not become ready in time."
+              docker compose logs db
+              exit 1
+            fi
+            echo "PostgreSQL not ready yet. Waiting 5 seconds..."
+            sleep 5
+            ATTEMPTS=$((ATTEMPTS + 1))
+          done
+          echo "PostgreSQL is ready!"
+        env:
+          POSTGRES_USER: your_database_user
+          POSTGRES_DB: your_database_name
+          POSTGRES_PASSWORD: your_database_password
+
+      - name: Run Backend Tests
+        run: docker compose exec backend npm test
+
+      # You might add frontend tests here if you have them, e.g.:
+      # - name: Run Frontend Tests
+      #   run: docker compose exec frontend npm test # This would assume a test command in your frontend Dockerfile
+
+      - name: Stop Docker Compose Services
+        if: always()
+        run: docker compose down

@@ -21,6 +21,17 @@ services:
     environment:
       DATABASE_URL: postgres://your_database_user:your_database_password@db:5432/your_database_name
       NODE_ENV: development
+      # If your backend serves the frontend, you might not need the frontend service,
+      # or you might serve it directly from backend/public. More on this below.
 
+  frontend:
+    build: ./frontend # Build context for the frontend
+    ports:
+      - "80:80" # Expose frontend on port 80 (standard HTTP)
+    # depends_on: # Frontend usually doesn't depend directly on backend for serving static files
+    #   - backend # Unless you need to ensure backend is up for build-time environment variables
+    # volumes: # Optional: For development, you might mount source code for live reload
+    #   - ./frontend:/usr/share/nginx/html # Or similar for dev
+      # - /usr/src/app/node_modules # Prevents host node_modules from overriding container's
 volumes:
   db-data:
