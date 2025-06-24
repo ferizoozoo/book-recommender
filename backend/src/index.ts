@@ -1,12 +1,17 @@
+import 'dotenv/config';
+
 import express from 'express';
+import appRouter from "./presentation/routes";
+
+const PORT = process.env.PORT || 5000;
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/', (req: express.Request, res: express.Response) => {
-    res.status(200).send('Hello World!');
-})
+app.use(appRouter);
 
-app.listen(3000, () => {});
+app.listen(PORT, () => {
+    console.log('Server is running');
+});
