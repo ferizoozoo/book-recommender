@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import {UserController} from "../controllers/userController";
+import { userController } from "../../di/setup.ts";
 
 const authRouter = Router();
 
-authRouter.get('/users', UserController.getUsers);
+authRouter.get('/users', (req, res, next) => {
+    userController.getUsers(req,  res,  next)
+});
 
 export default authRouter;

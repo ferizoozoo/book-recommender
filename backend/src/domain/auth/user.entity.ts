@@ -1,4 +1,4 @@
-import {IValidate} from "../common/interfaces/i-validate";
+import {IValidate} from "../common/interfaces/i-validate.ts";
 
 export class User implements IValidate {
     id: number;
@@ -28,6 +28,7 @@ export class User implements IValidate {
         return `${this.firstName} ${this.lastName}`;
     }
 
+    // TODO: maybe this validate method should be replaced with decorators.
     validate(): boolean {
         if (this.id < 0) {
             throw new Error('User ID must be a non-negative number.');

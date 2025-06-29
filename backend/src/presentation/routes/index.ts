@@ -1,9 +1,8 @@
-import authRoutes from './auth.routes';
 import {Router} from "express";
+import authRouter from "./auth.routes.ts";
 
 const appRouter = Router();
 
-// define all the routes below
-appRouter.use('/auth', authRoutes);
+appRouter.use('/auth', authRouter);
 
 export default appRouter;

@@ -1,16 +1,16 @@
 import {Request, Response, NextFunction} from "express";
-import {User} from "../../domain/auth/user.entity";
-import {UserService} from "../../services/auth.service";
+import {IUserService} from "../../services/interfaces/i-userService.ts";
 
 export class UserController {
-    public static getUsers(req: Request, res: Response, next: NextFunction) {
+    #userService: IUserService;
+
+    constructor(userService: IUserService) {
+        this.#userService = userService;
+    }
+
+    public getUsers(req: Request, res: Response, next: NextFunction) {
         // TODO: this is for testing purposes, but ports and adaptors may be used
         //       to gate the data received and sent at the presentation layer.
-        const user = UserService.getUsers();
-        res.status(200).json([{
-            firstname: user.firstName,
-            lastname: user.lastName,
-            email: user.email
-        }]);
+        res.status(200).json(this.#userService.getUsers());
     }
 }

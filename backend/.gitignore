@@ -1,6 +1,28 @@
 # Node.js dependencies
 node_modules/
+# Dependencies
+node_modules/
 
+# Environment variables
+.env
+
+# Build output
+dist/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
 # Compiled TypeScript output
 dist/
 
