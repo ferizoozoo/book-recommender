@@ -4,6 +4,6 @@ export interface AuthService {
 
 }
 
-export interface UserService {
-    getUsers(): User[];
+export interface IUserService {
+  getUsers(): Promise<User[]>;
 }

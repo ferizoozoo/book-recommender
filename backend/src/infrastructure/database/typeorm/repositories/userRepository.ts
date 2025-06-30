@@ -2,8 +2,8 @@ import {UserEntity} from "../models/auth.models.ts";
 import AppDataSource from "../main.ts";
 import {Repository} from "typeorm";
 import {User} from "../../../../domain/auth/user.entity.ts";
-import {mapUserDomainToModel} from "../models/mappers/auth.mapper.ts";
-import {IUserRepository} from "../../../../services/repositories/i-userRepository.ts";
+import {mapUserDomainToModel, mapUserEntityToDomain} from "../models/mappers/auth.mapper.ts";
+import {IUserRepository} from "../../../../services/interfaces/repositories/i-userRepository.ts";
 
 export class UserRepository implements IUserRepository {
     #users: Repository<UserEntity>;
@@ -18,7 +18,12 @@ export class UserRepository implements IUserRepository {
        console.log("User has been saved. User id is", userEntity.id)
    }
 
-   async getAllUsers(): Promise<UserEntity[]> {
-        return await this.#users.find();
+   async getAllUsers(): Promise<User[]> {
+        const userEntities = await this.#users.find();
+        const users: User[] = [];
+       userEntities.forEach(user => {
+           users.push(mapUserEntityToDomain(user));
+       })
+       return users;
    }
 }

@@ -1,7 +1,5 @@
 # Node.js dependencies
 node_modules/
-# Dependencies
-node_modules/
 
 # Environment variables
 .env
@@ -38,6 +36,9 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+
+# database
+*.sqlite
 
 # npm package manager cache
 .npm/
