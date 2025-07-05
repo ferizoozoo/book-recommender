@@ -1,0 +1,47 @@
+import {Request, Response, NextFunction} from "express";
+import {IAuthService} from "../interfaces/services/i-authService.ts";
+
+export class AuthController {
+    #authService: IAuthService;
+
+    constructor(authService: IAuthService) {
+        this.#authService = authService;
+    }
+
+    async login(req: Request, res: Response, nextFunction: NextFunction): Promise<void> {
+        // TODO: there should be a global exception handler as a middleware to avoid these try/catch blocks
+        //          in each of the controller actions/methods.
+        try {
+            const {email, password} = req.body;
+
+            if (!email || !password) {
+                // TODO: the messages shouldn't be hardcoded like that, a messages.ts in the presentation layer can help.
+                res.status(400).json({ message: 'Email and password are required' });
+                return;
+            }
+
+            const token = await this.#authService.login(email, password);
+            res.status(200).json({ token });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Authentication failed';
+            res.status(401).json({ message: errorMessage });
+        }
+    }
+
+    async register(req: Request, res: Response, nextFunction: NextFunction): Promise<void> {
+        try {
+            const {email, password} = req.body;
+
+            if (!email || !password) {
+                res.status(400).json({ message: 'Email and password are required' });
+                return;
+            }
+
+            const token = await this.#authService.register(email, password);
+            res.status(201).json({ token });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Registration failed';
+            res.status(400).json({ message: errorMessage });
+        }
+    }
+}

@@ -14,6 +14,4 @@ const typeORMConfig: DataSourceOptions = {
     // ... other TypeORM options like ssl, migrations, subscribers, etc.
 };
 
-console.log(typeORMConfig);
-
 export default typeORMConfig;

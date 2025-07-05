@@ -1,28 +1,16 @@
 import {IValidate} from "../common/interfaces/i-validate.ts";
+import {IHasher} from "../common/interfaces/i-hasher.ts";
+import {UserClaims} from "./user-claims.value.ts";
 
 export class User implements IValidate {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    salt: string;
-
     constructor(
-        id: number,
-        firstName: string,
-        lastName: string,
-        email: string,
-        password: string,
-        salt: string
-    ) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.salt = salt;
-    }
+        public id: number = 0,
+        public firstName: string = '',
+        public lastName: string = '',
+        public email: string = '',
+        public password: string = '',
+        public salt: string = ''
+    ) {}
 
     getFullName(): string {
         return `${this.firstName} ${this.lastName}`;
@@ -64,5 +52,23 @@ export class User implements IValidate {
         }
 
         return true;
+    }
+
+    async checkPassword(password: string, passwordHasher: IHasher): Promise<boolean> {
+        return await passwordHasher.compare(password, this.password);
+    }
+
+    async savePassword(password: string, passwordHasher: IHasher): Promise<void> {
+        this.password = await passwordHasher.hash(password);
+    }
+
+    toClaims(roles: string[] = []): UserClaims {
+        return new UserClaims(
+            this.id,
+            this.email,
+            roles,
+            this.firstName,
+            this.lastName
+        );
     }
 }

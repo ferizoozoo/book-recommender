@@ -12,10 +12,21 @@ export class UserRepository implements IUserRepository {
         this.#users = AppDataSource.getRepository(UserEntity);
     }
 
+    async getUserByEmail(email: string): Promise<User | null> {
+        const userEntity = await this.#users.findOne({
+            where: { email: email }
+        });
+
+        if (!userEntity) {
+            return null;
+        }
+
+        return mapUserEntityToDomain(userEntity);
+    }
+
    async addUser(user: User) {
         const userEntity = mapUserDomainToModel(user);
         await this.#users.save(userEntity);
-       console.log("User has been saved. User id is", userEntity.id)
    }
 
    async getAllUsers(): Promise<User[]> {

@@ -19,7 +19,7 @@ AppDataSource.initialize()
 app.use(express.json());
 
 // Routes
-app.use('/api', appRouter);
+app.use('/', appRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
