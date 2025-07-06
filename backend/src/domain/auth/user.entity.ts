@@ -1,6 +1,7 @@
 import {IValidate} from "../common/interfaces/i-validate.ts";
 import {IHasher} from "../common/interfaces/i-hasher.ts";
 import {UserClaims} from "./user-claims.value.ts";
+import {domainConsts} from "../common/consts.ts";
 
 export class User implements IValidate {
     constructor(
@@ -19,36 +20,36 @@ export class User implements IValidate {
     // TODO: maybe this validate method should be replaced with decorators.
     validate(): boolean {
         if (this.id < 0) {
-            throw new Error('User ID must be a non-negative number.');
+            throw new Error(domainConsts.UserIdNonNegative);
         }
 
         const nameRegex = /^[a-zA-Z' -]{2,50}$/;
         if (!this.firstName || !nameRegex.test(this.firstName)) {
-            throw new Error('First name must be between 2 and 50 characters and contain valid characters.');
+            throw new Error(domainConsts.UserFirstnameShouldBeValid);
         }
 
         if (!this.lastName || !nameRegex.test(this.lastName)) {
-            throw new Error('Last name must be between 2 and 50 characters and contain valid characters.');
+            throw new Error(domainConsts.UserLastnameShouldBeValid);
         }
 
         const emailRegex = /^[a-zA-Z0-9._%+-]{1,64}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!this.email || !emailRegex.test(this.email)) {
-            throw new Error('Email must be a valid email address.');
+            throw new Error(domainConsts.UserEmailShouldBeValid);
         }
         // While the regex limits the local part, RFC 5321 (SMTP) limits total email to 254 chars.
         // It's still good to have this explicit check for the whole string.
         if (this.email.length > 254) {
-            throw new Error('Email cannot exceed 254 characters.');
+            throw new Error(domainConsts.UserEmailCannotExceedLimit);
         }
 
         const hashedPasswordRegex = /^.{60}$/; // Example for bcrypt
         if (!this.password || !hashedPasswordRegex.test(this.password)) {
-            throw new Error('Invalid hashed password format or length.');
+            throw new Error(domainConsts.UserInvalidHashPassword);
         }
 
         const saltRegex = /^\$[2BCYbc][a-zA-Z0-9./]{29}$/;
         if (!this.salt || !saltRegex.test(this.salt)) {
-            throw new Error('Invalid salt format or length.');
+            throw new Error(domainConsts.UserInvalidSalt);
         }
 
         return true;

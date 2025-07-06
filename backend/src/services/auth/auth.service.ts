@@ -3,6 +3,7 @@ import {IHasher} from "../../domain/common/interfaces/i-hasher.ts";
 import {ITokenService} from "../interfaces/security/i-tokenService.ts";
 import {IAuthService} from "../../presentation/interfaces/services/i-authService.ts";
 import {User} from "../../domain/auth/user.entity.ts";
+import {serviceConsts} from "../common/consts.ts";
 
 export class AuthService implements IAuthService {
     #userRepo: IUserRepository;
@@ -17,12 +18,12 @@ export class AuthService implements IAuthService {
 
     async register(email: string, password: string): Promise<string> {
         if (!email || !password) {
-            throw new Error('Email and password are required');
+            throw new Error(serviceConsts.AuthEmailAndPasswordRequired);
         }
 
         const oldUser = await this.#userRepo.getUserByEmail(email);
         if (oldUser !== null) {
-            throw new Error('Email already registered');
+            throw new Error(serviceConsts.AuthEmailAndPasswordRequired);
         }
 
         // TODO: is 'new'ing an Entity a good thing or do we need like a static method for creating objects?
@@ -37,16 +38,16 @@ export class AuthService implements IAuthService {
 
     async login(email: string, password: string): Promise<string> {
         if (!email || !password) {
-            throw new Error('Email and password are required');
+            throw new Error(serviceConsts.AuthEmailAndPasswordRequired);
         }
 
         const user = await this.#userRepo.getUserByEmail(email);
         if (!user) {
-            throw new Error('Invalid email or password');
+            throw new Error(serviceConsts.AuthInvalidEmailAndPassword);
         }
 
         if (!await user.checkPassword(password, this.#hasher)) {
-            throw new Error('Invalid email or password');
+            throw new Error(serviceConsts.AuthInvalidEmailAndPassword);
         }
 
         const userClaims = user.toClaims();
