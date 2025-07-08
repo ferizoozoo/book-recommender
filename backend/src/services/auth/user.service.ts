@@ -1,5 +1,5 @@
-import {IUserService} from "../../presentation/interfaces/services/i-userService.ts";
-import {IUserRepository} from "../interfaces/repositories/i-userRepository.ts";
+import {IUserService} from "../../presentation/common/interfaces/services/i-userService.ts";
+import {IUserRepository} from "../common/interfaces/repositories/i-userRepository.ts";
 import {User} from "../../domain/auth/user.entity.ts";
 
 export class UserService implements IUserService {

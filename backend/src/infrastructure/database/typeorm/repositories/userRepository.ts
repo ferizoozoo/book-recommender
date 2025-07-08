@@ -3,7 +3,7 @@ import AppDataSource from "../main.ts";
 import {Repository} from "typeorm";
 import {User} from "../../../../domain/auth/user.entity.ts";
 import {mapUserDomainToModel, mapUserEntityToDomain} from "../models/mappers/auth.mapper.ts";
-import {IUserRepository} from "../../../../services/interfaces/repositories/i-userRepository.ts";
+import {IUserRepository} from "../../../../services/common/interfaces/repositories/i-userRepository.ts";
 
 export class UserRepository implements IUserRepository {
     #users: Repository<UserEntity>;

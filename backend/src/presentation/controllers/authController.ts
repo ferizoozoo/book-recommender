@@ -1,5 +1,5 @@
 import {Request, Response, NextFunction} from "express";
-import {IAuthService} from "../interfaces/services/i-authService.ts";
+import {IAuthService} from "../common/interfaces/services/i-authService.ts";
 import {presentationConsts} from "../common/consts.ts";
 
 export class AuthController {

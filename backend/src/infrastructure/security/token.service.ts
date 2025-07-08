@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { ITokenService } from "../../services/interfaces/security/i-tokenService.ts";
+import { ITokenService } from "../../services/common/interfaces/security/i-tokenService.ts";
 import { UserClaims } from "../../domain/auth/user-claims.value.ts";
 import jwtConfig from "../config/auth.config.ts";
 

@@ -26,4 +26,5 @@ const authController = new AuthController(authService);
 export {
     userController,
     authController,
+    tokenService
 };

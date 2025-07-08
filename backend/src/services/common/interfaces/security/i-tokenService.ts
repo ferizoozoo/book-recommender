@@ -1,5 +1,5 @@
-import {User} from "../../../domain/auth/user.entity.ts";
-import {UserClaims} from "../../../domain/auth/user-claims.value.ts";
+import {User} from "../../../../domain/auth/user.entity.ts";
+import {UserClaims} from "../../../../domain/auth/user-claims.value.ts";
 
 export interface ITokenService {
     generateAccessToken(user: UserClaims): string;

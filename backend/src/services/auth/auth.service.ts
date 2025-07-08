@@ -1,7 +1,7 @@
-import {IUserRepository} from "../interfaces/repositories/i-userRepository.ts";
+import {IUserRepository} from "../common/interfaces/repositories/i-userRepository.ts";
 import {IHasher} from "../../domain/common/interfaces/i-hasher.ts";
-import {ITokenService} from "../interfaces/security/i-tokenService.ts";
-import {IAuthService} from "../../presentation/interfaces/services/i-authService.ts";
+import {ITokenService} from "../common/interfaces/security/i-tokenService.ts";
+import {IAuthService} from "../../presentation/common/interfaces/services/i-authService.ts";
 import {User} from "../../domain/auth/user.entity.ts";
 import {serviceConsts} from "../common/consts.ts";
 
