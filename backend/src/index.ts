@@ -4,6 +4,7 @@ import applicationConfig from "./infrastructure/config/application.config.ts";
 import express from 'express';
 import appRouter from './presentation/routes/index.ts';
 import AppDataSource from "./infrastructure/database/typeorm/main.ts";
+import {errorHandler} from "./presentation/common/middlewares/errorHandler.middleware.ts";
 
 const app = express();
 const PORT = applicationConfig.port || 5000;
@@ -20,6 +21,8 @@ app.use(express.json());
 
 // Routes
 app.use('/', appRouter);
+
+app.use(errorHandler)
 
 // Health check endpoint
 app.get('/health', (req, res) => {
