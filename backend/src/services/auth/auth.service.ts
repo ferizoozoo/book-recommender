@@ -4,6 +4,7 @@ import {ITokenService} from "../common/interfaces/security/i-tokenService.ts";
 import {IAuthService} from "../../presentation/common/interfaces/services/i-authService.ts";
 import {User} from "../../domain/auth/user.entity.ts";
 import {serviceConsts} from "../common/consts.ts";
+import {AuthTokens} from "../common/interfaces/types/authTokens.ts";
 
 export class AuthService implements IAuthService {
     #userRepo: IUserRepository;
@@ -36,7 +37,7 @@ export class AuthService implements IAuthService {
         return this.#tokenService.generateAccessToken(userClaims);
     }
 
-    async login(email: string, password: string): Promise<string> {
+    async login(email: string, password: string): Promise<AuthTokens> {
         if (!email || !password) {
             throw new Error(serviceConsts.AuthEmailAndPasswordRequired);
         }
@@ -51,7 +52,23 @@ export class AuthService implements IAuthService {
         }
 
         const userClaims = user.toClaims();
-        return this.#tokenService.generateAccessToken(userClaims);
+        const newAccessToken = this.#tokenService.generateAccessToken(userClaims);
+        const newRefreshToken = this.#tokenService.generateRefreshToken(userClaims);
+
+        return {
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken
+        }
+    }
+
+    async refresh(refreshToken: string): Promise<AuthTokens> {
+        const claims = this.#tokenService.validateRefreshToken(refreshToken);
+        const newRefreshToken = this.#tokenService.generateRefreshToken(claims);
+        const newAccessToken = this.#tokenService.generateAccessToken(claims);
+        return {
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken
+        }
     }
 }
 

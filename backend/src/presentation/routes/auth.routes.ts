@@ -13,4 +13,8 @@ authRouter.post('/register', async (req, res, next) => {
     await authController.register(req, res, next);
 });
 
+authRouter.post('/refresh', async (req, res, next) => {
+    await authController.refresh(req, res, next);
+})
+
 export default authRouter;

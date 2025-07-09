@@ -44,4 +44,16 @@ export class AuthController {
             res.status(400).json({ message: errorMessage });
         }
     }
+
+    async refresh(req: Request, res: Response, nextFunction: NextFunction): Promise<void> {
+        try {
+            const refreshToken = req.body.refreshToken;
+
+            const token = await this.#authService.refresh(refreshToken);
+            res.status(201).json({ token });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : presentationConsts.AuthRegisterFailed;
+            res.status(400).json({ message: errorMessage });
+        }
+    }
 }
