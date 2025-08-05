@@ -1,9 +1,11 @@
-import {IUserService} from "../../presentation/common/interfaces/services/i-userService.ts";
 import {IUserRepository} from "../common/interfaces/repositories/i-userRepository.ts";
+import {IUserService} from "../../presentation/common/interfaces/services/i-userService.ts";
 import {User} from "../../domain/auth/user.entity.ts";
+import {serviceConsts} from "../common/consts.ts";
 
 export class UserService implements IUserService {
     #userRepo: IUserRepository;
+
     constructor(userRepo: IUserRepository) {
         this.#userRepo = userRepo;
     }
@@ -12,3 +14,5 @@ export class UserService implements IUserService {
         return await this.#userRepo.getAllUsers();
     }
 }
+
+

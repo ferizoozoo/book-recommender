@@ -70,6 +70,10 @@ export class AuthService implements IAuthService {
             refreshToken: newRefreshToken
         }
     }
+
+    async getUsers(): Promise<User[]> {
+        return await this.#userRepo.getAllUsers();
+    }
 }
 
 

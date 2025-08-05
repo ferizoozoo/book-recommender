@@ -4,7 +4,10 @@ import { UserRepository } from "../../infrastructure/database/typeorm/repositori
 import {BcryptHasher} from "../../infrastructure/security/bcrypt-hasher.ts";
 import {JwtTokenService} from "../../infrastructure/security/token.service.ts";
 import {AuthController} from "../controllers/authController.ts";
-import {UserService} from "../../services/auth/user.service.ts";
+import {UserService} from "../../services/auth/user.service";
+import {LibraryService} from "../../services/library/library.service.ts";
+import {LibraryController} from "../controllers/libraryController.ts";
+import {BookRepository} from "../../infrastructure/database/typeorm/repositories/bookRepository.ts";
 
 // NOTE: this is a very simple DI functionality for our purpose.
 //        if a more sophisticated DI functionality is needed, then we could
@@ -22,9 +25,15 @@ const authService = new AuthService(userRepository, hasher, tokenService);
 
 const authController = new AuthController(authService);
 
+// Library services
+const bookRepository = new BookRepository();
+const libraryService = new LibraryService(bookRepository);
+const libraryController = new LibraryController(libraryService);
+
 // export the registered services
 export {
     userController,
     authController,
+    libraryController,
     tokenService
 };

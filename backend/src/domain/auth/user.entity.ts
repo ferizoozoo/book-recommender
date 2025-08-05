@@ -3,6 +3,7 @@ import {IHasher} from "../common/interfaces/i-hasher.ts";
 import {UserClaims} from "./user-claims.value.ts";
 import {domainConsts} from "../common/consts.ts";
 
+// NOTE: the reason I didn't make the fields private and encapsulated is, "what is the point?"
 export class User implements IValidate {
     constructor(
         public id: number = 0,
