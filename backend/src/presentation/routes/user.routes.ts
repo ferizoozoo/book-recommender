@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import {userController} from "../../di/setup.ts";
+import {userController} from "../di/setup.ts";
 
 const userRouter = Router();
 

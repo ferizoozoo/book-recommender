@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
 import jwtConfig from "../../../infrastructure/config/auth.config.ts";
-import {tokenService} from "../../../di/setup.ts";
+import {tokenService} from "../../di/setup.ts";
 import {UserClaims} from "../../../domain/auth/user-claims.value.ts"; // NOTE: Well, we don't have any classes to inject the interface
 
 export interface AuthenticatedRequest extends Request {

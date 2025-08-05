@@ -1,10 +1,10 @@
 import 'dotenv/config';
 import "reflect-metadata"
-import applicationConfig from "./infrastructure/config/application.config.ts";
+import applicationConfig from "../infrastructure/config/application.config.ts";
 import express from 'express';
-import appRouter from './presentation/routes/index.ts';
-import AppDataSource from "./infrastructure/database/typeorm/main.ts";
-import {errorHandler} from "./presentation/common/middlewares/errorHandler.middleware.ts";
+import appRouter from './routes';
+import AppDataSource from "../infrastructure/database/typeorm/main.ts";
+import {errorHandler} from "./common/middlewares/errorHandler.middleware.ts";
 
 const app = express();
 const PORT = applicationConfig.port || 5000;
