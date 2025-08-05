@@ -95,7 +95,7 @@ export class CreateLibraryEntities1691251200000 implements MigrationInterface {
     // Create Book table
     await queryRunner.createTable(
       new Table({
-        name: "book",
+        name: "books",
         columns: [
           {
             name: "id",
@@ -172,42 +172,42 @@ export class CreateLibraryEntities1691251200000 implements MigrationInterface {
 
     // Add foreign key constraints
     await queryRunner.createForeignKey(
-      "book",
+      "books",
       new TableForeignKey({
         columnNames: ["authorId"],
         referencedColumnNames: ["id"],
-        referencedTableName: "author",
+        referencedTableName: "authors",
         onDelete: "CASCADE",
       })
     );
 
     await queryRunner.createForeignKey(
-      "book",
+      "books",
       new TableForeignKey({
         columnNames: ["publisherId"],
         referencedColumnNames: ["id"],
-        referencedTableName: "publisher",
+        referencedTableName: "publishers",
         onDelete: "CASCADE",
       })
     );
 
     // Add foreign key constraints for User relationships
     await queryRunner.createForeignKey(
-      "author",
+      "authors",
       new TableForeignKey({
         columnNames: ["userId"],
         referencedColumnNames: ["id"],
-        referencedTableName: "user",
+        referencedTableName: "users",
         onDelete: "SET NULL",
       })
     );
 
     await queryRunner.createForeignKey(
-      "publisher",
+      "publishers",
       new TableForeignKey({
         columnNames: ["userId"],
         referencedColumnNames: ["id"],
-        referencedTableName: "user",
+        referencedTableName: "users",
         onDelete: "SET NULL",
       })
     );
@@ -215,23 +215,23 @@ export class CreateLibraryEntities1691251200000 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Drop foreign keys first
-    const bookTable = await queryRunner.getTable("book");
-    const authorTable = await queryRunner.getTable("author");
-    const publisherTable = await queryRunner.getTable("publisher");
+    const bookTable = await queryRunner.getTable("books");
+    const authorTable = await queryRunner.getTable("authors");
+    const publisherTable = await queryRunner.getTable("publishers");
 
     if (bookTable) {
       const authorForeignKey = bookTable.foreignKeys.find(
         (fk) => fk.columnNames.indexOf("authorId") !== -1
       );
       if (authorForeignKey) {
-        await queryRunner.dropForeignKey("book", authorForeignKey);
+        await queryRunner.dropForeignKey("books", authorForeignKey);
       }
 
       const publisherForeignKey = bookTable.foreignKeys.find(
         (fk) => fk.columnNames.indexOf("publisherId") !== -1
       );
       if (publisherForeignKey) {
-        await queryRunner.dropForeignKey("book", publisherForeignKey);
+        await queryRunner.dropForeignKey("books", publisherForeignKey);
       }
     }
 
@@ -240,7 +240,7 @@ export class CreateLibraryEntities1691251200000 implements MigrationInterface {
         (fk) => fk.columnNames.indexOf("userId") !== -1
       );
       if (userForeignKey) {
-        await queryRunner.dropForeignKey("author", userForeignKey);
+        await queryRunner.dropForeignKey("authors", userForeignKey);
       }
     }
 
@@ -249,13 +249,13 @@ export class CreateLibraryEntities1691251200000 implements MigrationInterface {
         (fk) => fk.columnNames.indexOf("userId") !== -1
       );
       if (userForeignKey) {
-        await queryRunner.dropForeignKey("publisher", userForeignKey);
+        await queryRunner.dropForeignKey("publishers", userForeignKey);
       }
     }
 
     // Drop tables
-    await queryRunner.dropTable("book");
-    await queryRunner.dropTable("author");
-    await queryRunner.dropTable("publisher");
+    await queryRunner.dropTable("books");
+    await queryRunner.dropTable("authors");
+    await queryRunner.dropTable("publishers");
   }
 }
