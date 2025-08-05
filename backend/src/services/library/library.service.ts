@@ -1,143 +1,183 @@
-import { IBookRepository } from "../common/interfaces/repositories/i-bookRepository.ts";
-import { Book } from "../../domain/library/book.entity.ts";
-import { ILibraryService } from "../../presentation/common/interfaces/services/i-libraryService.ts";
-import { serviceConsts } from "../common/consts.ts";
+import { IBookRepository } from "../common/interfaces/repositories/i-bookRepository";
+import { IAuthorRepository } from "../common/interfaces/repositories/i-authorRepository";
+import { IPublisherRepository } from "../common/interfaces/repositories/i-publisherRepository";
+import { Book } from "../../domain/library/book.entity";
+import { Author } from "../../domain/library/author.entity";
+import { Publisher } from "../../domain/library/publisher.entity";
+import { ILibraryService } from "../../presentation/common/interfaces/services/i-libraryService";
+import { serviceConsts } from "../common/consts";
 
 export class LibraryService implements ILibraryService {
-    #bookRepo: IBookRepository;
+  #bookRepo: IBookRepository;
+  #authorRepo: IAuthorRepository;
+  #publisherRepo: IPublisherRepository;
 
-    constructor(bookRepo: IBookRepository) {
-        this.#bookRepo = bookRepo;
+  constructor(
+    bookRepo: IBookRepository,
+    authorRepo: IAuthorRepository,
+    publisherRepo: IPublisherRepository
+  ) {
+    this.#bookRepo = bookRepo;
+    this.#authorRepo = authorRepo;
+    this.#publisherRepo = publisherRepo;
+  }
+
+  async getAllBooks(): Promise<Book[]> {
+    return await this.#bookRepo.getAll();
+  }
+
+  async getBookById(id: number): Promise<Book | null> {
+    return await this.#bookRepo.getById(id);
+  }
+
+  async getBookByIsbn(isbn: string): Promise<Book | null> {
+    if (!isbn) {
+      throw new Error("ISBN is required");
+    }
+    return await this.#bookRepo.getByIsbn(isbn);
+  }
+
+  async addAuthor(author: Author): Promise<Author> {
+    if (!author.validate()) {
+      throw new Error(serviceConsts.AuthorValidationFailed);
     }
 
-    async getAllBooks(): Promise<Book[]> {
-        return await this.#bookRepo.getAll();
+    await this.#authorRepo.save(author);
+    const savedAuthor = await this.#authorRepo.getById(author.id);
+    if (!savedAuthor) {
+      throw new Error(serviceConsts.AuthorNotFound);
+    }
+    return savedAuthor;
+  }
+
+  async addPublisher(publisher: Publisher): Promise<Publisher> {
+    if (!publisher.validate()) {
+      throw new Error(serviceConsts.PublisherValidationFailed);
     }
 
-    async getBookById(id: number): Promise<Book | null> {
-        return await this.#bookRepo.getById(id);
+    await this.#publisherRepo.save(publisher);
+    const savedPublisher = await this.#publisherRepo.getById(publisher.id);
+    if (!savedPublisher) {
+      throw new Error(serviceConsts.PublisherNotFound);
+    }
+    return savedPublisher;
+  }
+
+  async addBook(book: Book): Promise<void> {
+    if (!book.validate()) {
+      throw new Error(serviceConsts.BookValidationFailed);
     }
 
-    async getBookByIsbn(isbn: string): Promise<Book | null> {
-        if (!isbn) {
-            throw new Error("ISBN is required");
-        }
-        return await this.#bookRepo.getByIsbn(isbn);
+    const existingBook = await this.#bookRepo.getByIsbn(book.isbn);
+    if (existingBook) {
+      throw new Error(serviceConsts.BookAlreadyExists);
     }
 
-    async addBook(book: Book): Promise<void> {
-        if (!book.title || !book.isbn) {
-            throw new Error("Book title and ISBN are required");
-        }
+    await this.#bookRepo.save(book);
+  }
 
-        const existingBook = await this.#bookRepo.getByIsbn(book.isbn);
-        if (existingBook) {
-            throw new Error("A book with this ISBN already exists");
-        }
-
-        await this.#bookRepo.save(book);
+  async updateBook(book: Book): Promise<void> {
+    if (!book.id) {
+      throw new Error("Book ID is required for updates");
     }
 
-    async updateBook(book: Book): Promise<void> {
-        if (!book.id) {
-            throw new Error("Book ID is required for updates");
-        }
-
-        const existingBook = await this.#bookRepo.getById(book.id);
-        if (!existingBook) {
-            throw new Error("Book not found");
-        }
-
-        await this.#bookRepo.update(book);
+    const existingBook = await this.#bookRepo.getById(book.id);
+    if (!existingBook) {
+      throw new Error("Book not found");
     }
 
-    async deleteBook(id: number): Promise<void> {
-        const existingBook = await this.#bookRepo.getById(id);
-        if (!existingBook) {
-            throw new Error("Book not found");
-        }
+    await this.#bookRepo.update(book);
+  }
 
-        await this.#bookRepo.delete(id);
+  async deleteBook(id: number): Promise<void> {
+    const existingBook = await this.#bookRepo.getById(id);
+    if (!existingBook) {
+      throw new Error("Book not found");
     }
 
-    async searchBooks(query: string): Promise<Book[]> {
-        if (!query) {
-            throw new Error("Search query is required");
-        }
-        return await this.#bookRepo.search(query);
+    await this.#bookRepo.delete(id);
+  }
+
+  async searchBooks(query: string): Promise<Book[]> {
+    if (!query) {
+      throw new Error("Search query is required");
+    }
+    return await this.#bookRepo.search(query);
+  }
+
+  async addLabelToBook(bookId: number, label: string): Promise<void> {
+    if (!label) {
+      throw new Error("Label is required");
     }
 
-    async addLabelToBook(bookId: number, label: string): Promise<void> {
-        if (!label) {
-            throw new Error("Label is required");
-        }
-
-        const book = await this.#bookRepo.getById(bookId);
-        if (!book) {
-            throw new Error("Book not found");
-        }
-
-        if (!book.labels) {
-            book.labels = [];
-        }
-
-        if (!book.labels.includes(label)) {
-            book.labels.push(label);
-            await this.#bookRepo.update(book);
-        }
+    const book = await this.#bookRepo.getById(bookId);
+    if (!book) {
+      throw new Error("Book not found");
     }
 
-    async removeLabelFromBook(bookId: number, label: string): Promise<void> {
-        const book = await this.#bookRepo.getById(bookId);
-        if (!book) {
-            throw new Error("Book not found");
-        }
-
-        if (book.labels && book.labels.includes(label)) {
-            book.labels = book.labels.filter(l => l !== label);
-            await this.#bookRepo.update(book);
-        }
+    if (!book.labels) {
+      book.labels = [];
     }
 
-    async getBooksByLabel(label: string): Promise<Book[]> {
-        if (!label) {
-            throw new Error("Label is required");
-        }
+    if (!book.labels.includes(label)) {
+      book.labels.push(label);
+      await this.#bookRepo.update(book);
+    }
+  }
 
-        const allBooks = await this.#bookRepo.getAll();
-        return allBooks.filter(book => book.labels && book.labels.includes(label));
+  async removeLabelFromBook(bookId: number, label: string): Promise<void> {
+    const book = await this.#bookRepo.getById(bookId);
+    if (!book) {
+      throw new Error("Book not found");
     }
 
-    async orderBook(bookId: number, userId: string): Promise<void> {
-        const book = await this.#bookRepo.getById(bookId);
-        if (!book) {
-            throw new Error("Book not found");
-        }
+    if (book.labels && book.labels.includes(label)) {
+      book.labels = book.labels.filter((l) => l !== label);
+      await this.#bookRepo.update(book);
+    }
+  }
 
-        if (!book.available || book.quantity < 1) {
-            throw new Error("Book is not available for ordering");
-        }
-
-        // Update book quantity and availability
-        book.quantity--;
-        book.available = book.quantity > 0;
-        await this.#bookRepo.update(book);
-
-        // In a real implementation, you would save the order to an order repository
-        // For now, we're just updating the book quantity
+  async getBooksByLabel(label: string): Promise<Book[]> {
+    if (!label) {
+      throw new Error("Label is required");
     }
 
-    async returnBook(bookId: number): Promise<void> {
-        const book = await this.#bookRepo.getById(bookId);
-        if (!book) {
-            throw new Error("Book not found");
-        }
+    const allBooks = await this.#bookRepo.getAll();
+    return allBooks.filter(
+      (book) => book.labels && book.labels.includes(label)
+    );
+  }
 
-        // Update book quantity and availability
-        book.quantity++;
-        book.available = true;
-        await this.#bookRepo.update(book);
-
-        // In a real implementation, you would update the order status
+  async orderBook(bookId: number, userId: string): Promise<void> {
+    const book = await this.#bookRepo.getById(bookId);
+    if (!book) {
+      throw new Error("Book not found");
     }
+
+    if (!book.available || book.quantity < 1) {
+      throw new Error("Book is not available for ordering");
+    }
+
+    // Update book quantity and availability
+    book.quantity--;
+    book.available = book.quantity > 0;
+    await this.#bookRepo.update(book);
+
+    // In a real implementation, you would save the order to an order repository
+    // For now, we're just updating the book quantity
+  }
+
+  async returnBook(bookId: number): Promise<void> {
+    const book = await this.#bookRepo.getById(bookId);
+    if (!book) {
+      throw new Error("Book not found");
+    }
+
+    // Update book quantity and availability
+    book.quantity++;
+    book.available = true;
+    await this.#bookRepo.update(book);
+
+    // In a real implementation, you would update the order status
+  }
 }

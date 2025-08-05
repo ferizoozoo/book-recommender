@@ -23,7 +23,7 @@ export class AuthorEntity {
   books: BookEntity[];
 
   @ManyToOne(() => UserEntity)
-  @JoinColumn({ name: "user_id" })
+  @JoinColumn({ name: "userId" })
   user: UserEntity;
 }
 
@@ -54,7 +54,7 @@ export class PublisherEntity {
   books: BookEntity[];
 
   @ManyToOne(() => UserEntity)
-  @JoinColumn({ name: "user_id" })
+  @JoinColumn({ name: "userId" })
   user: UserEntity;
 }
 
@@ -104,10 +104,10 @@ export class BookEntity {
   numberOfReviews: number;
 
   @ManyToOne(() => AuthorEntity, (author) => author.books)
-  @JoinColumn({ name: "author_id" })
+  @JoinColumn({ name: "authorId" })
   author: AuthorEntity;
 
   @ManyToOne(() => PublisherEntity, (publisher) => publisher.books)
-  @JoinColumn({ name: "publisher_id" })
+  @JoinColumn({ name: "publisherId" })
   publisher: PublisherEntity;
 }

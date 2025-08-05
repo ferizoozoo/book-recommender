@@ -4,6 +4,7 @@ import { presentationConsts } from "../common/consts";
 import { Book } from "../../domain/library/book.entity";
 import { Author } from "../../domain/library/author.entity";
 import { Publisher } from "../../domain/library/publisher.entity";
+import { User } from "../../domain/auth/user.entity";
 
 export class LibraryController {
   #libraryService: ILibraryService;
@@ -102,20 +103,43 @@ export class LibraryController {
         return;
       }
 
-      const defaultAuthor =
-        author instanceof Author ? author : new Author(0, String(author));
-      const defaultPublisher =
+      const [firstName, lastName] = author.split(" ");
+      if (!firstName || !lastName) {
+        res
+          .status(400)
+          .json({ message: presentationConsts.LibraryAuthorNameRequired });
+        return;
+      }
+
+      const newAuthor =
+        author instanceof Author
+          ? author
+          : new Author(
+              0,
+              String(author),
+              "",
+              [],
+              new User(0, firstName, lastName, "", "")
+            );
+
+      const savedAuthor = await this.#libraryService.addAuthor(newAuthor);
+
+      const newPublisher =
         req.body.publisher instanceof Publisher
           ? req.body.publisher
           : new Publisher(0, "");
 
+      const savedPublisher = await this.#libraryService.addPublisher(
+        newPublisher
+      );
+
       const book = new Book(
         0, // ID will be set by the database
         title || "",
-        defaultAuthor,
+        savedAuthor,
         "", // description
         isbn || "",
-        defaultPublisher,
+        savedPublisher,
         new Date().getFullYear(), // default to current year
         "", // image
         0, // rating

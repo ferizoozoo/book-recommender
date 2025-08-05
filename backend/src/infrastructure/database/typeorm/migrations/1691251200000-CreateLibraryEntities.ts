@@ -12,7 +12,7 @@ export class CreateLibraryEntities1691251200000 implements MigrationInterface {
     // Create Author table
     await queryRunner.createTable(
       new Table({
-        name: "author",
+        name: "authors",
         columns: [
           {
             name: "id",
@@ -44,7 +44,7 @@ export class CreateLibraryEntities1691251200000 implements MigrationInterface {
     // Create Publisher table
     await queryRunner.createTable(
       new Table({
-        name: "publisher",
+        name: "publishers",
         columns: [
           {
             name: "id",

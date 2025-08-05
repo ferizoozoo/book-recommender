@@ -1,5 +1,21 @@
 export const serviceConsts = {
-   AuthEmailAndPasswordRequired: 'Email and password are required',
-   AuthEmailAlreadyRegistered: 'Email already registered',
-   AuthInvalidEmailAndPassword: 'Invalid email and password',
-}
+  // Auth related constants
+  AuthEmailAndPasswordRequired: "Email and password are required",
+  AuthEmailAlreadyRegistered: "Email already registered",
+  AuthInvalidEmailAndPassword: "Invalid email and password",
+
+  // Book related constants
+  BookValidationFailed: "Book validation failed",
+  BookAlreadyExists: "A book with this ISBN already exists",
+  BookNotFound: "Book not found",
+
+  // Author related constants
+  AuthorValidationFailed: "Author validation failed",
+  AuthorNotFound: "Author not found",
+  AuthorAlreadyExists: "Author already exists",
+
+  // Publisher related constants
+  PublisherValidationFailed: "Publisher validation failed",
+  PublisherNotFound: "Publisher not found",
+  PublisherAlreadyExists: "Publisher already exists",
+};

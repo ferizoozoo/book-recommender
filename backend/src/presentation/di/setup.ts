@@ -1,13 +1,15 @@
-import { AuthService } from '../../services/auth/auth.service.ts';
-import { UserController } from '../controllers/userController.ts';
+import { AuthService } from "../../services/auth/auth.service.ts";
+import { UserController } from "../controllers/userController.ts";
 import { UserRepository } from "../../infrastructure/database/typeorm/repositories/userRepository.ts";
-import {BcryptHasher} from "../../infrastructure/security/bcrypt-hasher.ts";
-import {JwtTokenService} from "../../infrastructure/security/token.service.ts";
-import {AuthController} from "../controllers/authController.ts";
-import {UserService} from "../../services/auth/user.service";
-import {LibraryService} from "../../services/library/library.service.ts";
-import {LibraryController} from "../controllers/libraryController.ts";
-import {BookRepository} from "../../infrastructure/database/typeorm/repositories/bookRepository.ts";
+import { BcryptHasher } from "../../infrastructure/security/bcrypt-hasher.ts";
+import { JwtTokenService } from "../../infrastructure/security/token.service.ts";
+import { AuthController } from "../controllers/authController.ts";
+import { UserService } from "../../services/auth/user.service";
+import { LibraryService } from "../../services/library/library.service.ts";
+import { LibraryController } from "../controllers/libraryController.ts";
+import { BookRepository } from "../../infrastructure/database/typeorm/repositories/bookRepository.ts";
+import { AuthorRepository } from "../../infrastructure/database/typeorm/repositories/authorRepository.ts";
+import { PublisherRepository } from "../../infrastructure/database/typeorm/repositories/publisherRepository.ts";
 
 // NOTE: this is a very simple DI functionality for our purpose.
 //        if a more sophisticated DI functionality is needed, then we could
@@ -27,13 +29,14 @@ const authController = new AuthController(authService);
 
 // Library services
 const bookRepository = new BookRepository();
-const libraryService = new LibraryService(bookRepository);
+const authorRepository = new AuthorRepository();
+const publisherRepository = new PublisherRepository();
+const libraryService = new LibraryService(
+  bookRepository,
+  authorRepository,
+  publisherRepository
+);
 const libraryController = new LibraryController(libraryService);
 
 // export the registered services
-export {
-    userController,
-    authController,
-    libraryController,
-    tokenService
-};
+export { userController, authController, libraryController, tokenService };
