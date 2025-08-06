@@ -6,20 +6,24 @@ import { Author } from "../../domain/library/author.entity";
 import { Publisher } from "../../domain/library/publisher.entity";
 import { ILibraryService } from "../../presentation/common/interfaces/services/i-libraryService";
 import { serviceConsts } from "../common/consts";
+import { IUserRepository } from "../common/interfaces/repositories/i-userRepository";
 
 export class LibraryService implements ILibraryService {
   #bookRepo: IBookRepository;
   #authorRepo: IAuthorRepository;
   #publisherRepo: IPublisherRepository;
+  #userRepo: IUserRepository;
 
   constructor(
     bookRepo: IBookRepository,
     authorRepo: IAuthorRepository,
-    publisherRepo: IPublisherRepository
+    publisherRepo: IPublisherRepository,
+    userRepo: IUserRepository
   ) {
     this.#bookRepo = bookRepo;
     this.#authorRepo = authorRepo;
     this.#publisherRepo = publisherRepo;
+    this.#userRepo = userRepo;
   }
 
   async getAllBooks(): Promise<Book[]> {
@@ -193,5 +197,21 @@ export class LibraryService implements ILibraryService {
     await this.#bookRepo.update(book);
 
     // In a real implementation, you would update the order status
+  }
+
+  // TODO: maybe we should use a separate service for user-related operations
+  // to avoid tight coupling between library and user services.
+  async likeBook(userId: number, bookId: number): Promise<void> {
+    const book = await this.#bookRepo.getById(bookId);
+    if (!book) {
+      throw new Error("Book not found");
+    }
+
+    const user = await this.#userRepo.getById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    await this.#bookRepo.likeBook(user, book);
   }
 }

@@ -34,7 +34,8 @@ const publisherRepository = new PublisherRepository();
 const libraryService = new LibraryService(
   bookRepository,
   authorRepository,
-  publisherRepository
+  publisherRepository,
+  userRepository
 );
 const libraryController = new LibraryController(libraryService);
 

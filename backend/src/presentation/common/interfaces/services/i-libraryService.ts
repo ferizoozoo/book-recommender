@@ -25,4 +25,5 @@ export interface ILibraryService {
   getBooksByLabel(label: string): Promise<Book[]>;
   orderBook(bookId: number, userId: string): Promise<void>;
   returnBook(bookId: number): Promise<void>;
+  likeBook(userId: number, bookId: number): Promise<void>;
 }

@@ -1,4 +1,4 @@
-import { BookEntity } from "../models/library.models";
+import { BookEntity, UserBookLikeEntity } from "../models/library.models";
 import AppDataSource from "..";
 import { Like, Repository } from "typeorm";
 import { Book } from "../../../../domain/library/book.entity";
@@ -10,16 +10,19 @@ import {
   mapBookEntitiesToDomain,
 } from "../models/mappers/library.mapper";
 import { IBookRepository } from "../../../../services/common/interfaces/repositories/i-bookRepository";
+import { UserEntity } from "../models/auth.models";
 
 export class BookRepository implements IBookRepository {
-  private repository: Repository<BookEntity>;
+  private bookRepository: Repository<BookEntity>;
+  private readonly bookLikeRepository: Repository<UserBookLikeEntity>;
 
   constructor() {
-    this.repository = AppDataSource.getRepository(BookEntity);
+    this.bookRepository = AppDataSource.getRepository(BookEntity);
+    this.bookLikeRepository = AppDataSource.getRepository(UserBookLikeEntity);
   }
 
   async getById(id: number): Promise<Book | null> {
-    const bookEntity = await this.repository.findOne({
+    const bookEntity = await this.bookRepository.findOne({
       where: { id },
       relations: ["author", "publisher"],
     });
@@ -27,14 +30,14 @@ export class BookRepository implements IBookRepository {
   }
 
   async getAll(): Promise<Book[]> {
-    const bookEntities = await this.repository.find({
+    const bookEntities = await this.bookRepository.find({
       relations: ["author", "publisher"],
     });
     return bookEntities.map((entity) => this.mapToDomain(entity));
   }
 
   async getByAuthorId(authorId: number): Promise<Book[]> {
-    const bookEntities = await this.repository.find({
+    const bookEntities = await this.bookRepository.find({
       where: { author: { id: authorId } },
       relations: ["author", "publisher"],
     });
@@ -42,7 +45,7 @@ export class BookRepository implements IBookRepository {
   }
 
   async getByPublisherId(publisherId: number): Promise<Book[]> {
-    const bookEntities = await this.repository.find({
+    const bookEntities = await this.bookRepository.find({
       where: { publisher: { id: publisherId } },
       relations: ["author", "publisher"],
     });
@@ -50,7 +53,7 @@ export class BookRepository implements IBookRepository {
   }
 
   async getByIsbn(isbn: string): Promise<Book | null> {
-    const bookEntity = await this.repository.findOne({
+    const bookEntity = await this.bookRepository.findOne({
       where: { isbn },
       relations: ["author", "publisher"],
     });
@@ -59,22 +62,22 @@ export class BookRepository implements IBookRepository {
 
   async save(book: Book): Promise<void> {
     const bookEntity = this.mapToEntity(book);
-    await this.repository.save(bookEntity);
+    await this.bookRepository.save(bookEntity);
   }
 
   async delete(id: number): Promise<void> {
-    await this.repository.delete(id);
+    await this.bookRepository.delete(id);
   }
 
   async update(book: Book): Promise<void> {
     const bookEntity = this.mapToEntity(book);
-    await this.repository.save(bookEntity);
+    await this.bookRepository.save(bookEntity);
   }
 
   async search(query: string): Promise<Book[]> {
     // Simple implementation that searches title and description
     // A more robust implementation would use full-text search
-    const bookEntities = await this.repository
+    const bookEntities = await this.bookRepository
       .createQueryBuilder("book")
       .leftJoinAndSelect("book.author", "author")
       .leftJoinAndSelect("book.publisher", "publisher")
@@ -84,6 +87,16 @@ export class BookRepository implements IBookRepository {
       .getMany();
 
     return bookEntities.map((entity) => this.mapToDomain(entity));
+  }
+
+  async likeBook(user: UserEntity, book: BookEntity): Promise<void> {
+    const like = new UserBookLikeEntity();
+    if (!user || !book) {
+      throw new Error("User and Book are required to like a book");
+    }
+    like.user = user;
+    like.book = book;
+    await this.bookLikeRepository.save(like);
   }
 
   private mapToDomain(entity: BookEntity): Book {

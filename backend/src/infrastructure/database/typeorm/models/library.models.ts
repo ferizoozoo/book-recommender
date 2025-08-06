@@ -107,3 +107,21 @@ export class BookEntity {
   @JoinColumn({ name: "publisherId" })
   publisher: PublisherEntity;
 }
+
+// TODO: maybe we should use a separate entity for user-related operations
+// like/dislike, to avoid tight coupling between library and user entities.
+// this is a simple implementation for demonstration purposes and an ACL between users and books
+// could be implemented later.
+@Entity("UserBookLikes")
+export class UserBookLikeEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ name: "userId" })
+  user: UserEntity;
+
+  @ManyToOne(() => BookEntity)
+  @JoinColumn({ name: "bookId" })
+  book: BookEntity;
+}

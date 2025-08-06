@@ -40,4 +40,16 @@ export class UserRepository implements IUserRepository {
     });
     return users;
   }
+
+  async getById(id: number): Promise<User | null> {
+    const userEntity = await this.#users.findOne({
+      where: { id: id },
+    });
+
+    if (!userEntity) {
+      return null;
+    }
+
+    return mapUserEntityToDomain(userEntity);
+  }
 }

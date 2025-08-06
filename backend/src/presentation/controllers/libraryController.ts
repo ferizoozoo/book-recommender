@@ -190,7 +190,9 @@ export class LibraryController {
       book.labels = [];
 
       await this.#libraryService.addBook(book);
-      res.status(201).json({ message: "Book added successfully", isbn });
+      res
+        .status(201)
+        .json({ message: presentationConsts.LibraryBookAdded, isbn });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to add book";
@@ -249,7 +251,7 @@ export class LibraryController {
       updatedBook.labels = existingBook.labels;
 
       await this.#libraryService.updateBook(updatedBook);
-      res.status(200).json({ message: "Book updated successfully" });
+      res.status(200).json({ message: presentationConsts.LibraryBookUpdated });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to update book";
@@ -272,7 +274,7 @@ export class LibraryController {
       }
 
       await this.#libraryService.deleteBook(bookId);
-      res.status(200).json({ message: "Book deleted successfully" });
+      res.status(200).json({ message: presentationConsts.LibraryBookDeleted });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to delete book";
@@ -288,7 +290,9 @@ export class LibraryController {
     try {
       const { query } = req.query;
       if (!query || typeof query !== "string") {
-        res.status(400).json({ message: "Search query is required" });
+        res
+          .status(400)
+          .json({ message: presentationConsts.LibraryBookDetailsRequired });
         return;
       }
 
@@ -324,7 +328,7 @@ export class LibraryController {
       }
 
       await this.#libraryService.addLabelToBook(bookId, label);
-      res.status(200).json({ message: "Label added successfully" });
+      res.status(200).json({ message: presentationConsts.LibraryLabelAdded });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to add label";
@@ -355,7 +359,7 @@ export class LibraryController {
       }
 
       await this.#libraryService.removeLabelFromBook(bookId, label);
-      res.status(200).json({ message: "Label removed successfully" });
+      res.status(200).json({ message: presentationConsts.LibraryLabelRemoved });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to remove label";
@@ -405,12 +409,14 @@ export class LibraryController {
       // In a real app, userId would come from authenticated user session
       const { userId } = req.body;
       if (!userId) {
-        res.status(400).json({ message: "User ID is required" });
+        res
+          .status(400)
+          .json({ message: presentationConsts.LibraryUserIdRequired });
         return;
       }
 
       await this.#libraryService.orderBook(bookId, userId);
-      res.status(200).json({ message: "Book ordered successfully" });
+      res.status(200).json({ message: presentationConsts.LibraryBookOrdered });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to order book";
@@ -433,10 +439,41 @@ export class LibraryController {
       }
 
       await this.#libraryService.returnBook(bookId);
-      res.status(200).json({ message: "Book returned successfully" });
+      res.status(200).json({ message: presentationConsts.LibraryBookReturned });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to return book";
+      res.status(400).json({ message: errorMessage });
+    }
+  }
+
+  async likeBook(
+    req: Request,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    try {
+      const bookId = parseInt(req.params.id);
+      if (isNaN(bookId)) {
+        res
+          .status(400)
+          .json({ message: presentationConsts.LibraryInvalidBookId });
+        return;
+      }
+
+      const { userId } = req.body;
+      if (!userId) {
+        res
+          .status(400)
+          .json({ message: presentationConsts.LibraryUserIdRequired });
+        return;
+      }
+
+      await this.#libraryService.likeBook(bookId, userId);
+      res.status(200).json({ message: presentationConsts.LibraryBookLiked });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to like book";
       res.status(400).json({ message: errorMessage });
     }
   }
