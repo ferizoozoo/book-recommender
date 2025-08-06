@@ -6,7 +6,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { UserEntity } from "./auth.models";
+import { UserEntity } from "./auth.models.ts";
 
 @Entity("authors")
 export class AuthorEntity {
@@ -52,10 +52,6 @@ export class PublisherEntity {
 
   @OneToMany(() => BookEntity, (book) => book.publisher)
   books: BookEntity[];
-
-  @ManyToOne(() => UserEntity)
-  @JoinColumn({ name: "userId" })
-  user: UserEntity;
 }
 
 @Entity("books")

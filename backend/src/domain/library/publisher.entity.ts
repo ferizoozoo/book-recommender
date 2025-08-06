@@ -1,7 +1,5 @@
 import { IValidate } from "../common/interfaces/i-validate";
 import { domainConsts } from "../common/consts";
-import { User } from "../auth/user.entity";
-import { Author } from "./author.entity";
 import { Book } from "./book.entity";
 
 // NOTE: the reason I didn't make the fields private and encapsulated is, "what is the point?"
@@ -14,8 +12,7 @@ export class Publisher implements IValidate {
     public state: string = "",
     public zip: string = "",
     public country: string = "",
-    public books: Book[] = [],
-    public user: User = new User()
+    public books: Book[] = []
   ) {}
 
   // TODO: maybe this validate method should be replaced with decorators.

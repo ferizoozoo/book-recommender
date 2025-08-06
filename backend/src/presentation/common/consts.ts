@@ -14,4 +14,6 @@ export const presentationConsts = {
   LibraryBookAlreadyExists: "Book with this ISBN already exists",
   LibraryBookNotAvailable: "Book is not available for ordering",
   LibraryAuthorNameRequired: "Author first and last name are required",
+  LibraryAuthorNotFound: "Author not found",
+  LibraryPublisherNotFound: "Publisher not found",
 };

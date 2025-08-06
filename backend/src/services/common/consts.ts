@@ -13,9 +13,11 @@ export const serviceConsts = {
   AuthorValidationFailed: "Author validation failed",
   AuthorNotFound: "Author not found",
   AuthorAlreadyExists: "Author already exists",
+  AuthorIdNonNegative: "Author ID must be non-negative",
 
   // Publisher related constants
   PublisherValidationFailed: "Publisher validation failed",
   PublisherNotFound: "Publisher not found",
   PublisherAlreadyExists: "Publisher already exists",
+  PublisherIdNonNegative: "Publisher ID must be non-negative",
 };

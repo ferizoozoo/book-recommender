@@ -9,10 +9,10 @@
     "start": "node dist/index.js",
     "dev": "nodemon src/presentation/index.ts",
     "build": "tsc",
-    "typeorm": "npm run build && node --loader ts-node/esm --experimental-specifier-resolution=node ./node_modules/typeorm/cli.js --dataSource src/infrastructure/database/typeorm/index.ts",
-    "migration:create": "npm run typeorm -- migration:create",
-    "migration:run": "npm run typeorm -- migration:run",
-    "migration:revert": "npm run typeorm -- migration:revert"
+    "typeorm": "typeorm-ts-node-esm -d src/infrastructure/database/typeorm/index.ts",
+    "migration:create": "npm run typeorm migration:create src/infrastructure/database/typeorm/migrations/",
+    "migration:run": "npm run typeorm migration:run",
+    "migration:revert": "npm run typeorm migration:revert"
   },
   "keywords": [],
   "author": "",

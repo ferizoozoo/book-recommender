@@ -50,6 +50,13 @@ export class LibraryService implements ILibraryService {
     return savedAuthor;
   }
 
+  async getAuthorById(authorId: number): Promise<Author | null> {
+    if (authorId < 0) {
+      throw new Error(serviceConsts.AuthorIdNonNegative);
+    }
+    return await this.#authorRepo.getById(authorId);
+  }
+
   async addPublisher(publisher: Publisher): Promise<Publisher> {
     if (!publisher.validate()) {
       throw new Error(serviceConsts.PublisherValidationFailed);
@@ -61,6 +68,13 @@ export class LibraryService implements ILibraryService {
       throw new Error(serviceConsts.PublisherNotFound);
     }
     return savedPublisher;
+  }
+
+  async getPublisherById(publisherId: number): Promise<Publisher | null> {
+    if (publisherId < 0) {
+      throw new Error(serviceConsts.PublisherIdNonNegative);
+    }
+    return await this.#publisherRepo.getById(publisherId);
   }
 
   async addBook(book: Book): Promise<void> {

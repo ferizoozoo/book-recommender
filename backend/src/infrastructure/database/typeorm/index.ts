@@ -1,4 +1,4 @@
-import { DataSource } from "typeorm"
+import { DataSource } from "typeorm";
 import typeORMConfig from "../../config/database.config.ts";
 
 // TODO: for now, the db is initialized whenever it is imported anywhere, either in repo or elsewhere.
@@ -6,12 +6,14 @@ import typeORMConfig from "../../config/database.config.ts";
 //       and used everywhere.
 
 const AppDataSource = new DataSource({
-    ...typeORMConfig,
-    entities: ['src/infrastructure/database/typeorm/models/*.ts'],
-    migrations: [
-        "src/infrastructure/database/typeorm/migrations/*.ts"
-    ],
-    migrationsTableName: "custom_migration_table",
-})
+  ...typeORMConfig,
+  entities: [
+    process.cwd() + "/src/infrastructure/database/typeorm/models/*.{ts,js}",
+  ],
+  migrations: [
+    process.cwd() + "/src/infrastructure/database/typeorm/migrations/*.{ts,js}",
+  ],
+  migrationsTableName: "custom_migration_table",
+});
 
 export default AppDataSource;

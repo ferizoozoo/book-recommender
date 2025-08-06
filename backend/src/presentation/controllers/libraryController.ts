@@ -13,6 +13,54 @@ export class LibraryController {
     this.#libraryService = libraryService;
   }
 
+  async addAuthor(
+    req: Request,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    try {
+      const { id, bio, image } = req.body;
+      if (!id || !bio || !image) {
+        res
+          .status(400)
+          .json({ message: presentationConsts.LibraryAuthorNameRequired });
+        return;
+      }
+
+      const author = new Author(id, bio, image, [], new User());
+      const savedAuthor = await this.#libraryService.addAuthor(author);
+      res.status(201).json({ author: savedAuthor });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to add author";
+      res.status(400).json({ message: errorMessage });
+    }
+  }
+
+  async addPublisher(
+    req: Request,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    try {
+      const { id, name, address } = req.body;
+      if (!id || !name || !address) {
+        res
+          .status(400)
+          .json({ message: presentationConsts.LibraryPublisherNotFound });
+        return;
+      }
+
+      const publisher = new Publisher(id, name, address);
+      const savedPublisher = await this.#libraryService.addPublisher(publisher);
+      res.status(201).json({ publisher: savedPublisher });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to add publisher";
+      res.status(400).json({ message: errorMessage });
+    }
+  }
+
   async getAllBooks(
     req: Request,
     res: Response,
@@ -88,58 +136,48 @@ export class LibraryController {
     }
   }
 
+  // TODO: for now, we are using the Book entity directly in the controller.
+  //       In a real application, we might want to use a DTO (Data Transfer Object)
+  //       to avoid exposing domain entities directly.
   async addBook(
     req: Request,
     res: Response,
     nextFunction: NextFunction
   ): Promise<void> {
     try {
-      const { title, author, isbn, quantity } = req.body;
+      const { title, authorId, publisherId, isbn, quantity } = req.body;
 
-      if (!title || !author || !isbn) {
+      if (!title || !authorId || !publisherId || !isbn) {
         res
           .status(400)
           .json({ message: presentationConsts.LibraryBookDetailsRequired });
         return;
       }
-
-      const [firstName, lastName] = author.split(" ");
-      if (!firstName || !lastName) {
+      const author = await this.#libraryService.getAuthorById(authorId);
+      if (!author) {
         res
-          .status(400)
-          .json({ message: presentationConsts.LibraryAuthorNameRequired });
+          .status(404)
+          .json({ message: presentationConsts.LibraryAuthorNotFound });
         return;
       }
 
-      const newAuthor =
-        author instanceof Author
-          ? author
-          : new Author(
-              0,
-              String(author),
-              "",
-              [],
-              new User(0, firstName, lastName, "", "")
-            );
-
-      const savedAuthor = await this.#libraryService.addAuthor(newAuthor);
-
-      const newPublisher =
-        req.body.publisher instanceof Publisher
-          ? req.body.publisher
-          : new Publisher(0, "");
-
-      const savedPublisher = await this.#libraryService.addPublisher(
-        newPublisher
+      const publisher = await this.#libraryService.getPublisherById(
+        publisherId
       );
+      if (!publisher) {
+        res
+          .status(404)
+          .json({ message: presentationConsts.LibraryPublisherNotFound });
+        return;
+      }
 
       const book = new Book(
         0, // ID will be set by the database
         title || "",
-        savedAuthor,
+        author,
         "", // description
         isbn || "",
-        savedPublisher,
+        publisher,
         new Date().getFullYear(), // default to current year
         "", // image
         0, // rating

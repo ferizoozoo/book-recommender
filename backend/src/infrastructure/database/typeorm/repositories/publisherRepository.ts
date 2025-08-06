@@ -63,29 +63,6 @@ export class PublisherRepository implements IPublisherRepository {
     );
   }
 
-  async getByUserId(userId: number): Promise<Publisher | null> {
-    const publisherEntity = await this.#publishers.findOne({
-      where: { user: { id: userId } },
-      relations: ["user"],
-    });
-
-    if (!publisherEntity) {
-      return null;
-    }
-
-    const publisher = mapPublisherEntityToDomain(publisherEntity);
-
-    // Load books separately
-    const bookEntities = await this.#books.find({
-      where: { publisher: { id: publisher.id } },
-      relations: ["author"],
-    });
-
-    publisher.books = mapBookEntitiesToDomain(bookEntities);
-
-    return publisher;
-  }
-
   async save(publisher: Publisher): Promise<void> {
     const publisherEntity = mapPublisherDomainToModel(publisher);
     await this.#publishers.save(publisherEntity);
