@@ -6,6 +6,9 @@ import { Author } from "../../domain/library/author.entity";
 import { Publisher } from "../../domain/library/publisher.entity";
 import { User } from "../../domain/auth/user.entity";
 
+// TODO: this controller methods have a lot of code that should be done at the
+//        service/application layer. A refactor is needed to move this logic
+//        into the appropriate layer.
 export class LibraryController {
   #libraryService: ILibraryService;
 
