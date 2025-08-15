@@ -11,25 +11,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useAuthContext } from "@/contexts/auth-context";
-import type { SignUpData } from "../layout/auth/login";
 
-interface LoginData {
+interface SignupData {
   email: string;
   password: string;
+  retypePassword: string;
 }
 
-interface LoginFormProps extends React.ComponentProps<"div"> {
+interface SignupFormProps extends React.ComponentProps<"div"> {
   className?: string;
-  handlesubmit: (loginData: LoginData) => Promise<void>;
+  handlesubmit: (signupData: SignupData) => Promise<void>;
 }
 
-const LoginForm = ({ className, ...props }: LoginFormProps) => {
+const SignupForm = ({ className, ...props }: SignupFormProps) => {
   const handleSubmit = props!.handlesubmit;
 
   const { login } = useAuthContext();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [retypePassword, setRetypePassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,17 +42,34 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
     setPassword(event.target.value);
   };
 
+  const handleRetypePasswordChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRetypePassword(event.target.value);
+  };
+
+  const handleSignup = () => {
+    if (password !== retypePassword) {
+      setError("Passwords do not match");
+      return;
+    }
+    setError(null);
+    handleSubmit({ email, password });
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="bg-slate-800 border-slate-700 text-amber-50">
         <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
+          <CardTitle>Create your account</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Enter your email below to create a new account
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={() => handleSubmit({ email, password })}>
+          <form
+            onSubmit={() => handleSignup({ email, password, retypePassword })}
+          >
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="email">Email</Label>
@@ -66,15 +84,7 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
                 />
               </div>
               <div className="grid gap-3">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
+                <Label htmlFor="email">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -83,18 +93,22 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
                   onChange={handlePasswordChange}
                 />
               </div>
+              <div className="grid gap-3">
+                <Label htmlFor="retype-password">Retype Password</Label>
+                <Input
+                  id="retype-password"
+                  type="password"
+                  required
+                  value={retypePassword}
+                  onChange={handleRetypePasswordChange}
+                />
+              </div>
               {error && <div className="text-red-500 text-sm">{error}</div>}
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Logging in..." : "Login"}
+                  {isLoading ? "Creating account..." : "Create Account"}
                 </Button>
               </div>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <a href="/register" className="underline underline-offset-4">
-                Sign up
-              </a>
             </div>
           </form>
         </CardContent>
@@ -103,4 +117,4 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
   );
 };
 
-export default LoginForm;
+export default SignupForm;
