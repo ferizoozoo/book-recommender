@@ -1,4 +1,4 @@
-import LoginForm from "@/components/forms/loginForm";
+import SignupForm from "@/components/forms/signupForm";
 import React from "react";
 
 export interface SignUpData {
@@ -6,16 +6,11 @@ export interface SignUpData {
   password: string;
 }
 
-export interface LoginData {
-  email: string;
-  password: string;
-}
-
-const Login: React.FC = () => {
-  const handleLogin = async (loginData: LoginData) => {
-    const { email, password } = loginData;
+const Signup: React.FC = () => {
+  const handleRegister = async (signUpData: SignUpData) => {
+    const { email, password } = signUpData;
     const url = import.meta.env.VITE_API_URL;
-    const res = fetch(`${url}/auth/login`, {
+    const res = fetch(`${url}/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -29,11 +24,11 @@ const Login: React.FC = () => {
 
   return (
     <div className="flex flex-col justify-between">
-      <LoginForm className="w-1/3 m-auto" handlesubmit={handleLogin} />
+      <SignupForm className="w-1/3 m-auto" handlesubmit={handleRegister} />
       {/* Uncomment the following line if you want to add a footer or additional content */}
       {/* <p>This is an open source project</p> */}
     </div>
   );
 };
 
-export default Login;
+export default Signup;
