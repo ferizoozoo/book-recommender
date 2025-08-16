@@ -8,9 +8,13 @@ import {
   Sparkles,
   ArrowRight,
   Quote,
+  Link,
 } from "lucide-react";
+import { useNavigate } from "react-router";
 
 export default function HomePage() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -70,7 +74,13 @@ export default function HomePage() {
             taste. Join thousands of readers finding their perfect next book.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8 py-6">
+            <Button
+              onClick={() => {
+                navigate("/library/search");
+              }}
+              size="lg"
+              className="text-lg px-8 py-6"
+            >
               Find Your Next Read
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
