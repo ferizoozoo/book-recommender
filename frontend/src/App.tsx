@@ -5,17 +5,31 @@ import Signup from "./components/layout/auth/signup";
 import Dashboard from "./components/layout/dashboard/dashboard";
 import HomePage from "./components/layout/library/home-page";
 import SearchPage from "./components/layout/library/search-books";
+import PrivateRoute from "./routing/private-route";
 
 function App() {
   return (
     <div className="m-auto">
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/library/search" element={<SearchPage />} />
-        <Route path="/library/landing" element={<HomePage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/library/search"
+          element={
+            <PrivateRoute>
+              <SearchPage />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </div>
   );
