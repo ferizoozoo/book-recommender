@@ -139,6 +139,24 @@ export class LibraryController {
     }
   }
 
+  async getTrendingBooks(
+    req: Request,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const books = await this.#libraryService.getTrendingBooks(limit);
+      res.status(200).json({ books });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to retrieve trending books";
+      res.status(500).json({ message: errorMessage });
+    }
+  }
+
   // TODO: for now, we are using the Book entity directly in the controller.
   //       In a real application, we might want to use a DTO (Data Transfer Object)
   //       to avoid exposing domain entities directly.

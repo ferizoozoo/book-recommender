@@ -12,6 +12,10 @@ libraryRouter.get("/search", async (req, res, next) => {
   await libraryController.searchBooks(req, res, next);
 });
 
+libraryRouter.get("/trending", async (req, res, next) => {
+  await libraryController.getTrendingBooks(req, res, next);
+});
+
 libraryRouter.get("/label", async (req, res, next) => {
   await libraryController.getBooksByLabel(req, res, next);
 });

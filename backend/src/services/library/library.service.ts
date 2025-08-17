@@ -41,6 +41,10 @@ export class LibraryService implements ILibraryService {
     return await this.#bookRepo.getByIsbn(isbn);
   }
 
+  async getTrendingBooks(limit: number): Promise<Book[]> {
+    return await this.#bookRepo.getTrendingBooks(limit);
+  }
+
   async addAuthor(author: Author): Promise<Author> {
     if (!author.validate()) {
       throw new Error(serviceConsts.AuthorValidationFailed);

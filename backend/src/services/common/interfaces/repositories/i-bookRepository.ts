@@ -7,6 +7,7 @@ export interface IBookRepository {
   getByAuthorId(authorId: number): Promise<Book[]>;
   getByPublisherId(publisherId: number): Promise<Book[]>;
   getByIsbn(isbn: string): Promise<Book | null>;
+  getTrendingBooks(limit: number): Promise<Book[]>;
   save(book: Book): Promise<void>;
   delete(id: number): Promise<void>;
   update(book: Book): Promise<void>;
