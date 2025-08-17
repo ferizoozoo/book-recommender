@@ -8,12 +8,116 @@ import {
   Sparkles,
   ArrowRight,
   Quote,
-  Link,
 } from "lucide-react";
 import { useNavigate } from "react-router";
+import { useEffect, useState, type JSX } from "react";
+import { set } from "zod";
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const [books, setBooks] = useState<
+    {
+      title: string;
+      author: string;
+      genre: string;
+      rating: number;
+    }[]
+  >([]);
+  const [features, setFeatures] = useState<
+    {
+      icon: JSX.Element;
+      title: string;
+      description: string;
+    }[]
+  >([]);
+  const [testimonials, setTestimonials] = useState<
+    {
+      author: string;
+      quote: string;
+      books: string;
+    }[]
+  >([]);
+
+  const getBooks = () => {
+    return [
+      {
+        title: "The Seven Husbands of Evelyn Hugo",
+        author: "Taylor Jenkins Reid",
+        genre: "Fiction",
+        rating: 4.8,
+      },
+      {
+        title: "Atomic Habits",
+        author: "James Clear",
+        genre: "Self-Help",
+        rating: 4.7,
+      },
+      {
+        title: "The Silent Patient",
+        author: "Alex Michaelides",
+        genre: "Thriller",
+        rating: 4.6,
+      },
+      {
+        title: "Educated",
+        author: "Tara Westover",
+        genre: "Memoir",
+        rating: 4.9,
+      },
+    ];
+  };
+
+  const getFeatures = () => {
+    return [
+      {
+        icon: <Sparkles className="h-8 w-8 text-primary" />,
+        title: "AI-Powered Matching",
+        description:
+          "Our advanced algorithm analyzes your reading history and preferences to find perfect matches.",
+      },
+      {
+        icon: <Users className="h-8 w-8 text-primary" />,
+        title: "Community Insights",
+        description:
+          "Discover what readers with similar tastes are loving and get recommendations from real people.",
+      },
+      {
+        icon: <BookOpen className="h-8 w-8 text-primary" />,
+        title: "Diverse Library",
+        description:
+          "Explore millions of books across every genre, from bestsellers to hidden gems waiting to be discovered.",
+      },
+    ];
+  };
+
+  const getTestimonials = () => {
+    return [
+      {
+        quote:
+          "Bookrec introduced me to authors I never would have discovered on my own. Every recommendation has been spot-on!",
+        author: "Sarah M.",
+        books: "127 books read",
+      },
+      {
+        quote:
+          "I was stuck in a reading rut until I found Bookrec. Now I'm excited about every book on my to-read list.",
+        author: "Michael R.",
+        books: "89 books read",
+      },
+      {
+        quote:
+          "The personalized recommendations are incredible. It's like having a librarian who knows exactly what I love.",
+        author: "Emma L.",
+        books: "203 books read",
+      },
+    ];
+  };
+
+  useEffect(() => {
+    setBooks(getBooks());
+    setFeatures(getFeatures());
+    setTestimonials(getTestimonials());
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -27,7 +131,7 @@ export default function HomePage() {
             </span>
           </div>
           <nav className="hidden md:flex items-center gap-6">
-            <a
+            {/* <a
               href="#discover"
               className="text-foreground hover:text-primary transition-colors"
             >
@@ -44,11 +148,21 @@ export default function HomePage() {
               className="text-foreground hover:text-primary transition-colors"
             >
               About
-            </a>
-            <Button variant="outline" size="sm">
+            </a> */}
+            <a
+              href="/login"
+              className="text-foreground hover:text-primary transition-colors"
+            >
               Sign In
-            </Button>
-            <Button size="sm">Sign Up</Button>
+            </a>
+            {/* <Button variant="outline" size="sm"></Button> */}
+            <a
+              href="/register"
+              className="text-foreground hover:text-primary transition-colors"
+            >
+              Register
+            </a>
+            {/* <Button size="sm"></Button> */}
           </nav>
         </div>
       </header>
@@ -74,20 +188,17 @@ export default function HomePage() {
             taste. Join thousands of readers finding their perfect next book.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              onClick={() => {
-                navigate("/library/search");
-              }}
-              size="lg"
-              className="text-lg px-8 py-6"
-            >
+            <Button size="lg" className="text-lg px-8 py-6">
               Find Your Next Read
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button
+              onClick={() => {
+                navigate("/library/search");
+              }}
               variant="outline"
               size="lg"
-              className="text-lg px-8 py-6 bg-transparent"
+              className="text-lg px-8 py-6 bg-transparent cursor-pointer"
             >
               Browse Popular Books
             </Button>
@@ -107,32 +218,7 @@ export default function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                title: "The Seven Husbands of Evelyn Hugo",
-                author: "Taylor Jenkins Reid",
-                genre: "Fiction",
-                rating: 4.8,
-              },
-              {
-                title: "Atomic Habits",
-                author: "James Clear",
-                genre: "Self-Help",
-                rating: 4.7,
-              },
-              {
-                title: "The Silent Patient",
-                author: "Alex Michaelides",
-                genre: "Thriller",
-                rating: 4.6,
-              },
-              {
-                title: "Educated",
-                author: "Tara Westover",
-                genre: "Memoir",
-                rating: 4.9,
-              },
-            ].map((book, index) => (
+            {books.map((book, index) => (
               <Card
                 key={index}
                 className="group hover:shadow-lg transition-all duration-300 cursor-pointer"
@@ -176,26 +262,7 @@ export default function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <Sparkles className="h-8 w-8 text-primary" />,
-                title: "AI-Powered Matching",
-                description:
-                  "Our advanced algorithm analyzes your reading history and preferences to find perfect matches.",
-              },
-              {
-                icon: <Users className="h-8 w-8 text-primary" />,
-                title: "Community Insights",
-                description:
-                  "Discover what readers with similar tastes are loving and get recommendations from real people.",
-              },
-              {
-                icon: <BookOpen className="h-8 w-8 text-primary" />,
-                title: "Diverse Library",
-                description:
-                  "Explore millions of books across every genre, from bestsellers to hidden gems waiting to be discovered.",
-              },
-            ].map((feature, index) => (
+            {features.map((feature, index) => (
               <Card
                 key={index}
                 className="text-center p-8 hover:shadow-md transition-shadow"
@@ -222,26 +289,7 @@ export default function HomePage() {
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                quote:
-                  "Bookrec introduced me to authors I never would have discovered on my own. Every recommendation has been spot-on!",
-                author: "Sarah M.",
-                books: "127 books read",
-              },
-              {
-                quote:
-                  "I was stuck in a reading rut until I found Bookrec. Now I'm excited about every book on my to-read list.",
-                author: "Michael R.",
-                books: "89 books read",
-              },
-              {
-                quote:
-                  "The personalized recommendations are incredible. It's like having a librarian who knows exactly what I love.",
-                author: "Emma L.",
-                books: "203 books read",
-              },
-            ].map((testimonial, index) => (
+            {testimonials.map((testimonial, index) => (
               <Card key={index} className="p-6">
                 <CardContent className="p-0">
                   <Quote className="h-8 w-8 text-accent mb-4" />
@@ -283,7 +331,11 @@ export default function HomePage() {
             Join over 50,000 readers who've found their perfect books with
             Bookrec
           </p>
-          <Button size="lg" className="text-lg px-12 py-6">
+          <Button
+            onClick={() => navigate("/register")}
+            size="lg"
+            className="text-lg px-12 py-6 cursor-pointer"
+          >
             Get Started Free
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
