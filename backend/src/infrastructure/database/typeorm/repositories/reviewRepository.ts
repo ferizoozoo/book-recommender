@@ -30,6 +30,8 @@ export class ReviewRepository implements IReviewRepository {
     return mapReviewEntityToDomain(reviewEntity);
   }
 
+  // TODO: maybe this method should be removed since it touches more entities than just the
+  //        reviews entity.
   async getBookReviews(bookId: number): Promise<Review[] | null> {
     const reviewEntities = await this.#reviews.find({
       where: { book: { id: bookId } },
