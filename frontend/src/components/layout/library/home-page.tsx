@@ -11,18 +11,9 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useEffect, useState, type JSX } from "react";
-import { set } from "zod";
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [books, setBooks] = useState<
-    {
-      title: string;
-      author: string;
-      genre: string;
-      rating: number;
-    }[]
-  >([]);
   const [features, setFeatures] = useState<
     {
       icon: JSX.Element;
@@ -37,35 +28,14 @@ export default function HomePage() {
       books: string;
     }[]
   >([]);
-
-  const getBooks = () => {
-    return [
-      {
-        title: "The Seven Husbands of Evelyn Hugo",
-        author: "Taylor Jenkins Reid",
-        genre: "Fiction",
-        rating: 4.8,
-      },
-      {
-        title: "Atomic Habits",
-        author: "James Clear",
-        genre: "Self-Help",
-        rating: 4.7,
-      },
-      {
-        title: "The Silent Patient",
-        author: "Alex Michaelides",
-        genre: "Thriller",
-        rating: 4.6,
-      },
-      {
-        title: "Educated",
-        author: "Tara Westover",
-        genre: "Memoir",
-        rating: 4.9,
-      },
-    ];
-  };
+  const [trendingBooks, setTrendingBooks] = useState<
+    {
+      title: string;
+      author: string;
+      genre: string;
+      rating: number;
+    }[]
+  >([]);
 
   const getFeatures = () => {
     return [
@@ -113,10 +83,18 @@ export default function HomePage() {
     ];
   };
 
+  const getTrendingBooks = async () => {
+    const res = await fetch("/api/library/trending?limit=4");
+    if (!res.ok) {
+      throw new Error("Failed to fetch trending books");
+    }
+    return await res.json();
+  };
+
   useEffect(() => {
-    setBooks(getBooks());
     setFeatures(getFeatures());
     setTestimonials(getTestimonials());
+    setTrendingBooks(getTrendingBooks());
   }, []);
 
   return (
@@ -218,7 +196,7 @@ export default function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {books.map((book, index) => (
+            {trendingBooks.map((book, index) => (
               <Card
                 key={index}
                 className="group hover:shadow-lg transition-all duration-300 cursor-pointer"
