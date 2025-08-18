@@ -6,8 +6,10 @@ import {
   AuthorEntity,
   BookEntity,
   PublisherEntity,
+  ReviewEntity,
 } from "../library.models.ts";
 import { mapUserDomainToModel, mapUserEntityToDomain } from "./auth.mapper.ts";
+import { Review } from "../../../../../domain/library/review.entity.ts";
 
 export function mapAuthorDomainToModel(author: Author): AuthorEntity {
   const authorEntity = new AuthorEntity();
@@ -114,6 +116,27 @@ export function mapPublisherEntityToDomain(
   return publisher;
 }
 
+export function mapReviewDomainToModel(review: Review): ReviewEntity {
+  const reviewEntity = new ReviewEntity();
+  reviewEntity.id = review.id;
+  reviewEntity.book = mapBookDomainToModel(review.book);
+  reviewEntity.user = mapUserDomainToModel(review.user);
+  reviewEntity.comment = review.comment;
+
+  return reviewEntity;
+}
+
+export function mapReviewEntityToDomain(reviewEntity: ReviewEntity): Review {
+  const review = new Review(
+    reviewEntity.id,
+    mapBookEntityToDomain(reviewEntity.book),
+    mapUserEntityToDomain(reviewEntity.user),
+    reviewEntity.comment
+  );
+
+  return review;
+}
+
 export function mapBookEntitiesToDomain(bookEntities: BookEntity[]): Book[] {
   return bookEntities
     ? bookEntities.map((entity) => mapBookEntityToDomain(entity))
@@ -133,5 +156,13 @@ export function mapPublisherEntitiesToDomain(
 ): Publisher[] {
   return publisherEntities
     ? publisherEntities.map((entity) => mapPublisherEntityToDomain(entity))
+    : [];
+}
+
+export function mapReviewEntitiesToDomain(
+  reviewEntities: ReviewEntity[]
+): Review[] {
+  return reviewEntities
+    ? reviewEntities.map((entity) => mapReviewEntityToDomain(entity))
     : [];
 }

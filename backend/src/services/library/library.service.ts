@@ -7,23 +7,33 @@ import { Publisher } from "../../domain/library/publisher.entity";
 import { ILibraryService } from "../../presentation/common/interfaces/services/i-libraryService";
 import { serviceConsts } from "../common/consts";
 import { IUserRepository } from "../common/interfaces/repositories/i-userRepository";
+import { Review } from "../../domain/library/review.entity";
+import { IReviewRepository } from "../common/interfaces/repositories/i-reviewRepository";
 
 export class LibraryService implements ILibraryService {
   #bookRepo: IBookRepository;
   #authorRepo: IAuthorRepository;
   #publisherRepo: IPublisherRepository;
   #userRepo: IUserRepository;
+  #reviewRepo: IReviewRepository;
 
   constructor(
     bookRepo: IBookRepository,
     authorRepo: IAuthorRepository,
     publisherRepo: IPublisherRepository,
-    userRepo: IUserRepository
+    userRepo: IUserRepository,
+    reviewRepo: IReviewRepository
   ) {
     this.#bookRepo = bookRepo;
     this.#authorRepo = authorRepo;
     this.#publisherRepo = publisherRepo;
     this.#userRepo = userRepo;
+    this.#reviewRepo = reviewRepo;
+  }
+
+  async getReadersReviewBooks(bookId: number): Promise<Review[]> {
+    const bookReviews = await this.#reviewRepo.getBookReviews(bookId);
+    return bookReviews!;
   }
 
   async getAllBooks(): Promise<Book[]> {

@@ -10,6 +10,7 @@ import { LibraryController } from "../controllers/libraryController.ts";
 import { BookRepository } from "../../infrastructure/database/typeorm/repositories/bookRepository.ts";
 import { AuthorRepository } from "../../infrastructure/database/typeorm/repositories/authorRepository.ts";
 import { PublisherRepository } from "../../infrastructure/database/typeorm/repositories/publisherRepository.ts";
+import { ReviewRepository } from "../../infrastructure/database/typeorm/repositories/reviewRepository.ts";
 
 // NOTE: this is a very simple DI functionality for our purpose.
 //        if a more sophisticated DI functionality is needed, then we could
@@ -31,11 +32,13 @@ const authController = new AuthController(authService);
 const bookRepository = new BookRepository();
 const authorRepository = new AuthorRepository();
 const publisherRepository = new PublisherRepository();
+const reviewRepository = new ReviewRepository();
 const libraryService = new LibraryService(
   bookRepository,
   authorRepository,
   publisherRepository,
-  userRepository
+  userRepository,
+  reviewRepository
 );
 const libraryController = new LibraryController(libraryService);
 

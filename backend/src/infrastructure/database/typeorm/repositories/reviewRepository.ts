@@ -1,0 +1,64 @@
+import { BookEntity, ReviewEntity } from "../models/library.models.ts";
+import AppDataSource from "../index.ts";
+import { Repository } from "typeorm";
+import {
+  mapBookEntityToDomain,
+  mapReviewDomainToModel,
+  mapReviewEntityToDomain,
+} from "../models/mappers/library.mapper.ts";
+import { Review } from "../../../../domain/library/review.entity.ts";
+import { IReviewRepository } from "../../../../services/common/interfaces/repositories/i-reviewRepository.ts";
+
+export class ReviewRepository implements IReviewRepository {
+  #reviews: Repository<ReviewEntity>;
+  #books: Repository<BookEntity>;
+
+  constructor() {
+    this.#reviews = AppDataSource.getRepository(ReviewEntity);
+    this.#books = AppDataSource.getRepository(BookEntity);
+  }
+
+  async getById(id: number): Promise<Review | null> {
+    const reviewEntity = await this.#reviews.findOne({
+      where: { id },
+    });
+
+    if (!reviewEntity) {
+      return null;
+    }
+
+    return mapReviewEntityToDomain(reviewEntity);
+  }
+
+  async getBookReviews(bookId: number): Promise<Review[] | null> {
+    const reviewEntities = await this.#reviews.find({
+      where: { book: { id: bookId } },
+    });
+
+    if (!reviewEntities) {
+      return null;
+    }
+
+    // if (!reviewEntities) {
+    //   return null;
+    // }
+
+    // review.book = mapBookEntityToDomain(bookEntity);
+
+    return reviewEntities.map(mapReviewEntityToDomain);
+  }
+
+  async save(review: Review): Promise<void> {
+    const reviewEntity = mapReviewDomainToModel(review);
+    await this.#reviews.save(reviewEntity);
+  }
+
+  async delete(id: number): Promise<void> {
+    await this.#reviews.delete(id);
+  }
+
+  async update(review: Review): Promise<void> {
+    const reviewEntity = mapReviewDomainToModel(review);
+    await this.#reviews.update(review.id, reviewEntity);
+  }
+}

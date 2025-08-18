@@ -1,6 +1,7 @@
 import { Book } from "../../../../domain/library/book.entity";
 import { Author } from "../../../../domain/library/author.entity";
 import { Publisher } from "../../../../domain/library/publisher.entity";
+import { Review } from "../../../../domain/library/review.entity";
 
 // TODO: since these service methods are used in the presentation layer,
 // we might want to consider using DTOs for better separation of concerns
@@ -16,6 +17,7 @@ export interface ILibraryService {
   getAllBooks(): Promise<Book[]>;
   getBookById(id: number): Promise<Book | null>;
   getBookByIsbn(isbn: string): Promise<Book | null>;
+  getReadersReviewBooks(bookId: number): Promise<Review[]>;
   getTrendingBooks(limit: number): Promise<Book[]>;
   addBook(book: Book): Promise<void>;
   updateBook(book: Book): Promise<void>;

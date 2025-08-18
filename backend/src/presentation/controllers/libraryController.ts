@@ -157,6 +157,23 @@ export class LibraryController {
     }
   }
 
+  async getReadersReviewBooks(
+    req: Request,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    try {
+      const { book } = req.params;
+      const bookId = parseInt(book);
+      const reviews = await this.#libraryService.getReadersReviewBooks(bookId);
+      res.status(200).json({ reviews });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to retrieve reviews";
+      res.status(500).json({ message: errorMessage });
+    }
+  }
+
   // TODO: for now, we are using the Book entity directly in the controller.
   //       In a real application, we might want to use a DTO (Data Transfer Object)
   //       to avoid exposing domain entities directly.

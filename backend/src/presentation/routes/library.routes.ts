@@ -8,6 +8,11 @@ libraryRouter.get("/", async (req, res, next) => {
   await libraryController.getAllBooks(req, res, next);
 });
 
+// TODO: this is for the 'what readers say?' section
+libraryRouter.get("/readers-review", async (req, res, next) => {
+  await libraryController.getReadersReviewBooks(req, res, next);
+});
+
 libraryRouter.get("/search", async (req, res, next) => {
   await libraryController.searchBooks(req, res, next);
 });

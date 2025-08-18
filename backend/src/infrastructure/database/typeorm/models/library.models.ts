@@ -125,3 +125,24 @@ export class UserBookLikeEntity {
   @JoinColumn({ name: "bookId" })
   book: BookEntity;
 }
+
+@Entity("reviews")
+export class ReviewEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @ManyToOne(() => BookEntity)
+  @JoinColumn({ name: "bookId" })
+  book: BookEntity;
+
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ name: "userId" })
+  user: UserEntity;
+
+  // TODO: see the Review entity todo
+  // @Column({ type: "int", default: 0 })
+  // rating: number;
+
+  @Column({ type: "text", nullable: true })
+  comment: string;
+}
