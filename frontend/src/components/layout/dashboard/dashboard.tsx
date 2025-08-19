@@ -6,8 +6,44 @@ import { SiteHeader } from "@/components/blocks/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 import data from "./data.json";
+import { useEffect, useState } from "react";
+
+interface DashboardTableData {
+  id: number;
+  header: string;
+  type: string;
+  status: string;
+  target: string;
+  limit: string;
+  reviewer: string;
+}
 
 export default function Dashboard() {
+  const [tableData, setTableData] = useState<DashboardTableData[]>([]);
+
+  const transformData = (data: any[]) => {
+    const t = data.map((item) => ({
+      id: item.id,
+      header: item.title,
+      reviewer: item.author,
+      type: "Cover page",
+      status: "",
+      target: "",
+      limit: "",
+    }));
+    return t;
+  };
+
+  useEffect(() => {
+    async function fetchData() {
+      const res = await fetch("/library");
+      return await res.json();
+    }
+    fetchData().then((fetchedData) => {
+      setTableData(transformData(fetchedData));
+    });
+  }, [tableData]);
+
   return (
     <SidebarProvider
       style={
@@ -27,7 +63,7 @@ export default function Dashboard() {
               <div className="px-4 lg:px-6">
                 <ChartAreaInteractive />
               </div>
-              <DataTable data={data} />
+              <DataTable data={tableData} />
             </div>
           </div>
         </div>
