@@ -1,5 +1,7 @@
 import SignupForm from "@/components/forms/signupForm";
+import { useLocalStorage } from "@/hooks/use-local-storage";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export interface SignUpData {
   email: string;
@@ -7,10 +9,13 @@ export interface SignUpData {
 }
 
 const Signup: React.FC = () => {
+  const [_, setLocalStorage] = useLocalStorage("user", null);
+  const navigate = useNavigate();
+
   const handleRegister = async (signUpData: SignUpData) => {
     const { email, password } = signUpData;
     const url = import.meta.env.VITE_API_URL;
-    const res = fetch(`${url}/auth/register`, {
+    const res = await fetch(`${url}/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -19,7 +24,10 @@ const Signup: React.FC = () => {
     });
     const data = await res.json();
 
-    console.log(data);
+    if (res.ok) {
+      setLocalStorage(data);
+      navigate("/dashboard");
+    }
   };
 
   return (

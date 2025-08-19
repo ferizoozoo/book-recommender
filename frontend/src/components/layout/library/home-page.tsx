@@ -94,7 +94,10 @@ export default function HomePage() {
   useEffect(() => {
     setFeatures(getFeatures());
     setTestimonials(getTestimonials());
-    setTrendingBooks(getTrendingBooks());
+    async function fetchTrendingBooks() {
+      setTrendingBooks(await getTrendingBooks());
+    }
+    fetchTrendingBooks();
   }, []);
 
   return (
@@ -196,7 +199,7 @@ export default function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {trendingBooks.map((book, index) => (
+            {trendingBooks?.map((book, index) => (
               <Card
                 key={index}
                 className="group hover:shadow-lg transition-all duration-300 cursor-pointer"
