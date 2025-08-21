@@ -33,6 +33,10 @@ libraryRouter.get("/isbn/:isbn", async (req, res, next) => {
   await libraryController.getBookByIsbn(req, res, next);
 });
 
+libraryRouter.get("/user/:email", async (req, res, next) => {
+  await libraryController.getAllBooksForUser(req, res, next);
+});
+
 libraryRouter.post("/", async (req, res, next) => {
   await libraryController.addBook(req, res, next);
 });

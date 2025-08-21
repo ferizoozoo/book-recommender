@@ -11,6 +11,7 @@ import { BookRepository } from "../../infrastructure/database/typeorm/repositori
 import { AuthorRepository } from "../../infrastructure/database/typeorm/repositories/authorRepository.ts";
 import { PublisherRepository } from "../../infrastructure/database/typeorm/repositories/publisherRepository.ts";
 import { ReviewRepository } from "../../infrastructure/database/typeorm/repositories/reviewRepository.ts";
+import { LibraryAuthService } from "../../services/orchestrators/library-auth.service.ts";
 
 // NOTE: this is a very simple DI functionality for our purpose.
 //        if a more sophisticated DI functionality is needed, then we could
@@ -33,6 +34,11 @@ const bookRepository = new BookRepository();
 const authorRepository = new AuthorRepository();
 const publisherRepository = new PublisherRepository();
 const reviewRepository = new ReviewRepository();
+// Orchestrator
+const libraryAuthService = new LibraryAuthService(
+  userRepository,
+  bookRepository
+);
 const libraryService = new LibraryService(
   bookRepository,
   authorRepository,
@@ -40,7 +46,16 @@ const libraryService = new LibraryService(
   userRepository,
   reviewRepository
 );
-const libraryController = new LibraryController(libraryService);
+const libraryController = new LibraryController(
+  libraryService,
+  libraryAuthService
+);
 
 // export the registered services
-export { userController, authController, libraryController, tokenService };
+export {
+  userController,
+  authController,
+  libraryController,
+  tokenService,
+  libraryAuthService,
+};

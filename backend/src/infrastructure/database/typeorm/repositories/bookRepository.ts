@@ -1,4 +1,8 @@
-import { BookEntity, UserBookLikeEntity } from "../models/library.models";
+import {
+  BookEntity,
+  UserBookEntity,
+  UserBookLikeEntity,
+} from "../models/library.models";
 import AppDataSource from "..";
 import { Like, Repository } from "typeorm";
 import { Book } from "../../../../domain/library/book.entity";
@@ -8,17 +12,30 @@ import {
   mapBookDomainToModel,
   mapBookEntityToDomain,
   mapBookEntitiesToDomain,
+  mapUserBookEntitiesToBookDomain,
 } from "../models/mappers/library.mapper";
 import { IBookRepository } from "../../../../services/common/interfaces/repositories/i-bookRepository";
 import { UserEntity } from "../models/auth.models";
+import { User } from "../../../../domain/auth/user.entity";
 
 export class BookRepository implements IBookRepository {
   private bookRepository: Repository<BookEntity>;
   private readonly bookLikeRepository: Repository<UserBookLikeEntity>;
+  private readonly bookUserRepository: Repository<UserBookEntity>;
+  private readonly userRepository: Repository<UserEntity>;
 
   constructor() {
     this.bookRepository = AppDataSource.getRepository(BookEntity);
     this.bookLikeRepository = AppDataSource.getRepository(UserBookLikeEntity);
+    this.bookUserRepository = AppDataSource.getRepository(UserBookEntity);
+  }
+  async getAllForUser(userId: number): Promise<Book[]> {
+    const bookEntities = await this.bookUserRepository.find({
+      where: { userId: userId },
+      relations: ["author", "publisher"],
+    });
+
+    return mapUserBookEntitiesToBookDomain(bookEntities);
   }
 
   async getById(id: number): Promise<Book | null> {
@@ -26,14 +43,14 @@ export class BookRepository implements IBookRepository {
       where: { id },
       relations: ["author", "publisher"],
     });
-    return bookEntity ? this.mapToDomain(bookEntity) : null;
+    return bookEntity ? mapBookEntityToDomain(bookEntity) : null;
   }
 
   async getAll(): Promise<Book[]> {
     const bookEntities = await this.bookRepository.find({
       relations: ["author", "publisher"],
     });
-    return bookEntities.map((entity) => this.mapToDomain(entity));
+    return bookEntities.map((entity) => mapBookEntityToDomain(entity));
   }
 
   async getByAuthorId(authorId: number): Promise<Book[]> {
@@ -41,7 +58,7 @@ export class BookRepository implements IBookRepository {
       where: { author: { id: authorId } },
       relations: ["author", "publisher"],
     });
-    return bookEntities.map((entity) => this.mapToDomain(entity));
+    return bookEntities.map((entity) => mapBookEntityToDomain(entity));
   }
 
   async getTrendingBooks(limit: number): Promise<Book[]> {
@@ -57,7 +74,7 @@ export class BookRepository implements IBookRepository {
       .take(limit)
       // Execute the query
       .getRawMany();
-    return bookEntities.map((entity) => this.mapToDomain(entity));
+    return bookEntities.map((entity) => mapBookEntityToDomain(entity));
   }
 
   async getByPublisherId(publisherId: number): Promise<Book[]> {
@@ -65,7 +82,7 @@ export class BookRepository implements IBookRepository {
       where: { publisher: { id: publisherId } },
       relations: ["author", "publisher"],
     });
-    return bookEntities.map((entity) => this.mapToDomain(entity));
+    return bookEntities.map((entity) => mapBookEntityToDomain(entity));
   }
 
   async getByIsbn(isbn: string): Promise<Book | null> {
@@ -73,11 +90,11 @@ export class BookRepository implements IBookRepository {
       where: { isbn },
       relations: ["author", "publisher"],
     });
-    return bookEntity ? this.mapToDomain(bookEntity) : null;
+    return bookEntity ? mapBookEntityToDomain(bookEntity) : null;
   }
 
   async save(book: Book): Promise<void> {
-    const bookEntity = this.mapToEntity(book);
+    const bookEntity = mapBookDomainToModel(book);
     await this.bookRepository.save(bookEntity);
   }
 
@@ -86,7 +103,7 @@ export class BookRepository implements IBookRepository {
   }
 
   async update(book: Book): Promise<void> {
-    const bookEntity = this.mapToEntity(book);
+    const bookEntity = mapBookDomainToModel(book);
     await this.bookRepository.save(bookEntity);
   }
 
@@ -102,60 +119,34 @@ export class BookRepository implements IBookRepository {
       })
       .getMany();
 
-    return bookEntities.map((entity) => this.mapToDomain(entity));
+    return bookEntities.map((entity) => mapBookEntityToDomain(entity));
   }
 
-  async likeBook(user: UserEntity, book: BookEntity): Promise<void> {
-    const like = new UserBookLikeEntity();
+  async likeBook(user: User, book: Book): Promise<void> {
     if (!user || !book) {
       throw new Error("User and Book are required to like a book");
     }
-    like.user = user;
-    like.book = book;
+
+    const like = new UserBookLikeEntity();
+
+    const userEntity = await this.userRepository.findOne({
+      where: { id: user.id },
+    });
+
+    if (!userEntity) {
+      throw new Error("User not found");
+    }
+
+    const bookEntity = await this.bookRepository.findOne({
+      where: { id: book.id },
+    });
+
+    if (!bookEntity) {
+      throw new Error("Book not found");
+    }
+
+    like.user = userEntity;
+    like.book = bookEntity;
     await this.bookLikeRepository.save(like);
-  }
-
-  private mapToDomain(entity: BookEntity): Book {
-    const book = new Book(
-      entity.id,
-      entity.title,
-      new Author(0),
-      entity.description || "",
-      entity.isbn,
-      new Publisher(0),
-      entity.year || 0,
-      entity.image || "",
-      entity.rating,
-      entity.numberOfRatings,
-      entity.numberOfReviews
-    );
-    // We assume these fields are available in the Book domain entity
-    // If not, they would need to be added or mapped appropriately
-    book.rating = entity.rating;
-    book.numberOfRatings = entity.numberOfRatings;
-    book.numberOfReviews = entity.numberOfReviews;
-
-    // We would also map author and publisher if needed
-    // This depends on your domain model structure
-
-    return book;
-  }
-
-  private mapToEntity(book: Book): BookEntity {
-    const entity = new BookEntity();
-    if (book.id) entity.id = book.id;
-    entity.title = book.title;
-    entity.description = book.description || "";
-    entity.isbn = book.isbn;
-    entity.year = book.year || 0;
-    entity.image = book.image || "";
-    entity.rating = book.rating || 0;
-    entity.numberOfRatings = book.numberOfRatings || 0;
-    entity.numberOfReviews = book.numberOfReviews || 0;
-
-    // Author and publisher would be set here if needed
-    // This depends on your entity relationships
-
-    return entity;
   }
 }

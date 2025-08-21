@@ -106,12 +106,16 @@ export class BookEntity {
   @ManyToOne(() => PublisherEntity, (publisher) => publisher.books)
   @JoinColumn({ name: "publisherId" })
   publisher: PublisherEntity;
+
+  @OneToMany(() => UserBookEntity, (userBook) => userBook.book)
+  userBooks: UserBookEntity[];
 }
 
 // TODO: maybe we should use a separate entity for user-related operations
 // like/dislike, to avoid tight coupling between library and user entities.
 // this is a simple implementation for demonstration purposes and an ACL between users and books
 // could be implemented later.
+// TODO: maybe this entity and UserBookEntity should be merged
 @Entity("UserBookLikes")
 export class UserBookLikeEntity {
   @PrimaryGeneratedColumn()
@@ -145,4 +149,21 @@ export class ReviewEntity {
 
   @Column({ type: "text", nullable: true })
   comment: string;
+}
+
+@Entity("user_books")
+export class UserBookEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  userId: number;
+
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ name: "userId" })
+  user: UserEntity;
+
+  @ManyToOne(() => BookEntity, (book) => book.userBooks)
+  @JoinColumn({ name: "bookId" })
+  book: BookEntity;
 }

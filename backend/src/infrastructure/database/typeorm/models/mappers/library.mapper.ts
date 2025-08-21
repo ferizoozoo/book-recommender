@@ -7,6 +7,7 @@ import {
   BookEntity,
   PublisherEntity,
   ReviewEntity,
+  UserBookEntity,
 } from "../library.models.ts";
 import { mapUserDomainToModel, mapUserEntityToDomain } from "./auth.mapper.ts";
 import { Review } from "../../../../../domain/library/review.entity.ts";
@@ -165,4 +166,25 @@ export function mapReviewEntitiesToDomain(
   return reviewEntities
     ? reviewEntities.map((entity) => mapReviewEntityToDomain(entity))
     : [];
+}
+
+export function mapUserBookEntitiesToBookDomain(
+  bookUser: UserBookEntity[]
+): Book[] {
+  return bookUser.map((userBook) => {
+    const book = new Book(
+      userBook.book.id,
+      userBook.book.title,
+      mapAuthorEntityToDomain(userBook.book.author),
+      userBook.book.description,
+      userBook.book.isbn,
+      mapPublisherEntityToDomain(userBook.book.publisher),
+      userBook.book.year,
+      userBook.book.image,
+      userBook.book.rating,
+      userBook.book.numberOfRatings,
+      userBook.book.numberOfReviews
+    );
+    return book;
+  });
 }

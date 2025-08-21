@@ -14,7 +14,7 @@ export class LibraryService implements ILibraryService {
   #bookRepo: IBookRepository;
   #authorRepo: IAuthorRepository;
   #publisherRepo: IPublisherRepository;
-  #userRepo: IUserRepository;
+  #userRepo: IUserRepository; // TODO: here the user repository from the auth context is used, it should be used in the related orchestrator
   #reviewRepo: IReviewRepository;
 
   constructor(

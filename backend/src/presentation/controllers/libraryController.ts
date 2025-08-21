@@ -5,15 +5,21 @@ import { Book } from "../../domain/library/book.entity";
 import { Author } from "../../domain/library/author.entity";
 import { Publisher } from "../../domain/library/publisher.entity";
 import { User } from "../../domain/auth/user.entity";
+import { ILibraryAuthService } from "../common/interfaces/services/i-library-authService";
 
 // TODO: this controller methods have a lot of code that should be done at the
 //        service/application layer. A refactor is needed to move this logic
 //        into the appropriate layer.
 export class LibraryController {
   #libraryService: ILibraryService;
+  #libraryAuthService: ILibraryAuthService;
 
-  constructor(libraryService: ILibraryService) {
+  constructor(
+    libraryService: ILibraryService,
+    libraryAuthService: ILibraryAuthService
+  ) {
     this.#libraryService = libraryService;
+    this.#libraryAuthService = libraryAuthService;
   }
 
   async addAuthor(
@@ -513,6 +519,31 @@ export class LibraryController {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to like book";
       res.status(400).json({ message: errorMessage });
+    }
+  }
+
+  async getAllBooksForUser(
+    req: Request,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<Book[]> {
+    const email = req.params.email;
+    if (!email) {
+      res
+        .status(400)
+        .json({ message: presentationConsts.LibraryUserEmailRequired });
+      return [];
+    }
+
+    try {
+      const books = await this.#libraryAuthService.getAllForUser(email);
+      res.status(200).json({ books });
+      return books;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to retrieve books";
+      res.status(500).json({ message: errorMessage });
+      return [];
     }
   }
 }

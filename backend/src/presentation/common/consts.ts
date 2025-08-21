@@ -28,4 +28,5 @@ export const presentationConsts = {
   LibraryBookDetails: "Book details retrieved successfully",
   LibraryBookAdded: "Book added successfully",
   LibraryBookUpdated: "Book updated successfully",
+  LibraryUserEmailRequired: "User email is required",
 };
