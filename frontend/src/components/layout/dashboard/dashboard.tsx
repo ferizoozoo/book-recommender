@@ -1,28 +1,17 @@
 import { AppSidebar } from "@/components/blocks/app-sidebar";
-import { ChartAreaInteractive } from "@/components/blocks/chart-area-interactive";
-import { DataTable } from "@/components/blocks/data-table";
-import { SectionCards } from "@/components/blocks/section-cards";
 import { SiteHeader } from "@/components/blocks/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
-import data from "./data.json";
 import { useEffect, useState } from "react";
-
-interface DashboardTableData {
-  id: number;
-  header: string;
-  type: string;
-  status: string;
-  target: string;
-  limit: string;
-  reviewer: string;
-}
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import { DataTable } from "@/components/blocks/data-table";
 
 export default function Dashboard() {
-  const [tableData, setTableData] = useState<DashboardTableData[]>([]);
+  const [user, _] = useLocalStorage("user", null);
+  const [tableData, setTableData] = useState<any[]>([]);
 
   const transformData = (data: any[]) => {
-    const t = data.map((item) => ({
+    return data.map((item) => ({
       id: item.id,
       header: item.title,
       reviewer: item.author,
@@ -31,17 +20,18 @@ export default function Dashboard() {
       target: "",
       limit: "",
     }));
-    return t;
   };
 
   useEffect(() => {
     async function fetchData() {
-      const res = await fetch("/library");
-      return await res.json();
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/library/user/${user.email}`
+      );
+      debugger;
+      const result = await res.json();
+      return setTableData(transformData(result));
     }
-    fetchData().then((fetchedData) => {
-      setTableData(transformData(fetchedData));
-    });
+    fetchData();
   }, [tableData]);
 
   return (
@@ -55,15 +45,18 @@ export default function Dashboard() {
     >
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader />
-        <div className="flex flex-1 flex-col">
+        <SiteHeader
+          header="Documents"
+          title="GitHub"
+          link="https://github.com/shadcn-ui/ui/tree/main/apps/v4/app/(examples)/dashboard"
+        />
+        <div className="flex flex-1 flex-col px-4">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <SectionCards />
-              <div className="px-4 lg:px-6">
-                <ChartAreaInteractive />
-              </div>
-              <DataTable data={tableData} />
+              <DataTable
+                data={tableData}
+                caption="A list of your recent invoices."
+              />
             </div>
           </div>
         </div>

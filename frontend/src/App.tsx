@@ -17,17 +17,17 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
+            // <PrivateRoute>
+            <Dashboard />
+            // </PrivateRoute>
           }
         />
         <Route
           path="/library/search"
           element={
-            <PrivateRoute>
-              <SearchPage />
-            </PrivateRoute>
+            // <PrivateRoute>
+            <SearchPage />
+            // </PrivateRoute>
           }
         />
       </Routes>
