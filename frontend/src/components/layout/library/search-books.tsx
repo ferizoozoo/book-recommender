@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -131,30 +131,56 @@ export default function SearchPage() {
   const [selectedRating, setSelectedRating] = useState("All Ratings");
   const [selectedYear, setSelectedYear] = useState("All Years");
   const [showFilters, setShowFilters] = useState(false);
+  const [filteredBooks, setFilteredBooks] = useState(mockBooks);
 
   // Filter books based on search criteria
-  const filteredBooks = mockBooks.filter((book) => {
-    const matchesSearch =
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesGenre =
-      selectedGenre === "All Genres" || book.genre === selectedGenre;
-    const matchesRating =
-      selectedRating === "All Ratings" ||
-      book.rating >= Number.parseFloat(selectedRating.replace("+", ""));
+  // const filteredBooks = mockBooks.filter((book) => {
+  //   const matchesSearch =
+  //     book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //     book.author.toLowerCase().includes(searchQuery.toLowerCase());
+  //   // const matchesGenre =
+  //   //   selectedGenre === "All Genres" || book.genre === selectedGenre;
+  //   // const matchesRating =
+  //   //   selectedRating === "All Ratings" ||
+  //   //   book.rating >= Number.parseFloat(selectedRating.replace("+", ""));
 
-    let matchesYear = true;
-    if (selectedYear !== "All Years") {
-      if (selectedYear === "2020-2024") matchesYear = book.year >= 2020;
-      else if (selectedYear === "2015-2019")
-        matchesYear = book.year >= 2015 && book.year <= 2019;
-      else if (selectedYear === "2010-2014")
-        matchesYear = book.year >= 2010 && book.year <= 2014;
-      else if (selectedYear === "Before 2010") matchesYear = book.year < 2010;
-    }
+  //   let matchesYear = true;
+  //   if (selectedYear !== "All Years") {
+  //     if (selectedYear === "2020-2024") matchesYear = book.year >= 2020;
+  //     else if (selectedYear === "2015-2019")
+  //       matchesYear = book.year >= 2015 && book.year <= 2019;
+  //     else if (selectedYear === "2010-2014")
+  //       matchesYear = book.year >= 2010 && book.year <= 2014;
+  //     else if (selectedYear === "Before 2010") matchesYear = book.year < 2010;
+  //   }
 
-    return matchesSearch && matchesGenre && matchesRating && matchesYear;
-  });
+  //   // return matchesSearch && matchesGenre && matchesRating && matchesYear;
+  //   return matchesSearch && matchesYear;
+  // });
+
+  const handleSearch = async () => {
+    // Call the search function with the current filters
+    const filters = {
+      title: searchQuery,
+      author: searchQuery,
+      year: selectedYear,
+    };
+    const res = await fetch("/library/filter", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(filters),
+    });
+
+    const data = await res.json();
+    setFilteredBooks(data);
+  };
+
+  useEffect(() => {
+    if (searchQuery.length <= 3) return;
+    handleSearch();
+  }, [searchQuery, selectedGenre, selectedRating, selectedYear]);
 
   return (
     <div className="min-h-screen bg-background">
