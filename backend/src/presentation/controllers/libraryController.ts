@@ -180,6 +180,28 @@ export class LibraryController {
     }
   }
 
+  async getFilteredBooks(
+    req: Request,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    try {
+      const { year } = req.query;
+
+      const filters: any = {};
+      if (year) filters.year = year;
+
+      const books = await this.#libraryService.getFilteredBooks(filters);
+      res.status(200).json({ books });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to retrieve filtered books";
+      res.status(500).json({ message: errorMessage });
+    }
+  }
+
   // TODO: for now, we are using the Book entity directly in the controller.
   //       In a real application, we might want to use a DTO (Data Transfer Object)
   //       to avoid exposing domain entities directly.

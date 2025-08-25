@@ -29,6 +29,21 @@ export class BookRepository implements IBookRepository {
     this.bookLikeRepository = AppDataSource.getRepository(UserBookLikeEntity);
     this.bookUserRepository = AppDataSource.getRepository(UserBookEntity);
   }
+  async filter(filters: any): Promise<Book[]> {
+    const query = this.bookRepository.createQueryBuilder("book");
+
+    if (filters.year) {
+      query.andWhere("book.year = :year", { year: filters.year });
+    }
+
+    query.andWhere("book.title ILIKE :title", { title: `%${filters.title}%` });
+    query.andWhere("book.author ILIKE :author", {
+      author: `%${filters.author}%`,
+    });
+
+    const filteredBooks = await query.getMany();
+    return mapBookEntitiesToDomain(filteredBooks);
+  }
   async getAllForUser(userId: number): Promise<Book[]> {
     const bookEntities = await this.bookUserRepository.find({
       where: { userId: userId },

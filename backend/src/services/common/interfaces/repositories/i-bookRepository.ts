@@ -4,6 +4,7 @@ import { Book } from "../../../../domain/library/book.entity.ts";
 export interface IBookRepository {
   getById(id: number): Promise<Book | null>;
   getAll(): Promise<Book[]>;
+  filter(filters: any): Promise<Book[]>;
   getAllForUser(userId: number): Promise<Book[]>;
   getByAuthorId(authorId: number): Promise<Book[]>;
   getByPublisherId(publisherId: number): Promise<Book[]>;
