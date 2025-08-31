@@ -11,7 +11,7 @@ import { IPublisherRepository } from "../../../../services/common/interfaces/rep
 
 export class PublisherRepository implements IPublisherRepository {
   #publishers: Repository<PublisherEntity>;
-  #books: Repository<BookEntity>;
+  #books: Repository<BookEntity>; // TODO: this violates DDD, and for fetching books, we should use an orchestrator
 
   constructor() {
     this.#publishers = AppDataSource.getRepository(PublisherEntity);

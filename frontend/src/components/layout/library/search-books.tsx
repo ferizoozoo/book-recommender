@@ -11,99 +11,100 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BookOpen, Star, Search, SlidersHorizontal } from "lucide-react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
+import config from "../../../../config";
 
-// Mock book data
-const mockBooks = [
-  {
-    id: 1,
-    title: "The Seven Husbands of Evelyn Hugo",
-    author: "Taylor Jenkins Reid",
-    genre: "Fiction",
-    rating: 4.8,
-    year: 2017,
-    pages: 400,
-    description:
-      "A reclusive Hollywood icon finally tells her story to a young journalist.",
-  },
-  {
-    id: 2,
-    title: "Atomic Habits",
-    author: "James Clear",
-    genre: "Self-Help",
-    rating: 4.7,
-    year: 2018,
-    pages: 320,
-    description:
-      "An easy and proven way to build good habits and break bad ones.",
-  },
-  {
-    id: 3,
-    title: "The Silent Patient",
-    author: "Alex Michaelides",
-    genre: "Thriller",
-    rating: 4.6,
-    year: 2019,
-    pages: 336,
-    description:
-      "A woman's act of violence against her husband and her refusal to speak.",
-  },
-  {
-    id: 4,
-    title: "Educated",
-    author: "Tara Westover",
-    genre: "Memoir",
-    rating: 4.9,
-    year: 2018,
-    pages: 334,
-    description:
-      "A memoir about a young girl who, kept out of school, leaves her survivalist family.",
-  },
-  {
-    id: 5,
-    title: "Where the Crawdads Sing",
-    author: "Delia Owens",
-    genre: "Fiction",
-    rating: 4.5,
-    year: 2018,
-    pages: 384,
-    description:
-      "A mystery about a young woman who raised herself in the marshes of North Carolina.",
-  },
-  {
-    id: 6,
-    title: "Becoming",
-    author: "Michelle Obama",
-    genre: "Memoir",
-    rating: 4.8,
-    year: 2018,
-    pages: 448,
-    description:
-      "The memoir of former United States First Lady Michelle Obama.",
-  },
-  {
-    id: 7,
-    title: "The Midnight Library",
-    author: "Matt Haig",
-    genre: "Fiction",
-    rating: 4.4,
-    year: 2020,
-    pages: 288,
-    description:
-      "Between life and death there is a library, and within that library, the shelves go on forever.",
-  },
-  {
-    id: 8,
-    title: "Sapiens",
-    author: "Yuval Noah Harari",
-    genre: "Non-Fiction",
-    rating: 4.6,
-    year: 2014,
-    pages: 464,
-    description:
-      "A brief history of humankind from the Stone Age to the present.",
-  },
-];
+// // Mock book data
+// const mockBooks = [
+//   {
+//     id: 1,
+//     title: "The Seven Husbands of Evelyn Hugo",
+//     author: "Taylor Jenkins Reid",
+//     genre: "Fiction",
+//     rating: 4.8,
+//     year: 2017,
+//     pages: 400,
+//     description:
+//       "A reclusive Hollywood icon finally tells her story to a young journalist.",
+//   },
+//   {
+//     id: 2,
+//     title: "Atomic Habits",
+//     author: "James Clear",
+//     genre: "Self-Help",
+//     rating: 4.7,
+//     year: 2018,
+//     pages: 320,
+//     description:
+//       "An easy and proven way to build good habits and break bad ones.",
+//   },
+//   {
+//     id: 3,
+//     title: "The Silent Patient",
+//     author: "Alex Michaelides",
+//     genre: "Thriller",
+//     rating: 4.6,
+//     year: 2019,
+//     pages: 336,
+//     description:
+//       "A woman's act of violence against her husband and her refusal to speak.",
+//   },
+//   {
+//     id: 4,
+//     title: "Educated",
+//     author: "Tara Westover",
+//     genre: "Memoir",
+//     rating: 4.9,
+//     year: 2018,
+//     pages: 334,
+//     description:
+//       "A memoir about a young girl who, kept out of school, leaves her survivalist family.",
+//   },
+//   {
+//     id: 5,
+//     title: "Where the Crawdads Sing",
+//     author: "Delia Owens",
+//     genre: "Fiction",
+//     rating: 4.5,
+//     year: 2018,
+//     pages: 384,
+//     description:
+//       "A mystery about a young woman who raised herself in the marshes of North Carolina.",
+//   },
+//   {
+//     id: 6,
+//     title: "Becoming",
+//     author: "Michelle Obama",
+//     genre: "Memoir",
+//     rating: 4.8,
+//     year: 2018,
+//     pages: 448,
+//     description:
+//       "The memoir of former United States First Lady Michelle Obama.",
+//   },
+//   {
+//     id: 7,
+//     title: "The Midnight Library",
+//     author: "Matt Haig",
+//     genre: "Fiction",
+//     rating: 4.4,
+//     year: 2020,
+//     pages: 288,
+//     description:
+//       "Between life and death there is a library, and within that library, the shelves go on forever.",
+//   },
+//   {
+//     id: 8,
+//     title: "Sapiens",
+//     author: "Yuval Noah Harari",
+//     genre: "Non-Fiction",
+//     rating: 4.6,
+//     year: 2014,
+//     pages: 464,
+//     description:
+//       "A brief history of humankind from the Stone Age to the present.",
+//   },
+// ];
 
 const genres = [
   "All Genres",
@@ -131,7 +132,7 @@ export default function SearchPage() {
   const [selectedRating, setSelectedRating] = useState("All Ratings");
   const [selectedYear, setSelectedYear] = useState("All Years");
   const [showFilters, setShowFilters] = useState(false);
-  const [filteredBooks, setFilteredBooks] = useState(mockBooks);
+  const [filteredBooks, setFilteredBooks] = useState<any[]>([]);
 
   // Filter books based on search criteria
   // const filteredBooks = mockBooks.filter((book) => {
@@ -165,7 +166,8 @@ export default function SearchPage() {
       author: searchQuery,
       year: selectedYear,
     };
-    const res = await fetch("/library/filter", {
+    debugger;
+    const res = await fetch(`${config.apiUrl}/library/search`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -330,40 +332,44 @@ export default function SearchPage() {
 
         {/* Results */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredBooks.map((book) => (
-            <Card
-              key={book.id}
-              className="group hover:shadow-lg transition-all duration-300 cursor-pointer"
-            >
-              <CardContent className="p-6">
-                <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg mb-4 flex items-center justify-center">
-                  <BookOpen className="h-12 w-12 text-primary/60" />
-                </div>
-                <h3 className="font-serif font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
-                  {book.title}
-                </h3>
-                <p className="text-muted-foreground text-sm mb-2">
-                  by {book.author}
-                </p>
-                <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
-                  {book.description}
-                </p>
-                <div className="flex items-center justify-between mb-2">
-                  <Badge variant="outline" className="text-xs">
-                    {book.genre}
-                  </Badge>
-                  <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 fill-accent text-accent" />
-                    <span className="text-sm font-medium">{book.rating}</span>
+          {filteredBooks && filteredBooks.length > 0 ? (
+            filteredBooks?.map((book) => (
+              <Card
+                key={book.id}
+                className="group hover:shadow-lg transition-all duration-300 cursor-pointer"
+              >
+                <CardContent className="p-6">
+                  <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg mb-4 flex items-center justify-center">
+                    <BookOpen className="h-12 w-12 text-primary/60" />
                   </div>
-                </div>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{book.year}</span>
-                  <span>{book.pages} pages</span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                  <h3 className="font-serif font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                    {book.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm mb-2">
+                    by {book.author}
+                  </p>
+                  <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
+                    {book.description}
+                  </p>
+                  <div className="flex items-center justify-between mb-2">
+                    <Badge variant="outline" className="text-xs">
+                      {book.genre}
+                    </Badge>
+                    <div className="flex items-center gap-1">
+                      <Star className="h-4 w-4 fill-accent text-accent" />
+                      <span className="text-sm font-medium">{book.rating}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>{book.year}</span>
+                    <span>{book.pages} pages</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <div>No books found</div>
+          )}
         </div>
 
         {/* No Results */}

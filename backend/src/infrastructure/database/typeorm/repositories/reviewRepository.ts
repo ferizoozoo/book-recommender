@@ -11,11 +11,9 @@ import { IReviewRepository } from "../../../../services/common/interfaces/reposi
 
 export class ReviewRepository implements IReviewRepository {
   #reviews: Repository<ReviewEntity>;
-  #books: Repository<BookEntity>;
 
   constructor() {
     this.#reviews = AppDataSource.getRepository(ReviewEntity);
-    this.#books = AppDataSource.getRepository(BookEntity);
   }
 
   async getById(id: number): Promise<Review | null> {

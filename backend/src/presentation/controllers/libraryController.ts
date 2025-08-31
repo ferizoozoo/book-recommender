@@ -7,6 +7,8 @@ import { Publisher } from "../../domain/library/publisher.entity";
 import { User } from "../../domain/auth/user.entity";
 import { ILibraryAuthService } from "../common/interfaces/services/i-library-authService";
 
+// TODO: each controller should have its own DTO, for better validation and type safety
+
 // TODO: this controller methods have a lot of code that should be done at the
 //        service/application layer. A refactor is needed to move this logic
 //        into the appropriate layer.
@@ -186,7 +188,7 @@ export class LibraryController {
     nextFunction: NextFunction
   ): Promise<void> {
     try {
-      const { year } = req.query;
+      const { year } = req.body;
 
       const filters: any = {};
       if (year) filters.year = year;
@@ -348,28 +350,28 @@ export class LibraryController {
     }
   }
 
-  async searchBooks(
-    req: Request,
-    res: Response,
-    nextFunction: NextFunction
-  ): Promise<void> {
-    try {
-      const { query } = req.query;
-      if (!query || typeof query !== "string") {
-        res
-          .status(400)
-          .json({ message: presentationConsts.LibraryBookDetailsRequired });
-        return;
-      }
+  // async searchBooks(
+  //   req: Request,
+  //   res: Response,
+  //   nextFunction: NextFunction
+  // ): Promise<void> {
+  //   try {
+  //     const { query } = req.query;
+  //     if (!query || typeof query !== "string") {
+  //       res
+  //         .status(400)
+  //         .json({ message: presentationConsts.LibraryBookDetailsRequired });
+  //       return;
+  //     }
 
-      const books = await this.#libraryService.searchBooks(query);
-      res.status(200).json({ books });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to search books";
-      res.status(500).json({ message: errorMessage });
-    }
-  }
+  //     const books = await this.#libraryService.searchBooks(query);
+  //     res.status(200).json({ books });
+  //   } catch (error) {
+  //     const errorMessage =
+  //       error instanceof Error ? error.message : "Failed to search books";
+  //     res.status(500).json({ message: errorMessage });
+  //   }
+  // }
 
   async addLabelToBook(
     req: Request,

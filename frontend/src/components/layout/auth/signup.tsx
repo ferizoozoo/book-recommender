@@ -26,7 +26,7 @@ const Signup: React.FC = () => {
 
     if (res.ok) {
       setLocalStorage(data);
-      navigate("/dashboard");
+      navigate("/");
     }
   };
 

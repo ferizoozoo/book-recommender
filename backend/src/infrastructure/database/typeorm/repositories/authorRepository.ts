@@ -11,7 +11,7 @@ import { IAuthorRepository } from "../../../../services/common/interfaces/reposi
 
 export class AuthorRepository implements IAuthorRepository {
   #authors: Repository<AuthorEntity>;
-  #books: Repository<BookEntity>;
+  #books: Repository<BookEntity>; // TODO: this violates DDD, and for fetching books, we should use an orchestrator
 
   constructor() {
     this.#authors = AppDataSource.getRepository(AuthorEntity);

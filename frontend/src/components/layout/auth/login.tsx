@@ -30,7 +30,7 @@ const Login: React.FC = () => {
     const data = await res.json();
     if (res.ok) {
       setLocalStorage(data);
-      navigate("/dashboard");
+      navigate("/");
     }
   };
 

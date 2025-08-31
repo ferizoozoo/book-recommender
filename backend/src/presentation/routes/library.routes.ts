@@ -13,8 +13,8 @@ libraryRouter.get("/readers-review", async (req, res, next) => {
   await libraryController.getReadersReviewBooks(req, res, next);
 });
 
-libraryRouter.get("/search", async (req, res, next) => {
-  await libraryController.searchBooks(req, res, next);
+libraryRouter.post("/search", async (req, res, next) => {
+  await libraryController.getFilteredBooks(req, res, next);
 });
 
 libraryRouter.get("/trending", async (req, res, next) => {

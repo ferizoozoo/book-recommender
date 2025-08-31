@@ -30,8 +30,8 @@ export class LibraryService implements ILibraryService {
     this.#userRepo = userRepo;
     this.#reviewRepo = reviewRepo;
   }
-  getFilteredBooks(filters: any): Promise<Book[]> {
-    return this.#bookRepo.filter(filters);
+  async getFilteredBooks(filters: any): Promise<Book[]> {
+    return await this.#bookRepo.filter(filters);
   }
 
   async getReadersReviewBooks(bookId: number): Promise<Review[]> {

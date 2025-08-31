@@ -20,9 +20,9 @@ import { User } from "../../../../domain/auth/user.entity";
 
 export class BookRepository implements IBookRepository {
   private bookRepository: Repository<BookEntity>;
-  private readonly bookLikeRepository: Repository<UserBookLikeEntity>;
-  private readonly bookUserRepository: Repository<UserBookEntity>;
-  private readonly userRepository: Repository<UserEntity>;
+  private readonly bookLikeRepository: Repository<UserBookLikeEntity>; // TODO: this violates DDD, and for fetching books, we should use an orchestrator
+  private readonly bookUserRepository: Repository<UserBookEntity>; // TODO: this violates DDD, and for fetching books, we should use an orchestrator
+  private readonly userRepository: Repository<UserEntity>; // TODO: this violates DDD, and for fetching books, we should use an orchestrator
 
   constructor() {
     this.bookRepository = AppDataSource.getRepository(BookEntity);
@@ -36,8 +36,8 @@ export class BookRepository implements IBookRepository {
       query.andWhere("book.year = :year", { year: filters.year });
     }
 
-    query.andWhere("book.title ILIKE :title", { title: `%${filters.title}%` });
-    query.andWhere("book.author ILIKE :author", {
+    query.andWhere("book.title LIKE :title", { title: `%${filters.title}%` });
+    query.andWhere("book.author LIKE :author", {
       author: `%${filters.author}%`,
     });
 
