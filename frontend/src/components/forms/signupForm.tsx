@@ -10,23 +10,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { useAuthContext } from "@/contexts/auth-context";
 
 interface SignupData {
   email: string;
   password: string;
-  retypePassword: string;
+  retypePassword: string | null;
 }
 
 interface SignupFormProps extends React.ComponentProps<"div"> {
   className?: string;
-  handlesubmit: (signupData: SignupData) => Promise<void>;
+  handleregister: (submitData: SignupData) => Promise<void>;
 }
 
 const SignupForm = ({ className, ...props }: SignupFormProps) => {
-  const handleSubmit = props!.handlesubmit;
-
-  const { login } = useAuthContext();
+  const { handleregister } = props;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -48,13 +45,15 @@ const SignupForm = ({ className, ...props }: SignupFormProps) => {
     setRetypePassword(event.target.value);
   };
 
-  const handleSignup = () => {
+  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (password !== retypePassword) {
       setError("Passwords do not match");
       return;
     }
     setError(null);
-    handleSubmit({ email, password });
+    // TODO: retype password should be also checked in the server
+    await handleregister({ email, password, retypePassword: null });
   };
 
   return (
@@ -67,9 +66,7 @@ const SignupForm = ({ className, ...props }: SignupFormProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form
-            onSubmit={() => handleSignup({ email, password, retypePassword })}
-          >
+          <form onSubmit={handleSignup}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="email">Email</Label>
