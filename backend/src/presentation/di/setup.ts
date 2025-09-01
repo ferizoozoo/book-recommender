@@ -4,7 +4,7 @@ import { UserRepository } from "../../infrastructure/database/typeorm/repositori
 import { BcryptHasher } from "../../infrastructure/security/bcrypt-hasher.ts";
 import { JwtTokenService } from "../../infrastructure/security/token.service.ts";
 import { AuthController } from "../controllers/authController.ts";
-import { UserService } from "../../services/auth/user.service";
+import { UserService } from "../../services/auth/user.service.ts";
 import { LibraryService } from "../../services/library/library.service.ts";
 import { LibraryController } from "../controllers/libraryController.ts";
 import { BookRepository } from "../../infrastructure/database/typeorm/repositories/bookRepository.ts";
