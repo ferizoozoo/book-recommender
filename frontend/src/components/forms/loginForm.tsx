@@ -20,14 +20,11 @@ interface LoginData {
 
 interface LoginFormProps extends React.ComponentProps<"div"> {
   className?: string;
-  handlesubmit: (loginData: LoginData) => Promise<void>;
+  // handleLogin: (loginData: LoginData) => Promise<void>;
 }
 
 const LoginForm = ({ className, ...props }: LoginFormProps) => {
-  const handleSubmit = props!.handlesubmit;
-
   const { login } = useAuthContext();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +38,28 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
     setPassword(event.target.value);
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    login(email, password)
+      .then(() => {
+        // Handle successful login
+      })
+      .catch((error) => {
+        setError(error.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="bg-slate-800 border-slate-700 text-amber-50">
@@ -51,7 +70,7 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={() => handleSubmit({ email, password })}>
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="email">Email</Label>
