@@ -4,6 +4,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { UserEntity } from "./auth.models.ts";
@@ -22,7 +23,7 @@ export class AuthorEntity {
   @OneToMany(() => BookEntity, (book) => book.author)
   books: BookEntity[];
 
-  @ManyToOne(() => UserEntity)
+  @OneToOne(() => UserEntity)
   @JoinColumn({ name: "userId" })
   user: UserEntity;
 }
@@ -151,6 +152,7 @@ export class ReviewEntity {
   comment: string;
 }
 
+// TODO: refactor this and UserBookLikeEntity into a single entity
 @Entity("user_books")
 export class UserBookEntity {
   @PrimaryGeneratedColumn()

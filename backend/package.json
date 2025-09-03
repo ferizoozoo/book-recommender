@@ -12,12 +12,14 @@
     "typeorm": "typeorm-ts-node-esm -d src/infrastructure/database/typeorm/index.ts",
     "migration:create": "npm run typeorm migration:create src/infrastructure/database/typeorm/migrations/",
     "migration:run": "npm run typeorm migration:run",
-    "migration:revert": "npm run typeorm migration:revert"
+    "migration:revert": "npm run typeorm migration:revert",
+    "seed": "node --loader ts-node/esm src/infrastructure/database/typeorm/seed.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@faker-js/faker": "^10.0.0",
     "bcrypt": "^6.0.0",
     "better-sqlite3": "^11.10.0",
     "cors": "^2.8.5",
