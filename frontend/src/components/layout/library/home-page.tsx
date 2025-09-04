@@ -84,7 +84,8 @@ export default function HomePage() {
   };
 
   const getTrendingBooks = async () => {
-    const res = await fetch("/api/library/trending?limit=4");
+    const url = import.meta.env.VITE_API_URL;
+    const res = await fetch(`${url}/library/trending?limit=4`);
     if (!res.ok) {
       throw new Error("Failed to fetch trending books");
     }
@@ -92,12 +93,15 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    setFeatures(getFeatures());
-    setTestimonials(getTestimonials());
     async function fetchTrendingBooks() {
-      setTrendingBooks(await getTrendingBooks());
+      const data = await getTrendingBooks();
+      const books = data.books;
+      setTrendingBooks(books);
     }
     fetchTrendingBooks();
+
+    setFeatures(getFeatures());
+    setTestimonials(getTestimonials());
   }, []);
 
   return (
@@ -199,33 +203,39 @@ export default function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {trendingBooks?.map((book, index) => (
-              <Card
-                key={index}
-                className="group hover:shadow-lg transition-all duration-300 cursor-pointer"
-              >
-                <CardContent className="p-6">
-                  <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg mb-4 flex items-center justify-center">
-                    <BookOpen className="h-12 w-12 text-primary/60" />
-                  </div>
-                  <h3 className="font-serif font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                    {book.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm mb-2">
-                    by {book.author}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="text-xs">
-                      {book.genre}
-                    </Badge>
-                    <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 fill-accent text-accent" />
-                      <span className="text-sm font-medium">{book.rating}</span>
+            {trendingBooks.length > 0 &&
+              trendingBooks?.map((book, index) => (
+                <Card
+                  key={index}
+                  className="group hover:shadow-lg transition-all duration-300 cursor-pointer"
+                >
+                  <CardContent className="p-6">
+                    <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg mb-4 flex items-center justify-center">
+                      <BookOpen className="h-12 w-12 text-primary/60" />
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    <h3 className="font-serif font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                      {book.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm mb-2">
+                      by{" "}
+                      {book.author.user.firstname +
+                        " " +
+                        book.author.user.lastname}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <Badge variant="outline" className="text-xs">
+                        {book.genre}
+                      </Badge>
+                      <div className="flex items-center gap-1">
+                        <Star className="h-4 w-4 fill-accent text-accent" />
+                        <span className="text-sm font-medium">
+                          {book.rating}
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
           </div>
         </div>
       </section>
