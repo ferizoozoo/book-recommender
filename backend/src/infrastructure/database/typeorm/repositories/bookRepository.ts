@@ -77,18 +77,11 @@ export class BookRepository implements IBookRepository {
   }
 
   async getTrendingBooks(limit: number): Promise<Book[]> {
-    const bookEntities = await this.bookRepository
-      .createQueryBuilder("books")
-      // Select all columns from the book entity
-      .addSelect("COUNT(books.numberOfRatings)", "ratingsCount")
-      // Group by book to count ratings for each one
-      .groupBy("books.id")
-      // Order by the new 'ratingsCount' field in descending order
-      .orderBy("ratingsCount", "DESC")
-      // Optional: Limit the number of results (e.g., top 10)
-      .take(limit)
-      // Execute the query
-      .getRawMany();
+    const bookEntities = await this.bookRepository.find({
+      take: limit,
+      relations: ["author", "publisher"],
+    });
+
     return bookEntities.map((entity) => mapBookEntityToDomain(entity));
   }
 
