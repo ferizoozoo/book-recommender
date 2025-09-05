@@ -131,33 +131,7 @@ export default function SearchPage() {
   const [selectedGenre, setSelectedGenre] = useState("All Genres");
   const [selectedRating, setSelectedRating] = useState("All Ratings");
   const [selectedYear, setSelectedYear] = useState("All Years");
-  const [showFilters, setShowFilters] = useState(false);
   const [filteredBooks, setFilteredBooks] = useState<any[]>([]);
-
-  // Filter books based on search criteria
-  // const filteredBooks = mockBooks.filter((book) => {
-  //   const matchesSearch =
-  //     book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-  //     book.author.toLowerCase().includes(searchQuery.toLowerCase());
-  //   // const matchesGenre =
-  //   //   selectedGenre === "All Genres" || book.genre === selectedGenre;
-  //   // const matchesRating =
-  //   //   selectedRating === "All Ratings" ||
-  //   //   book.rating >= Number.parseFloat(selectedRating.replace("+", ""));
-
-  //   let matchesYear = true;
-  //   if (selectedYear !== "All Years") {
-  //     if (selectedYear === "2020-2024") matchesYear = book.year >= 2020;
-  //     else if (selectedYear === "2015-2019")
-  //       matchesYear = book.year >= 2015 && book.year <= 2019;
-  //     else if (selectedYear === "2010-2014")
-  //       matchesYear = book.year >= 2010 && book.year <= 2014;
-  //     else if (selectedYear === "Before 2010") matchesYear = book.year < 2010;
-  //   }
-
-  //   // return matchesSearch && matchesGenre && matchesRating && matchesYear;
-  //   return matchesSearch && matchesYear;
-  // });
 
   const handleSearch = async () => {
     // Call the search function with the current filters
@@ -248,84 +222,6 @@ export default function SearchPage() {
               className="pl-10 h-12 text-lg"
             />
           </div>
-          {/* Filter Toggle
-          <div className="flex items-center justify-between">
-            <Button
-              variant="outline"
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2"
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              Filters
-            </Button>
-            <p className="text-sm text-muted-foreground">
-              {filteredBooks.length} books found
-            </p>
-          </div> */}
-          {/* Filters */}
-          {/* {showFilters && (
-            <Card className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
-                    Genre
-                  </label>
-                  <Select
-                    value={selectedGenre}
-                    onValueChange={setSelectedGenre}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {genres.map((genre) => (
-                        <SelectItem key={genre} value={genre}>
-                          {genre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
-                    Rating
-                  </label>
-                  <Select
-                    value={selectedRating}
-                    onValueChange={setSelectedRating}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ratings.map((rating) => (
-                        <SelectItem key={rating} value={rating}>
-                          {rating}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
-                    Publication Year
-                  </label>
-                  <Select value={selectedYear} onValueChange={setSelectedYear}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {years.map((year) => (
-                        <SelectItem key={year} value={year}>
-                          {year}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </Card>
-          )} */}
         </div>
 
         {/* Results */}
