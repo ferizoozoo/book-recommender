@@ -164,9 +164,8 @@ export default function SearchPage() {
     const filters = {
       title: searchQuery,
       author: searchQuery,
-      year: selectedYear,
+      year: searchQuery,
     };
-    debugger;
     const res = await fetch(`${config.apiUrl}/library/search`, {
       method: "POST",
       headers: {
@@ -176,11 +175,12 @@ export default function SearchPage() {
     });
 
     const data = await res.json();
-    setFilteredBooks(data);
+    const books = data.books;
+    setFilteredBooks(books);
   };
 
   useEffect(() => {
-    if (searchQuery.length <= 3) return;
+    if (searchQuery.length <= 3) setFilteredBooks([]);
     handleSearch();
   }, [searchQuery, selectedGenre, selectedRating, selectedYear]);
 
@@ -242,14 +242,13 @@ export default function SearchPage() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
-              placeholder="Search by title, author, or keyword..."
+              placeholder="Search by title, author, year or keyword..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 h-12 text-lg"
             />
           </div>
-
-          {/* Filter Toggle */}
+          {/* Filter Toggle
           <div className="flex items-center justify-between">
             <Button
               variant="outline"
@@ -262,10 +261,9 @@ export default function SearchPage() {
             <p className="text-sm text-muted-foreground">
               {filteredBooks.length} books found
             </p>
-          </div>
-
+          </div> */}
           {/* Filters */}
-          {showFilters && (
+          {/* {showFilters && (
             <Card className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -327,7 +325,7 @@ export default function SearchPage() {
                 </div>
               </div>
             </Card>
-          )}
+          )} */}
         </div>
 
         {/* Results */}
@@ -346,7 +344,7 @@ export default function SearchPage() {
                     {book.title}
                   </h3>
                   <p className="text-muted-foreground text-sm mb-2">
-                    by {book.author}
+                    by {book.author.firstname} {book.author.lastname}
                   </p>
                   <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
                     {book.description}

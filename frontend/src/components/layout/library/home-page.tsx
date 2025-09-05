@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useEffect, useState, type JSX } from "react";
+import config from "../../../../config";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -84,8 +85,7 @@ export default function HomePage() {
   };
 
   const getTrendingBooks = async () => {
-    const url = import.meta.env.VITE_API_URL;
-    const res = await fetch(`${url}/library/trending?limit=4`);
+    const res = await fetch(`${config.apiUrl}/library/trending?limit=4`);
     if (!res.ok) {
       throw new Error("Failed to fetch trending books");
     }
