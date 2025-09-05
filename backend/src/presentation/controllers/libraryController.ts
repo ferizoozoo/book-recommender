@@ -6,6 +6,7 @@ import { Author } from "../../domain/library/author.entity";
 import { Publisher } from "../../domain/library/publisher.entity";
 import { User } from "../../domain/auth/user.entity";
 import { ILibraryAuthService } from "../common/interfaces/services/i-library-authService";
+import { AuthGuard } from "../common/decorators/auth.decorator";
 
 // TODO: each controller should have its own DTO, for better validation and type safety
 
@@ -24,6 +25,7 @@ export class LibraryController {
     this.#libraryAuthService = libraryAuthService;
   }
 
+  @AuthGuard(["admin"])
   async addAuthor(
     req: Request,
     res: Response,
@@ -48,6 +50,7 @@ export class LibraryController {
     }
   }
 
+  @AuthGuard(["admin"])
   async addPublisher(
     req: Request,
     res: Response,
@@ -72,6 +75,7 @@ export class LibraryController {
     }
   }
 
+  @AuthGuard(["admin"])
   async getAllBooks(
     req: Request,
     res: Response,
@@ -87,6 +91,7 @@ export class LibraryController {
     }
   }
 
+  @AuthGuard(["user", "admin"])
   async getBookById(
     req: Request,
     res: Response,
@@ -117,6 +122,7 @@ export class LibraryController {
     }
   }
 
+  @AuthGuard(["user", "admin"])
   async getBookByIsbn(
     req: Request,
     res: Response,
@@ -147,6 +153,7 @@ export class LibraryController {
     }
   }
 
+  @AuthGuard(["user", "admin"])
   async getTrendingBooks(
     req: Request,
     res: Response,
@@ -165,6 +172,7 @@ export class LibraryController {
     }
   }
 
+  @AuthGuard(["user", "admin"])
   async getReadersReviewBooks(
     req: Request,
     res: Response,
@@ -182,6 +190,7 @@ export class LibraryController {
     }
   }
 
+  @AuthGuard(["user", "admin"])
   async getFilteredBooks(
     req: Request,
     res: Response,
@@ -209,6 +218,7 @@ export class LibraryController {
   // TODO: for now, we are using the Book entity directly in the controller.
   //       In a real application, we might want to use a DTO (Data Transfer Object)
   //       to avoid exposing domain entities directly.
+  @AuthGuard(["admin"])
   async addBook(
     req: Request,
     res: Response,
@@ -270,6 +280,7 @@ export class LibraryController {
     }
   }
 
+  @AuthGuard(["admin"])
   async updateBook(
     req: Request,
     res: Response,
@@ -329,6 +340,7 @@ export class LibraryController {
     }
   }
 
+  @AuthGuard(["admin"])
   async deleteBook(
     req: Request,
     res: Response,
@@ -352,29 +364,7 @@ export class LibraryController {
     }
   }
 
-  // async searchBooks(
-  //   req: Request,
-  //   res: Response,
-  //   nextFunction: NextFunction
-  // ): Promise<void> {
-  //   try {
-  //     const { query } = req.query;
-  //     if (!query || typeof query !== "string") {
-  //       res
-  //         .status(400)
-  //         .json({ message: presentationConsts.LibraryBookDetailsRequired });
-  //       return;
-  //     }
-
-  //     const books = await this.#libraryService.searchBooks(query);
-  //     res.status(200).json({ books });
-  //   } catch (error) {
-  //     const errorMessage =
-  //       error instanceof Error ? error.message : "Failed to search books";
-  //     res.status(500).json({ message: errorMessage });
-  //   }
-  // }
-
+  @AuthGuard(["admin"])
   async addLabelToBook(
     req: Request,
     res: Response,
@@ -406,6 +396,7 @@ export class LibraryController {
     }
   }
 
+  @AuthGuard(["admin"])
   async removeLabelFromBook(
     req: Request,
     res: Response,
@@ -437,6 +428,7 @@ export class LibraryController {
     }
   }
 
+  @AuthGuard(["user", "admin"])
   async getBooksByLabel(
     req: Request,
     res: Response,
@@ -462,61 +454,7 @@ export class LibraryController {
     }
   }
 
-  async orderBook(
-    req: Request,
-    res: Response,
-    nextFunction: NextFunction
-  ): Promise<void> {
-    try {
-      const bookId = parseInt(req.params.id);
-      if (isNaN(bookId)) {
-        res
-          .status(400)
-          .json({ message: presentationConsts.LibraryInvalidBookId });
-        return;
-      }
-
-      // In a real app, userId would come from authenticated user session
-      const { userId } = req.body;
-      if (!userId) {
-        res
-          .status(400)
-          .json({ message: presentationConsts.LibraryUserIdRequired });
-        return;
-      }
-
-      await this.#libraryService.orderBook(bookId, userId);
-      res.status(200).json({ message: presentationConsts.LibraryBookOrdered });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to order book";
-      res.status(400).json({ message: errorMessage });
-    }
-  }
-
-  async returnBook(
-    req: Request,
-    res: Response,
-    nextFunction: NextFunction
-  ): Promise<void> {
-    try {
-      const bookId = parseInt(req.params.id);
-      if (isNaN(bookId)) {
-        res
-          .status(400)
-          .json({ message: presentationConsts.LibraryInvalidBookId });
-        return;
-      }
-
-      await this.#libraryService.returnBook(bookId);
-      res.status(200).json({ message: presentationConsts.LibraryBookReturned });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to return book";
-      res.status(400).json({ message: errorMessage });
-    }
-  }
-
+  @AuthGuard(["user", "admin"])
   async likeBook(
     req: Request,
     res: Response,
@@ -548,6 +486,7 @@ export class LibraryController {
     }
   }
 
+  @AuthGuard(["user", "admin"])
   async getAllBooksForUser(
     req: Request,
     res: Response,

@@ -58,15 +58,6 @@ libraryRouter.delete("/:id/label", async (req, res, next) => {
   await libraryController.removeLabelFromBook(req, res, next);
 });
 
-// Order management routes
-libraryRouter.post("/:id/order", async (req, res, next) => {
-  await libraryController.orderBook(req, res, next);
-});
-
-libraryRouter.post("/:id/return", async (req, res, next) => {
-  await libraryController.returnBook(req, res, next);
-});
-
 libraryRouter.post("/authors", async (req, res, next) => {
   await libraryController.addAuthor(req, res, next);
 });
