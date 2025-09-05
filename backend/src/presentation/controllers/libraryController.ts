@@ -188,10 +188,12 @@ export class LibraryController {
     nextFunction: NextFunction
   ): Promise<void> {
     try {
-      const { year } = req.body;
+      const { year, author, title } = req.body;
 
       const filters: any = {};
       if (year) filters.year = year;
+      if (author) filters.author = author;
+      if (title) filters.title = title;
 
       const books = await this.#libraryService.getFilteredBooks(filters);
       res.status(200).json({ books });

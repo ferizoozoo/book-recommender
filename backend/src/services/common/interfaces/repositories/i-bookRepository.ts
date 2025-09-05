@@ -13,6 +13,5 @@ export interface IBookRepository {
   save(book: Book): Promise<void>;
   delete(id: number): Promise<void>;
   update(book: Book): Promise<void>;
-  search(query: string): Promise<Book[]>;
   likeBook(user: User, book: Book): Promise<void>;
 }

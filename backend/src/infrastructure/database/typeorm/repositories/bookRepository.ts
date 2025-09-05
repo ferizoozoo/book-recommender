@@ -36,8 +36,8 @@ export class BookRepository implements IBookRepository {
       query.andWhere("book.year = :year", { year: filters.year });
     }
 
-    query.andWhere("book.title LIKE :title", { title: `%${filters.title}%` });
-    query.andWhere("book.author LIKE :author", {
+    query.orWhere("book.title LIKE :title", { title: `%${filters.title}%` });
+    query.orWhere("book.author LIKE :author", {
       author: `%${filters.author}%`,
     });
 
@@ -113,21 +113,6 @@ export class BookRepository implements IBookRepository {
   async update(book: Book): Promise<void> {
     const bookEntity = mapBookDomainToModel(book);
     await this.bookRepository.save(bookEntity);
-  }
-
-  async search(query: string): Promise<Book[]> {
-    // Simple implementation that searches title and description
-    // A more robust implementation would use full-text search
-    const bookEntities = await this.bookRepository
-      .createQueryBuilder("book")
-      .leftJoinAndSelect("book.author", "author")
-      .leftJoinAndSelect("book.publisher", "publisher")
-      .where("book.title LIKE :query OR book.description LIKE :query", {
-        query: `%${query}%`,
-      })
-      .getMany();
-
-    return bookEntities.map((entity) => mapBookEntityToDomain(entity));
   }
 
   async likeBook(user: User, book: Book): Promise<void> {

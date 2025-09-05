@@ -133,13 +133,6 @@ export class LibraryService implements ILibraryService {
     await this.#bookRepo.delete(id);
   }
 
-  async searchBooks(query: string): Promise<Book[]> {
-    if (!query) {
-      throw new Error("Search query is required");
-    }
-    return await this.#bookRepo.search(query);
-  }
-
   async addLabelToBook(bookId: number, label: string): Promise<void> {
     if (!label) {
       throw new Error("Label is required");

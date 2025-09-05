@@ -23,7 +23,6 @@ export interface ILibraryService {
   addBook(book: Book): Promise<void>;
   updateBook(book: Book): Promise<void>;
   deleteBook(id: number): Promise<void>;
-  searchBooks(query: string): Promise<Book[]>;
   addLabelToBook(bookId: number, label: string): Promise<void>;
   removeLabelFromBook(bookId: number, label: string): Promise<void>;
   getBooksByLabel(label: string): Promise<Book[]>;
