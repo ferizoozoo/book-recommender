@@ -12,6 +12,7 @@ import {
 import { useNavigate } from "react-router";
 import { useEffect, useState, type JSX } from "react";
 import config from "../../../../config";
+import Header from "@/components/blocks/header";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -106,51 +107,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-serif font-bold text-foreground">
-              Bookrec
-            </span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6">
-            {/* <a
-              href="#discover"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Discover
-            </a>
-            <a
-              href="#genres"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Genres
-            </a>
-            <a
-              href="#about"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              About
-            </a> */}
-            <a
-              href="/login"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Sign In
-            </a>
-            {/* <Button variant="outline" size="sm"></Button> */}
-            <a
-              href="/register"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Register
-            </a>
-            {/* <Button size="sm"></Button> */}
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero Section */}
       <section className="py-20 px-4">

@@ -3,134 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { BookOpen, Star, Search, SlidersHorizontal } from "lucide-react";
+import { BookOpen, Star, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import config from "../../../../config";
-
-// // Mock book data
-// const mockBooks = [
-//   {
-//     id: 1,
-//     title: "The Seven Husbands of Evelyn Hugo",
-//     author: "Taylor Jenkins Reid",
-//     genre: "Fiction",
-//     rating: 4.8,
-//     year: 2017,
-//     pages: 400,
-//     description:
-//       "A reclusive Hollywood icon finally tells her story to a young journalist.",
-//   },
-//   {
-//     id: 2,
-//     title: "Atomic Habits",
-//     author: "James Clear",
-//     genre: "Self-Help",
-//     rating: 4.7,
-//     year: 2018,
-//     pages: 320,
-//     description:
-//       "An easy and proven way to build good habits and break bad ones.",
-//   },
-//   {
-//     id: 3,
-//     title: "The Silent Patient",
-//     author: "Alex Michaelides",
-//     genre: "Thriller",
-//     rating: 4.6,
-//     year: 2019,
-//     pages: 336,
-//     description:
-//       "A woman's act of violence against her husband and her refusal to speak.",
-//   },
-//   {
-//     id: 4,
-//     title: "Educated",
-//     author: "Tara Westover",
-//     genre: "Memoir",
-//     rating: 4.9,
-//     year: 2018,
-//     pages: 334,
-//     description:
-//       "A memoir about a young girl who, kept out of school, leaves her survivalist family.",
-//   },
-//   {
-//     id: 5,
-//     title: "Where the Crawdads Sing",
-//     author: "Delia Owens",
-//     genre: "Fiction",
-//     rating: 4.5,
-//     year: 2018,
-//     pages: 384,
-//     description:
-//       "A mystery about a young woman who raised herself in the marshes of North Carolina.",
-//   },
-//   {
-//     id: 6,
-//     title: "Becoming",
-//     author: "Michelle Obama",
-//     genre: "Memoir",
-//     rating: 4.8,
-//     year: 2018,
-//     pages: 448,
-//     description:
-//       "The memoir of former United States First Lady Michelle Obama.",
-//   },
-//   {
-//     id: 7,
-//     title: "The Midnight Library",
-//     author: "Matt Haig",
-//     genre: "Fiction",
-//     rating: 4.4,
-//     year: 2020,
-//     pages: 288,
-//     description:
-//       "Between life and death there is a library, and within that library, the shelves go on forever.",
-//   },
-//   {
-//     id: 8,
-//     title: "Sapiens",
-//     author: "Yuval Noah Harari",
-//     genre: "Non-Fiction",
-//     rating: 4.6,
-//     year: 2014,
-//     pages: 464,
-//     description:
-//       "A brief history of humankind from the Stone Age to the present.",
-//   },
-// ];
-
-const genres = [
-  "All Genres",
-  "Fiction",
-  "Non-Fiction",
-  "Thriller",
-  "Self-Help",
-  "Memoir",
-  "Romance",
-  "Fantasy",
-  "Mystery",
-];
-const ratings = ["All Ratings", "4.5+", "4.0+", "3.5+", "3.0+"];
-const years = [
-  "All Years",
-  "2020-2024",
-  "2015-2019",
-  "2010-2014",
-  "Before 2010",
-];
+import Header from "@/components/blocks/header";
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedGenre, setSelectedGenre] = useState("All Genres");
-  const [selectedRating, setSelectedRating] = useState("All Ratings");
-  const [selectedYear, setSelectedYear] = useState("All Years");
   const [filteredBooks, setFilteredBooks] = useState<any[]>([]);
 
   const handleSearch = async () => {
@@ -156,48 +35,11 @@ export default function SearchPage() {
   useEffect(() => {
     if (searchQuery.length <= 3) setFilteredBooks([]);
     handleSearch();
-  }, [searchQuery, selectedGenre, selectedRating, selectedYear]);
+  }, [searchQuery]);
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <BookOpen className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-serif font-bold text-foreground">
-              Bookrec
-            </span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link
-              href="/"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Home
-            </Link>
-            <Link href="/search" className="text-primary font-medium">
-              Search
-            </Link>
-            <a
-              href="#genres"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Genres
-            </a>
-            <a
-              href="#about"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              About
-            </a>
-            <Button variant="outline" size="sm">
-              Sign In
-            </Button>
-            <Button size="sm">Sign Up</Button>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       <div className="container mx-auto px-4 py-8">
         {/* Search Header */}
