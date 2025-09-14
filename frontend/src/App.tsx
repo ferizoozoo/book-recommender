@@ -25,9 +25,9 @@ function App() {
         <Route
           path="/library/search"
           element={
-            // <PrivateRoute>
-            <SearchPage />
-            // </PrivateRoute>
+            <PrivateRoute>
+              <SearchPage />
+            </PrivateRoute>
           }
         />
       </Routes>

@@ -13,8 +13,10 @@ import { useNavigate } from "react-router";
 import { useEffect, useState, type JSX } from "react";
 import config from "../../../../config";
 import Header from "@/components/blocks/header";
+import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
 
 export default function HomePage() {
+  const fetchWithAuth = useFetchWithAuth();
   const navigate = useNavigate();
   const [features, setFeatures] = useState<
     {

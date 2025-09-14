@@ -11,12 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useAuthContext } from "@/contexts/auth-context";
-import type { SignUpData } from "../layout/auth/login";
-
-interface LoginData {
-  email: string;
-  password: string;
-}
 
 interface LoginFormProps extends React.ComponentProps<"div"> {
   className?: string;

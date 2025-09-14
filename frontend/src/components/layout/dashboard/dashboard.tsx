@@ -27,7 +27,6 @@ export default function Dashboard() {
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/library/user/${user.email}`
       );
-      debugger;
       const result = await res.json();
       return setTableData(transformData(result));
     }

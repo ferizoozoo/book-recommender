@@ -7,23 +7,21 @@ import { BookOpen, Star, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import config from "../../../../config";
 import Header from "@/components/blocks/header";
+import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
 
 export default function SearchPage() {
+  const fetchWithAuth = useFetchWithAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredBooks, setFilteredBooks] = useState<any[]>([]);
 
   const handleSearch = async () => {
-    // Call the search function with the current filters
     const filters = {
       title: searchQuery,
       author: searchQuery,
       year: searchQuery,
     };
-    const res = await fetch(`${config.apiUrl}/library/search`, {
+    const res = await fetchWithAuth(`${config.apiUrl}/library/search`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify(filters),
     });
 
@@ -34,7 +32,7 @@ export default function SearchPage() {
 
   useEffect(() => {
     if (searchQuery.length <= 3) setFilteredBooks([]);
-    handleSearch();
+    else handleSearch();
   }, [searchQuery]);
 
   return (

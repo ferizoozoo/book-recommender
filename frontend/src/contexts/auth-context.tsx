@@ -1,16 +1,20 @@
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import config from "../../config";
 import React, { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  user: any;
+  accessToken: string | null;
+  refreshToken: string | null;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
-  user: null,
+  accessToken: null,
+  refreshToken: null,
   //   login: async () => {},
   //   logout: () => {},
 } as AuthContextType);
@@ -23,32 +27,42 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
   children,
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userToken, setUserToken] = useState<any>(null);
+  const [accessToken, setAccessToken] = useLocalStorage("accessToken", null);
+  const [refreshToken, setRefreshToken] = useLocalStorage("refreshToken", null);
 
   const navigate = useNavigate();
 
-  const login = async (username: string, password: string) => {
+  const login = async (email: string, password: string) => {
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch(`${config.apiUrl}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
       });
       setIsAuthenticated(true);
-      setUserToken(res);
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Login failed");
+      }
+      const tokens = await res.json();
+      setAccessToken(tokens.token.accessToken);
+      setRefreshToken(tokens.token.refreshToken);
       navigate("/");
     } catch (error) {
       setIsAuthenticated(false);
-      setUserToken(null);
+      setAccessToken(null);
+      setRefreshToken(null);
+      navigate("/login");
       throw error;
     }
   };
 
   const logout = () => {
     setIsAuthenticated(false);
-    setUserToken(null);
+    setAccessToken(null);
+    setRefreshToken(null);
     navigate("/login");
   };
 
@@ -56,9 +70,10 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
     <AuthContext.Provider
       value={{
         isAuthenticated,
-        user: userToken,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
         login,
-        logout
+        logout,
       }}
     >
       {children}

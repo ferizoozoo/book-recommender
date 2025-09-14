@@ -153,7 +153,6 @@ export class LibraryController {
     }
   }
 
-  @AuthGuard(["user", "admin"])
   async getTrendingBooks(
     req: Request,
     res: Response,
