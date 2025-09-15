@@ -25,15 +25,15 @@ libraryRouter.get("/label", async (req, res, next) => {
   await libraryController.getBooksByLabel(req, res, next);
 });
 
-libraryRouter.get("/:id", async (req, res, next) => {
-  await libraryController.getBookById(req, res, next);
-});
+// libraryRouter.get("/:id", async (req, res, next) => {
+//   await libraryController.getBookById(req, res, next);
+// });
 
 libraryRouter.get("/isbn/:isbn", async (req, res, next) => {
   await libraryController.getBookByIsbn(req, res, next);
 });
 
-libraryRouter.get("/user/:email", async (req, res, next) => {
+libraryRouter.get("/user", async (req, res, next) => {
   await libraryController.getAllBooksForUser(req, res, next);
 });
 

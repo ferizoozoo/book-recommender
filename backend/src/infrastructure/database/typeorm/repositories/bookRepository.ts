@@ -24,6 +24,7 @@ export class BookRepository implements IBookRepository {
   private readonly bookUserRepository: Repository<UserBookEntity>; // TODO: this violates DDD, and for fetching books, we should use an orchestrator
   private readonly userRepository: Repository<UserEntity>; // TODO: this violates DDD, and for fetching books, we should use an orchestrator
 
+  // TODO: use the di to use the repositories, instead of creating them here
   constructor() {
     this.bookRepository = AppDataSource.getRepository(BookEntity);
     this.bookLikeRepository = AppDataSource.getRepository(UserBookLikeEntity);
@@ -47,7 +48,6 @@ export class BookRepository implements IBookRepository {
   async getAllForUser(userId: number): Promise<Book[]> {
     const bookEntities = await this.bookUserRepository.find({
       where: { userId: userId },
-      relations: ["author", "publisher"],
     });
 
     return mapUserBookEntitiesToBookDomain(bookEntities);

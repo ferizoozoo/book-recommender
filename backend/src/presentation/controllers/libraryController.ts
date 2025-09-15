@@ -6,7 +6,11 @@ import { Author } from "../../domain/library/author.entity";
 import { Publisher } from "../../domain/library/publisher.entity";
 import { User } from "../../domain/auth/user.entity";
 import { ILibraryAuthService } from "../common/interfaces/services/i-library-authService";
-import { AuthGuard } from "../common/decorators/auth.decorator";
+import {
+  AuthGuard,
+  AuthenticatedRequest,
+} from "../common/decorators/auth.decorator";
+import { UserClaims } from "../../domain/auth/user-claims.value";
 
 // TODO: each controller should have its own DTO, for better validation and type safety
 
@@ -27,7 +31,7 @@ export class LibraryController {
 
   @AuthGuard(["admin"])
   async addAuthor(
-    req: Request,
+    req: AuthenticatedRequest,
     res: Response,
     nextFunction: NextFunction
   ): Promise<void> {
@@ -39,6 +43,10 @@ export class LibraryController {
           .json({ message: presentationConsts.LibraryAuthorNameRequired });
         return;
       }
+
+      // Access the authenticated user's claims
+      const userClaims = req.user;
+      console.log("User adding author:", userClaims?.email, userClaims?.roles);
 
       const author = new Author(id, bio, image, [], new User());
       const savedAuthor = await this.#libraryService.addAuthor(author);
@@ -487,20 +495,14 @@ export class LibraryController {
 
   @AuthGuard(["user", "admin"])
   async getAllBooksForUser(
-    req: Request,
+    req: AuthenticatedRequest,
     res: Response,
     nextFunction: NextFunction
   ): Promise<Book[]> {
-    const email = req.params.email;
-    if (!email) {
-      res
-        .status(400)
-        .json({ message: presentationConsts.LibraryUserEmailRequired });
-      return [];
-    }
-
     try {
-      const books = await this.#libraryAuthService.getAllForUser(email);
+      const books = await this.#libraryAuthService.getAllForUser(
+        req.user!.email
+      );
       res.status(200).json({ books });
       return books;
     } catch (error) {
