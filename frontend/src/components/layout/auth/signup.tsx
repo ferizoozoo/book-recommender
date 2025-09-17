@@ -1,4 +1,4 @@
-import SignupForm from "@/components/forms/signupForm";
+import SignupForm from "@/components/forms/auth/signupForm";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import React from "react";
 import { useNavigate } from "react-router-dom";

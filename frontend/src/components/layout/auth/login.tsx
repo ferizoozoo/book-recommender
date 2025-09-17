@@ -1,4 +1,4 @@
-import LoginForm from "@/components/forms/loginForm";
+import LoginForm from "@/components/forms/auth/loginForm";
 import React from "react";
 
 export interface SignUpData {
