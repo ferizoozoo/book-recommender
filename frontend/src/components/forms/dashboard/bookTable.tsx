@@ -63,18 +63,18 @@ export function BooksTable({
           <CardTitle>Books</CardTitle>
           <Dialog>
             <DialogTrigger>
-              <Button disabled={isLoading}>
+              <div className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-black bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary cursor-pointer">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Book
-              </Button>
+              </div>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="bg-white">
               <BookForm onSubmit={onAdd} />
             </DialogContent>
           </Dialog>
         </CardHeader>
         <CardContent>
-          {books.length === 0 ? (
+          {books?.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <p>No books found. Add your first book to get started.</p>
             </div>
@@ -86,61 +86,59 @@ export function BooksTable({
                     <TableHead>Title</TableHead>
                     <TableHead>Author</TableHead>
                     <TableHead>Publisher</TableHead>
-                    <TableHead>Genre</TableHead>
                     <TableHead>ISBN</TableHead>
-                    <TableHead>Pages</TableHead>
                     <TableHead>Published</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    {/* <TableHead>Genre</TableHead> */}
+                    {/* <TableHead>Pages</TableHead> */}
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {books.map((book) => (
-                    <TableRow key={book.id}>
-                      <TableCell className="font-medium">
-                        <div>
-                          <p className="font-medium">{book.title}</p>
-                          {book.description && (
-                            <p className="text-sm text-muted-foreground truncate max-w-xs">
-                              {book.description}
+                  {books.length > 0 &&
+                    books?.map((book) => (
+                      <TableRow key={book.id}>
+                        <TableCell className="font-medium">
+                          <div>
+                            <p className="font-medium text-start">
+                              {book.title}
                             </p>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>{book.author.name}</TableCell>
-                      <TableCell>{book.publisher.name}</TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">{book.genre}</Badge>
-                      </TableCell>
-                      <TableCell className="font-mono text-sm">
-                        {book.isbn}
-                      </TableCell>
-                      <TableCell>{book.pages}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {book.publishedDate.toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex gap-2 justify-end">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onEdit(book)}
-                            disabled={isLoading}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDeleteClick(book)}
-                            disabled={isLoading}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                          </div>
+                        </TableCell>
+                        <TableCell>{book.author.name}</TableCell>
+                        <TableCell>{book.publisher.name}</TableCell>
+                        {/* <TableCell>
+                          <Badge variant="secondary">{book.genre}</Badge>
+                        </TableCell> */}
+                        <TableCell className="font-mono text-sm">
+                          {book.isbn}
+                        </TableCell>
+                        {/* <TableCell>{book.pages}</TableCell> */}
+                        <TableCell className="text-sm text-muted-foreground">
+                          {book.year}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex gap-2 justify-end">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => onEdit(book)}
+                              disabled={isLoading}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteClick(book)}
+                              disabled={isLoading}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </div>

@@ -20,7 +20,7 @@ interface PublishersTableProps {
   publishers: Publisher[];
   onEdit: (publisher: Publisher) => void;
   onDelete: (id: string) => void;
-  onAdd: () => void;
+  onAdd: (publisherData: any) => void;
   isLoading?: boolean;
 }
 
@@ -63,7 +63,7 @@ export function PublishersTable({
                 Add Publisher
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="bg-white">
               <PublisherForm onSubmit={onAdd} />
             </DialogContent>
           </Dialog>

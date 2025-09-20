@@ -4,7 +4,7 @@ import { libraryController } from "../di/setup.ts";
 const libraryRouter = Router();
 
 // Book management routes
-libraryRouter.get("/", async (req, res, next) => {
+libraryRouter.get("/books", async (req, res, next) => {
   await libraryController.getAllBooks(req, res, next);
 });
 
@@ -37,24 +37,24 @@ libraryRouter.get("/user", async (req, res, next) => {
   await libraryController.getAllBooksForUser(req, res, next);
 });
 
-libraryRouter.post("/", async (req, res, next) => {
+libraryRouter.post("/books", async (req, res, next) => {
   await libraryController.addBook(req, res, next);
 });
 
-libraryRouter.put("/:id", async (req, res, next) => {
+libraryRouter.put("/books/:id", async (req, res, next) => {
   await libraryController.updateBook(req, res, next);
 });
 
-libraryRouter.delete("/:id", async (req, res, next) => {
+libraryRouter.delete("/books/:id", async (req, res, next) => {
   await libraryController.deleteBook(req, res, next);
 });
 
 // Label management routes
-libraryRouter.post("/:id/label", async (req, res, next) => {
+libraryRouter.post("/books/:id/label", async (req, res, next) => {
   await libraryController.addLabelToBook(req, res, next);
 });
 
-libraryRouter.delete("/:id/label", async (req, res, next) => {
+libraryRouter.delete("/books/:id/label", async (req, res, next) => {
   await libraryController.removeLabelFromBook(req, res, next);
 });
 

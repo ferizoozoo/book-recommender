@@ -10,7 +10,7 @@ import type { Author } from "@/components/types";
 
 interface AuthorFormProps {
   author?: Author;
-  onSubmit: (data: { name: string; email: string; bio?: string }) => void;
+  onSubmit: (data: { bio?: string }) => void;
   onCancel: () => void;
   isLoading?: boolean;
 }
@@ -22,17 +22,13 @@ export function AuthorForm({
   isLoading = false,
 }: AuthorFormProps) {
   const [formData, setFormData] = useState({
-    name: author?.name || "",
-    email: author?.email || "",
     bio: author?.bio || "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
-      name: formData.name,
-      email: formData.email,
-      bio: formData.bio || undefined,
+      bio: formData.bio,
     });
   };
 
@@ -43,7 +39,7 @@ export function AuthorForm({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label htmlFor="name">Name *</Label>
             <Input
               id="name"
@@ -70,7 +66,7 @@ export function AuthorForm({
               required
               disabled={isLoading}
             />
-          </div>
+          </div> */}
 
           <div className="space-y-2">
             <Label htmlFor="bio">Biography</Label>

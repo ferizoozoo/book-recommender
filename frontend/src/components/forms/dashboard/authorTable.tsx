@@ -22,7 +22,7 @@ interface AuthorsTableProps {
   authors: Author[];
   onEdit: (author: Author) => void;
   onDelete: (id: string) => void;
-  onAdd: () => void;
+  onAdd: (authorData: any) => void;
   isLoading?: boolean;
 }
 
@@ -65,7 +65,7 @@ export function AuthorsTable({
                 Add Author
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="bg-white">
               <AuthorForm onSubmit={onAdd} />
             </DialogContent>
           </Dialog>
@@ -105,9 +105,9 @@ export function AuthorsTable({
                           <Badge variant="secondary">No bio</Badge>
                         )}
                       </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
+                      {/* <TableCell className="text-sm text-muted-foreground">
                         {author.createdAt.toLocaleDateString()}
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell className="text-right">
                         <div className="flex gap-2 justify-end">
                           <Button

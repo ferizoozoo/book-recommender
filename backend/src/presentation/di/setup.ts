@@ -1,5 +1,4 @@
 import { AuthService } from "../../services/auth/auth.service.ts";
-import { UserController } from "../controllers/userController.ts";
 import { UserRepository } from "../../infrastructure/database/typeorm/repositories/userRepository.ts";
 import { BcryptHasher } from "../../infrastructure/security/bcrypt-hasher.ts";
 import { JwtTokenService } from "../../infrastructure/security/token.service.ts";
@@ -20,8 +19,7 @@ import { LibraryAuthService } from "../../services/orchestrators/library-auth.se
 
 // Register services
 const userRepository = new UserRepository();
-const userService = new UserService(userRepository);
-const userController = new UserController(userService);
+// const userService = new UserService(userRepository);
 
 const hasher = new BcryptHasher();
 const tokenService = new JwtTokenService();
@@ -53,9 +51,9 @@ const libraryController = new LibraryController(
 
 // export the registered services
 export {
-  userController,
   authController,
   libraryController,
   tokenService,
   libraryAuthService,
+  userRepository,
 };

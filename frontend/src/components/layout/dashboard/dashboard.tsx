@@ -48,27 +48,34 @@ export default function Dashboard() {
         // Fetch books
         const booksRes = await fetchWithAuth(`${config.apiUrl}/library/books`);
         if (booksRes.ok) {
-          const booksData = await booksRes.json();
-          setBooks(booksData);
+          const data = await booksRes.json();
+          const booksData = data.books;
+          debugger;
+          // Initialize as empty array if undefined/null
+          setBooks(booksData || []);
+        } else {
+          // Initialize as empty array on error
+          setBooks([]);
+          console.error("Failed to fetch books:", await booksRes.text());
         }
 
         // Fetch authors
-        const authorsRes = await fetchWithAuth(
-          `${config.apiUrl}/library/authors`
-        );
-        if (authorsRes.ok) {
-          const authorsData = await authorsRes.json();
-          setAuthors(authorsData);
-        }
+        // const authorsRes = await fetchWithAuth(
+        //   `${config.apiUrl}/library/authors`
+        // );
+        // if (authorsRes.ok) {
+        //   const authorsData = await authorsRes.json();
+        //   setAuthors(authorsData);
+        // }
 
-        // Fetch publishers
-        const publishersRes = await fetchWithAuth(
-          `${config.apiUrl}/library/publishers`
-        );
-        if (publishersRes.ok) {
-          const publishersData = await publishersRes.json();
-          setPublishers(publishersData);
-        }
+        // // Fetch publishers
+        // const publishersRes = await fetchWithAuth(
+        //   `${config.apiUrl}/library/publishers`
+        // );
+        // if (publishersRes.ok) {
+        //   const publishersData = await publishersRes.json();
+        //   setPublishers(publishersData);
+        // }
       } catch (error) {
         console.error("Failed to fetch data:", error);
       }
@@ -231,11 +238,6 @@ export default function Dashboard() {
     >
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader
-          header="Books"
-          title="GitHub"
-          link="https://github.com/shadcn-ui/ui/tree/main/apps/v4/app/(examples)/dashboard"
-        />
         <div className="flex flex-1 flex-col px-4">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <Tabs defaultValue="books" className="w-full">
@@ -270,7 +272,7 @@ export default function Dashboard() {
                         authors={authors}
                         onEdit={handleAuthorEdit}
                         onDelete={handleAuthorDelete}
-                        onAdd={() => setShowAuthorForm(true)}
+                        onAdd={handleAuthorSubmit}
                       />
                     </div>
                   </div>
@@ -288,7 +290,7 @@ export default function Dashboard() {
                         publishers={publishers}
                         onEdit={handlePublisherEdit}
                         onDelete={handlePublisherDelete}
-                        onAdd={() => setShowPublisherForm(true)}
+                        onAdd={handlePublisherSubmit}
                       />
                     </div>
                   </div>

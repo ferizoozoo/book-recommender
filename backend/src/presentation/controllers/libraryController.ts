@@ -11,6 +11,9 @@ import {
   AuthenticatedRequest,
 } from "../common/decorators/auth.decorator";
 import { UserClaims } from "../../domain/auth/user-claims.value";
+import { authController, userRepository } from "../di/setup";
+import { mapAuthorDomainToModel } from "../../infrastructure/database/typeorm/models/mappers/library.mapper";
+import { mapUserDomainToModel } from "../../infrastructure/database/typeorm/models/mappers/auth.mapper";
 
 // TODO: each controller should have its own DTO, for better validation and type safety
 
@@ -36,8 +39,8 @@ export class LibraryController {
     nextFunction: NextFunction
   ): Promise<void> {
     try {
-      const { id, bio, image } = req.body;
-      if (!id || !bio || !image) {
+      const { bio } = req.body;
+      if (!bio) {
         res
           .status(400)
           .json({ message: presentationConsts.LibraryAuthorNameRequired });
@@ -48,7 +51,17 @@ export class LibraryController {
       const userClaims = req.user;
       console.log("User adding author:", userClaims?.email, userClaims?.roles);
 
-      const author = new Author(id, bio, image, [], new User());
+      // TODO: DISASTER, this code belongs to the service layer
+      //       we should not be creating entities in the controller
+      //       also, we should not be using the User entity here at all
+      const user = await userRepository.getUserByEmail(userClaims?.email || "");
+      if (!user) {
+        res
+          .status(400)
+          .json({ message: presentationConsts.LibraryAuthorNotFound });
+        return;
+      }
+      const author = new Author(0, bio, "", [], user);
       const savedAuthor = await this.#libraryService.addAuthor(author);
       res.status(201).json({ author: savedAuthor });
     } catch (error) {

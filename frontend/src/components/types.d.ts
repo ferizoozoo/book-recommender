@@ -26,6 +26,7 @@ export interface Book {
   publishedDate: Date;
   genre: string;
   pages: number;
+  year: number;
   description?: string;
   createdAt: Date;
   updatedAt: Date;
