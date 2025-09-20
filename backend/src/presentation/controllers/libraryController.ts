@@ -112,6 +112,40 @@ export class LibraryController {
     }
   }
 
+  @AuthGuard(["admin"])
+  async getAllAuthors(
+    req: Request,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    try {
+      const authors = await this.#libraryService.getAllAuthors();
+      res.status(200).json({ authors });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to retrieve authors";
+      res.status(500).json({ message: errorMessage });
+    }
+  }
+
+  @AuthGuard(["admin"])
+  async getAllPublishers(
+    req: Request,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    try {
+      const publishers = await this.#libraryService.getAllPublishers();
+      res.status(200).json({ publishers });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to retrieve publishers";
+      res.status(500).json({ message: errorMessage });
+    }
+  }
+
   @AuthGuard(["user", "admin"])
   async getBookById(
     req: Request,

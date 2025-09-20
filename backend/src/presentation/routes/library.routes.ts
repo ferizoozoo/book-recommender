@@ -8,6 +8,14 @@ libraryRouter.get("/books", async (req, res, next) => {
   await libraryController.getAllBooks(req, res, next);
 });
 
+libraryRouter.get("/authors", async (req, res, next) => {
+  await libraryController.getAllAuthors(req, res, next);
+});
+
+libraryRouter.get("/publishers", async (req, res, next) => {
+  await libraryController.getAllPublishers(req, res, next);
+});
+
 // TODO: this is for the 'what readers say?' section
 libraryRouter.get("/readers-review", async (req, res, next) => {
   await libraryController.getReadersReviewBooks(req, res, next);

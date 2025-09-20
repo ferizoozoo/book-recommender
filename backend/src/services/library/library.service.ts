@@ -43,6 +43,13 @@ export class LibraryService implements ILibraryService {
     return await this.#bookRepo.getAll();
   }
 
+  async getAllPublishers(): Promise<Publisher[]> {
+    return await this.#publisherRepo.getAll();
+  }
+
+  async getAllAuthors(): Promise<Author[]> {
+    return await this.#authorRepo.getAll();
+  }
   async getBookById(id: number): Promise<Book | null> {
     return await this.#bookRepo.getById(id);
   }

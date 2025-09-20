@@ -60,10 +60,10 @@ export function AuthorsTable({
 
           <Dialog>
             <DialogTrigger>
-              <Button disabled={isLoading}>
+              <div className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-black bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary cursor-pointer">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Author
-              </Button>
+              </div>
             </DialogTrigger>
             <DialogContent className="bg-white">
               <AuthorForm onSubmit={onAdd} />
@@ -81,20 +81,20 @@ export function AuthorsTable({
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Biography</TableHead>
-                    <TableHead>Created</TableHead>
+                    {/* <TableHead>Email</TableHead> */}
+                    {/* <TableHead>Biography</TableHead> */}
+                    {/* <TableHead>Created</TableHead> */}
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {authors.map((author) => (
                     <TableRow key={author.id}>
-                      <TableCell className="font-medium">
-                        {author.name}
+                      <TableCell className="text-start font-medium">
+                        {author.user.firstname} {author.user.lastname}
                       </TableCell>
-                      <TableCell>{author.email}</TableCell>
-                      <TableCell>
+                      {/* <TableCell>{author.email}</TableCell> */}
+                      {/* <TableCell>
                         {author.bio ? (
                           <div className="max-w-xs">
                             <p className="truncate text-sm text-muted-foreground">
@@ -104,7 +104,7 @@ export function AuthorsTable({
                         ) : (
                           <Badge variant="secondary">No bio</Badge>
                         )}
-                      </TableCell>
+                      </TableCell> */}
                       {/* <TableCell className="text-sm text-muted-foreground">
                         {author.createdAt.toLocaleDateString()}
                       </TableCell> */}

@@ -15,6 +15,8 @@ export interface ILibraryService {
   addPublisher(publisher: Publisher): Promise<Publisher>;
   getPublisherById(publisherId: number): Promise<Publisher | null>;
   getAllBooks(): Promise<Book[]>;
+  getAllAuthors(): Promise<Author[]>;
+  getAllPublishers(): Promise<Publisher[]>;
   getBookById(id: number): Promise<Book | null>;
   getBookByIsbn(isbn: string): Promise<Book | null>;
   getReadersReviewBooks(bookId: number): Promise<Review[]>;

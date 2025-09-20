@@ -42,9 +42,7 @@ export class PublisherRepository implements IPublisherRepository {
   }
 
   async getAll(): Promise<Publisher[]> {
-    const publisherEntities = await this.#publishers.find({
-      relations: ["user"],
-    });
+    const publisherEntities = await this.#publishers.find({});
 
     return Promise.all(
       publisherEntities.map(async (publisherEntity) => {

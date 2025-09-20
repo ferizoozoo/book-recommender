@@ -58,10 +58,10 @@ export function PublishersTable({
 
           <Dialog>
             <DialogTrigger>
-              <Button disabled={isLoading}>
+              <div className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-black bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary cursor-pointer">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Publisher
-              </Button>
+              </div>
             </DialogTrigger>
             <DialogContent className="bg-white">
               <PublisherForm onSubmit={onAdd} />
@@ -81,28 +81,28 @@ export function PublishersTable({
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
-                    <TableHead>Contact Email</TableHead>
-                    <TableHead>Address</TableHead>
-                    <TableHead>Website</TableHead>
-                    <TableHead>Created</TableHead>
+                    {/* <TableHead>Contact Email</TableHead> */}
+                    {/* <TableHead>Address</TableHead> */}
+                    {/* <TableHead>Website</TableHead> */}
+                    {/* <TableHead>Created</TableHead> */}
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {publishers.map((publisher) => (
                     <TableRow key={publisher.id}>
-                      <TableCell className="font-medium">
+                      <TableCell className="text-start font-medium">
                         {publisher.name}
                       </TableCell>
-                      <TableCell>{publisher.contactEmail}</TableCell>
-                      <TableCell>
+                      {/* <TableCell>{publisher.contactEmail}</TableCell> */}
+                      {/* <TableCell>
                         <div className="max-w-xs">
                           <p className="truncate text-sm text-muted-foreground">
                             {publisher.address}
                           </p>
                         </div>
-                      </TableCell>
-                      <TableCell>
+                      </TableCell> */}
+                      {/* <TableCell>
                         {publisher.website ? (
                           <a
                             href={publisher.website}
@@ -116,10 +116,10 @@ export function PublishersTable({
                         ) : (
                           <Badge variant="secondary">No website</Badge>
                         )}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {publisher.createdAt.toLocaleDateString()}
-                      </TableCell>
+                      </TableCell> */}
+                      {/* <TableCell className="text-sm text-muted-foreground">
+                        {publisher.createdAt.toDateString()}
+                      </TableCell> */}
                       <TableCell className="text-right">
                         <div className="flex gap-2 justify-end">
                           <Button

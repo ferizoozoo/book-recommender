@@ -5,6 +5,7 @@ export interface Author {
   bio?: string;
   createdAt: Date;
   updatedAt: Date;
+  user: User;
 }
 
 export interface Publisher {

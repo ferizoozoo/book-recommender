@@ -50,7 +50,6 @@ export default function Dashboard() {
         if (booksRes.ok) {
           const data = await booksRes.json();
           const booksData = data.books;
-          debugger;
           // Initialize as empty array if undefined/null
           setBooks(booksData || []);
         } else {
@@ -60,22 +59,23 @@ export default function Dashboard() {
         }
 
         // Fetch authors
-        // const authorsRes = await fetchWithAuth(
-        //   `${config.apiUrl}/library/authors`
-        // );
-        // if (authorsRes.ok) {
-        //   const authorsData = await authorsRes.json();
-        //   setAuthors(authorsData);
-        // }
+        const authorsRes = await fetchWithAuth(
+          `${config.apiUrl}/library/authors`
+        );
+        if (authorsRes.ok) {
+          const data = await authorsRes.json();
+          setAuthors(data.authors);
+        }
 
-        // // Fetch publishers
-        // const publishersRes = await fetchWithAuth(
-        //   `${config.apiUrl}/library/publishers`
-        // );
-        // if (publishersRes.ok) {
-        //   const publishersData = await publishersRes.json();
-        //   setPublishers(publishersData);
-        // }
+        // Fetch publishers
+        debugger;
+        const publishersRes = await fetchWithAuth(
+          `${config.apiUrl}/library/publishers`
+        );
+        if (publishersRes.ok) {
+          const data = await publishersRes.json();
+          setPublishers(data.publishers);
+        }
       } catch (error) {
         console.error("Failed to fetch data:", error);
       }
