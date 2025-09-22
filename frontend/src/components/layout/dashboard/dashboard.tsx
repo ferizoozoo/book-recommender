@@ -34,69 +34,78 @@ export default function Dashboard() {
   const [books, setBooks] = useState<any[]>([]);
   const [authors, setAuthors] = useState<any[]>([]);
   const [publishers, setPublishers] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Form visibility states
-  const [showBookForm, setShowBookForm] = useState(false);
-  const [showAuthorForm, setShowAuthorForm] = useState(false);
-  const [showPublisherForm, setShowPublisherForm] = useState(false);
-
-  useEffect(() => {
-    if (!accessToken) navigate("/login");
-
-    async function fetchData() {
-      try {
-        // Fetch books
-        const booksRes = await fetchWithAuth(`${config.apiUrl}/library/books`);
-        if (booksRes.ok) {
-          const data = await booksRes.json();
-          const booksData = data.books;
-          // Initialize as empty array if undefined/null
-          setBooks(booksData || []);
-        } else {
-          // Initialize as empty array on error
-          setBooks([]);
-          console.error("Failed to fetch books:", await booksRes.text());
-        }
-
-        // Fetch authors
-        const authorsRes = await fetchWithAuth(
-          `${config.apiUrl}/library/authors`
-        );
-        if (authorsRes.ok) {
-          const data = await authorsRes.json();
-          setAuthors(data.authors);
-        }
-
-        // Fetch publishers
-        debugger;
-        const publishersRes = await fetchWithAuth(
-          `${config.apiUrl}/library/publishers`
-        );
-        if (publishersRes.ok) {
-          const data = await publishersRes.json();
-          setPublishers(data.publishers);
-        }
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
+  // Fetch data function that can be called whenever needed
+  const fetchAllData = async () => {
+    try {
+      setIsLoading(true);
+      // Fetch books
+      const booksRes = await fetchWithAuth(`${config.apiUrl}/library/books`);
+      if (booksRes.ok) {
+        const data = await booksRes.json();
+        const booksData = data.books;
+        setBooks(booksData || []);
+      } else {
+        setBooks([]);
+        console.error("Failed to fetch books:", await booksRes.text());
       }
-    }
 
-    fetchData();
+      // Fetch authors
+      const authorsRes = await fetchWithAuth(
+        `${config.apiUrl}/library/authors`
+      );
+      if (authorsRes.ok) {
+        const data = await authorsRes.json();
+        setAuthors(data.authors);
+      }
+
+      // Fetch publishers
+      const publishersRes = await fetchWithAuth(
+        `${config.apiUrl}/library/publishers`
+      );
+      if (publishersRes.ok) {
+        const data = await publishersRes.json();
+        setPublishers(data.publishers);
+      }
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Initial data fetch
+  useEffect(() => {
+    if (!accessToken) {
+      navigate("/login");
+      return;
+    }
+    fetchAllData();
   }, [accessToken]);
 
   // Form submission handlers
   const handleBookSubmit = async (bookData: any) => {
     try {
-      const res = await fetchWithAuth(`${config.apiUrl}/library/books`, {
+      const createRes = await fetchWithAuth(`${config.apiUrl}/library/books`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(bookData),
       });
-      if (res.ok) {
-        const newBook = await res.json();
-        setBooks([...books, newBook]);
+
+      if (!createRes.ok) {
+        const errorText = await createRes.text();
+        throw new Error(errorText || "Failed to create book");
       }
+
+      // After successful creation, fetch fresh data
+      await fetchAllData();
+      return true;
     } catch (error) {
       console.error("Failed to add book:", error);
+      throw error; // Re-throw to handle in the component
     }
   };
 
@@ -131,20 +140,32 @@ export default function Dashboard() {
   };
 
   // Edit handlers
-  const handleBookEdit = (book: any) => {
+  const handleBookEdit = async (book: any) => {
     try {
       const id = book.id;
-      fetchWithAuth(`${config.apiUrl}/library/books/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(book),
-      }).then(async (res) => {
-        if (res.ok) {
-          const updatedBook = await res.json();
-          setBooks(books.map((b) => (b.id === id ? updatedBook : b)));
+      const updateRes = await fetchWithAuth(
+        `${config.apiUrl}/library/books/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(book),
         }
-      });
+      );
+
+      if (!updateRes.ok) {
+        const errorText = await updateRes.text();
+        throw new Error(errorText || "Failed to update book");
+      }
+
+      // After successful update, fetch fresh data
+      await fetchAllData();
+
+      return true;
     } catch (error) {
       console.error("Failed to update book:", error);
+      throw error; // Re-throw to handle in the component
     }
   };
 
@@ -254,6 +275,8 @@ export default function Dashboard() {
                       <h3 className="text-lg font-medium mb-4">Books List</h3>
                       <BooksTable
                         books={books}
+                        authors={authors}
+                        publishers={publishers}
                         onEdit={handleBookEdit}
                         onDelete={handleBookDelete}
                         onAdd={handleBookSubmit}

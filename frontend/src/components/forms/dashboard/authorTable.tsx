@@ -15,7 +15,13 @@ import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Plus } from "lucide-react";
 import { DeleteConfirmationDialog } from "./deleteConfirmationDialog";
 import type { Author } from "@/components/types";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { AuthorForm } from "./authorForm";
 
 interface AuthorsTableProps {
@@ -34,6 +40,14 @@ export function AuthorsTable({
   isLoading = false,
 }: AuthorsTableProps) {
   const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    author: Author | null;
+  }>({
+    open: false,
+    author: null,
+  });
+
+  const [editDialog, setEditDialog] = useState<{
     open: boolean;
     author: Author | null;
   }>({
@@ -66,7 +80,17 @@ export function AuthorsTable({
               </div>
             </DialogTrigger>
             <DialogContent className="bg-white">
-              <AuthorForm onSubmit={onAdd} />
+              <AuthorForm
+                onSubmit={onAdd}
+                onCancel={() => {
+                  const trigger = document.querySelector(
+                    '[aria-label="Close"]'
+                  );
+                  if (trigger instanceof HTMLButtonElement) {
+                    trigger.click();
+                  }
+                }}
+              />
             </DialogContent>
           </Dialog>
         </CardHeader>
@@ -110,14 +134,50 @@ export function AuthorsTable({
                       </TableCell> */}
                       <TableCell className="text-right">
                         <div className="flex gap-2 justify-end">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onEdit(author)}
-                            disabled={isLoading}
+                          <Dialog
+                            open={editDialog.open}
+                            onOpenChange={(open) =>
+                              setEditDialog({
+                                open,
+                                author: open ? author : null,
+                              })
+                            }
                           >
-                            <Edit className="w-4 h-4" />
-                          </Button>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={isLoading}
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="bg-white">
+                              <DialogHeader>
+                                <DialogTitle>Edit Author</DialogTitle>
+                              </DialogHeader>
+                              <AuthorForm
+                                author={editDialog.author || undefined}
+                                onSubmit={(authorData) => {
+                                  if (editDialog.author?.id) {
+                                    onEdit({
+                                      ...editDialog.author,
+                                      ...authorData,
+                                      id: editDialog.author.id,
+                                      updatedAt: new Date(),
+                                    });
+                                    setEditDialog({
+                                      open: false,
+                                      author: null,
+                                    });
+                                  }
+                                }}
+                                onCancel={() =>
+                                  setEditDialog({ open: false, author: null })
+                                }
+                              />
+                            </DialogContent>
+                          </Dialog>
                           <Button
                             variant="outline"
                             size="sm"

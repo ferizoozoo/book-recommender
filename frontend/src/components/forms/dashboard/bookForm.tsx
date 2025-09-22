@@ -1,4 +1,4 @@
-import React from "react";
+import React, { use } from "react";
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,8 @@ import type { Author, Book, Publisher } from "@/components/types";
 
 interface BookFormProps {
   book?: Book;
+  authors: Author[];
+  publishers: Publisher[];
   onSubmit: (data: {
     title: string;
     isbn: string;
@@ -32,13 +34,13 @@ interface BookFormProps {
 }
 
 export function BookForm({
+  authors,
+  publishers,
   book,
   onSubmit,
   onCancel,
   isLoading = false,
 }: BookFormProps) {
-  const [authors, setAuthors] = useState<Author[]>([]);
-  const [publishers, setPublishers] = useState<Publisher[]>([]);
   const [formData, setFormData] = useState({
     title: book?.title || "",
     isbn: book?.isbn || "",
@@ -51,11 +53,6 @@ export function BookForm({
     pages: book?.pages?.toString() || "",
     description: book?.description || "",
   });
-
-  useEffect(() => {
-    // setAuthors(dataStore.getAuthors());
-    // setPublishers(dataStore.getPublishers());
-  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,14 +135,14 @@ export function BookForm({
                   <SelectValue placeholder="Select an author" />
                 </SelectTrigger>
                 <SelectContent>
-                  {authors.map((author) => (
+                  {authors?.map((author) => (
                     <SelectItem key={author.id} value={author.id}>
                       {author.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {authors.length === 0 && (
+              {authors?.length === 0 && (
                 <p className="text-sm text-muted-foreground">
                   No authors available. Add authors first.
                 </p>
@@ -166,14 +163,14 @@ export function BookForm({
                   <SelectValue placeholder="Select a publisher" />
                 </SelectTrigger>
                 <SelectContent>
-                  {publishers.map((publisher) => (
+                  {publishers?.map((publisher) => (
                     <SelectItem key={publisher.id} value={publisher.id}>
                       {publisher.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {publishers.length === 0 && (
+              {publishers?.length === 0 && (
                 <p className="text-sm text-muted-foreground">
                   No publishers available. Add publishers first.
                 </p>

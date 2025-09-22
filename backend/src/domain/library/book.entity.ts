@@ -45,8 +45,12 @@ export class Book implements IValidate {
       throw new Error(domainConsts.BookDescriptionTooLong);
     }
 
-    const isbnRegex = /^(?:\d{10}|\d{13})$/;
-    if (!this.isbn || !isbnRegex.test(this.isbn)) {
+    // Remove any hyphens or spaces from ISBN before validation
+    const cleanIsbn = this.isbn.replace(/[-\s]/g, "");
+    // ISBN-10: Digits and 'X' allowed (for check digit)
+    // ISBN-13: Only digits allowed
+    const isbnRegex = /^(?:\d{9}[\dX]|\d{13})$/;
+    if (!this.isbn || !isbnRegex.test(cleanIsbn)) {
       throw new Error(domainConsts.BookIsbnShouldBeValid);
     }
 

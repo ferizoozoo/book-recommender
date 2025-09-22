@@ -21,9 +21,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { BookForm } from "./bookForm";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 interface BooksTableProps {
   books: Array<Book & { author: Author; publisher: Publisher }>;
+  authors: Author[];
+  publishers: Publisher[];
   onEdit: (book: Book) => void;
   onDelete: (id: string) => void;
   onAdd: (bookData: any) => void;
@@ -32,12 +36,24 @@ interface BooksTableProps {
 
 export function BooksTable({
   books,
+  authors,
+  publishers,
   onEdit,
   onDelete,
   onAdd,
   isLoading = false,
 }: BooksTableProps) {
+  const { toast } = useToast();
+  const [addDialog, setAddDialog] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    book: Book | null;
+  }>({
+    open: false,
+    book: null,
+  });
+
+  const [editDialog, setEditDialog] = useState<{
     open: boolean;
     book: Book | null;
   }>({
@@ -61,7 +77,7 @@ export function BooksTable({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Books</CardTitle>
-          <Dialog>
+          <Dialog open={addDialog} onOpenChange={setAddDialog}>
             <DialogTrigger>
               <div className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-black bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary cursor-pointer">
                 <Plus className="w-4 h-4 mr-2" />
@@ -69,7 +85,34 @@ export function BooksTable({
               </div>
             </DialogTrigger>
             <DialogContent className="bg-white">
-              <BookForm onSubmit={onAdd} />
+              <DialogHeader>
+                <DialogTitle>Add New Book</DialogTitle>
+              </DialogHeader>
+              <BookForm
+                authors={authors}
+                publishers={publishers}
+                onSubmit={async (data) => {
+                  try {
+                    await onAdd(data);
+                    setAddDialog(false);
+                    toast({
+                      title: "Success",
+                      description: "Book added successfully",
+                      variant: "success",
+                    });
+                  } catch (error) {
+                    toast({
+                      title: "Error",
+                      description:
+                        error instanceof Error
+                          ? error.message
+                          : "Failed to add book",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+                onCancel={() => setAddDialog(false)}
+              />
             </DialogContent>
           </Dialog>
         </CardHeader>
@@ -104,8 +147,8 @@ export function BooksTable({
                             </p>
                           </div>
                         </TableCell>
-                        <TableCell>{book.author.name}</TableCell>
-                        <TableCell>{book.publisher.name}</TableCell>
+                        <TableCell>{book.author?.name || "N/A"}</TableCell>
+                        <TableCell>{book.publisher?.name || "N/A"}</TableCell>
                         {/* <TableCell>
                           <Badge variant="secondary">{book.genre}</Badge>
                         </TableCell> */}
@@ -118,14 +161,83 @@ export function BooksTable({
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex gap-2 justify-end">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => onEdit(book)}
-                              disabled={isLoading}
+                            <Dialog
+                              open={editDialog.open}
+                              onOpenChange={(open) =>
+                                setEditDialog({
+                                  open,
+                                  book: open ? book : null,
+                                })
+                              }
                             >
-                              <Edit className="w-4 h-4" />
-                            </Button>
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  disabled={isLoading}
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="bg-white">
+                                <DialogHeader>
+                                  <DialogTitle>Edit Book</DialogTitle>
+                                </DialogHeader>
+                                <BookForm
+                                  book={editDialog.book || undefined}
+                                  authors={authors}
+                                  publishers={publishers}
+                                  isLoading={isLoading}
+                                  onSubmit={async (bookData) => {
+                                    if (editDialog.book?.id) {
+                                      try {
+                                        await onEdit({
+                                          ...editDialog.book, // Keep metadata
+                                          ...bookData, // Apply form updates
+                                          id: editDialog.book.id,
+                                          year: new Date(
+                                            bookData.publishedDate
+                                          ).getFullYear(),
+                                          authorId: bookData.authorId,
+                                          publisherId: bookData.publisherId,
+                                          createdAt: editDialog.book.createdAt,
+                                          updatedAt: new Date(),
+                                        });
+                                        // Ensure we close the dialog first
+                                        setEditDialog({
+                                          open: false,
+                                          book: null,
+                                        });
+                                        // Then show the toast
+                                        toast({
+                                          title: "Success",
+                                          description:
+                                            "Book updated successfully",
+                                          variant: "success",
+                                        });
+                                      } catch (error) {
+                                        // Close dialog even on error
+                                        setEditDialog({
+                                          open: false,
+                                          book: null,
+                                        });
+                                        toast({
+                                          title: "Error",
+                                          description:
+                                            error instanceof Error
+                                              ? error.message
+                                              : "Failed to update book",
+                                          variant: "destructive",
+                                        });
+                                      }
+                                    }
+                                  }}
+                                  onCancel={() =>
+                                    setEditDialog({ open: false, book: null })
+                                  }
+                                />
+                              </DialogContent>
+                            </Dialog>
                             <Button
                               variant="outline"
                               size="sm"
@@ -154,6 +266,7 @@ export function BooksTable({
         onConfirm={handleDeleteConfirm}
         isLoading={isLoading}
       />
+      <Toaster />
     </>
   );
 }

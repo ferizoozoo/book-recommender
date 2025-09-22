@@ -13,7 +13,13 @@ import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Plus, ExternalLink } from "lucide-react";
 import { DeleteConfirmationDialog } from "./deleteConfirmationDialog";
 import type { Publisher } from "@/components/types";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { PublisherForm } from "./publisherForm";
 
 interface PublishersTableProps {
@@ -32,6 +38,14 @@ export function PublishersTable({
   isLoading = false,
 }: PublishersTableProps) {
   const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    publisher: Publisher | null;
+  }>({
+    open: false,
+    publisher: null,
+  });
+
+  const [editDialog, setEditDialog] = useState<{
     open: boolean;
     publisher: Publisher | null;
   }>({
@@ -64,7 +78,17 @@ export function PublishersTable({
               </div>
             </DialogTrigger>
             <DialogContent className="bg-white">
-              <PublisherForm onSubmit={onAdd} />
+              <PublisherForm
+                onSubmit={onAdd}
+                onCancel={() => {
+                  const trigger = document.querySelector(
+                    '[aria-label="Close"]'
+                  );
+                  if (trigger instanceof HTMLButtonElement) {
+                    trigger.click();
+                  }
+                }}
+              />
             </DialogContent>
           </Dialog>
         </CardHeader>
@@ -122,14 +146,53 @@ export function PublishersTable({
                       </TableCell> */}
                       <TableCell className="text-right">
                         <div className="flex gap-2 justify-end">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onEdit(publisher)}
-                            disabled={isLoading}
+                          <Dialog
+                            open={editDialog.open}
+                            onOpenChange={(open) =>
+                              setEditDialog({
+                                open,
+                                publisher: open ? publisher : null,
+                              })
+                            }
                           >
-                            <Edit className="w-4 h-4" />
-                          </Button>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={isLoading}
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="bg-white">
+                              <DialogHeader>
+                                <DialogTitle>Edit Publisher</DialogTitle>
+                              </DialogHeader>
+                              <PublisherForm
+                                publisher={editDialog.publisher || undefined}
+                                onSubmit={(publisherData) => {
+                                  if (editDialog.publisher?.id) {
+                                    onEdit({
+                                      ...editDialog.publisher,
+                                      ...publisherData,
+                                      id: editDialog.publisher.id,
+                                      updatedAt: new Date(),
+                                    });
+                                    setEditDialog({
+                                      open: false,
+                                      publisher: null,
+                                    });
+                                  }
+                                }}
+                                onCancel={() =>
+                                  setEditDialog({
+                                    open: false,
+                                    publisher: null,
+                                  })
+                                }
+                              />
+                            </DialogContent>
+                          </Dialog>
                           <Button
                             variant="outline"
                             size="sm"

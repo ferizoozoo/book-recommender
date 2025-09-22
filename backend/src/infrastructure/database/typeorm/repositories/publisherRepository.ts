@@ -21,7 +21,6 @@ export class PublisherRepository implements IPublisherRepository {
   async getById(id: number): Promise<Publisher | null> {
     const publisherEntity = await this.#publishers.findOne({
       where: { id },
-      relations: ["user"],
     });
 
     if (!publisherEntity) {

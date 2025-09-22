@@ -279,7 +279,15 @@ export class LibraryController {
     nextFunction: NextFunction
   ): Promise<void> {
     try {
-      const { title, authorId, publisherId, isbn, quantity } = req.body;
+      const {
+        title,
+        authorId,
+        publisherId,
+        isbn,
+        quantity,
+        publishedDate,
+        description,
+      } = req.body;
 
       if (!title || !authorId || !publisherId || !isbn) {
         res
@@ -309,7 +317,7 @@ export class LibraryController {
         0, // ID will be set by the database
         title || "",
         author,
-        "", // description
+        description || "",
         isbn || "",
         publisher,
         new Date().getFullYear(), // default to current year
@@ -318,10 +326,6 @@ export class LibraryController {
         0, // numberOfRatings
         0 // numberOfReviews
       );
-
-      book.quantity = quantity || 1;
-      book.available = true;
-      book.labels = [];
 
       await this.#libraryService.addBook(book);
       res
