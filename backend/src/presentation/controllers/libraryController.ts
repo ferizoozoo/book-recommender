@@ -339,6 +339,101 @@ export class LibraryController {
   }
 
   @AuthGuard(["admin"])
+  async updateAuthor(
+    req: Request,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    try {
+      const authorId = parseInt(req.params.id);
+      if (isNaN(authorId)) {
+        res
+          .status(400)
+          .json({ message: presentationConsts.LibraryInvalidAuthorId });
+        return;
+      }
+
+      const existingAuthor = await this.#libraryService.getAuthorById(authorId);
+      if (!existingAuthor) {
+        res
+          .status(404)
+          .json({ message: presentationConsts.LibraryAuthorNotFound });
+        return;
+      }
+
+      const { bio, image } = req.body;
+
+      // TODO: this seems sketchy, we should not be creating a new Author instance
+      const updatedAuthor = new Author(
+        existingAuthor.id,
+        bio || existingAuthor.bio,
+        image || existingAuthor.image
+      );
+
+      console.log("Updated Author:", updatedAuthor);
+
+      await this.#libraryService.updateAuthor(updatedAuthor);
+      res
+        .status(200)
+        .json({ message: presentationConsts.LibraryAuthorUpdated });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update author";
+      res.status(400).json({ message: errorMessage });
+    }
+  }
+
+  @AuthGuard(["admin"])
+  async updatePublisher(
+    req: Request,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    try {
+      const publisherId = parseInt(req.params.id);
+      if (isNaN(publisherId)) {
+        res
+          .status(400)
+          .json({ message: presentationConsts.LibraryInvalidPublisherId });
+        return;
+      }
+
+      const existingPublisher = await this.#libraryService.getPublisherById(
+        publisherId
+      );
+      if (!existingPublisher) {
+        res
+          .status(404)
+          .json({ message: presentationConsts.LibraryPublisherNotFound });
+        return;
+      }
+
+      const { name, address, city, state, zip, country } = req.body;
+
+      // TODO: this seems sketchy, we should not be creating a new Publisher instance
+      const updatedPublisher = new Publisher(
+        existingPublisher.id,
+        name || existingPublisher.name,
+        address || existingPublisher.address,
+        city || existingPublisher.city,
+        state || existingPublisher.state,
+        zip || existingPublisher.zip,
+        country || existingPublisher.country,
+        existingPublisher.books
+      );
+
+      await this.#libraryService.updatePublisher(updatedPublisher);
+      res
+        .status(200)
+        .json({ message: presentationConsts.LibraryPublisherUpdated });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update publisher";
+      res.status(400).json({ message: errorMessage });
+    }
+  }
+
+  @AuthGuard(["admin"])
   async updateBook(
     req: Request,
     res: Response,

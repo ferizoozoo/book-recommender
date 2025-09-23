@@ -74,4 +74,12 @@ libraryRouter.post("/publishers", async (req, res, next) => {
   await libraryController.addPublisher(req, res, next);
 });
 
+libraryRouter.put("/authors/:id", async (req, res, next) => {
+  await libraryController.updateAuthor(req, res, next);
+});
+
+libraryRouter.put("/publishers/:id", async (req, res, next) => {
+  await libraryController.updatePublisher(req, res, next);
+});
+
 export default libraryRouter;

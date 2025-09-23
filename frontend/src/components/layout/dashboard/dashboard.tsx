@@ -180,39 +180,54 @@ export default function Dashboard() {
     }
   };
 
-  const handleAuthorEdit = (author: any) => {
+  const handleAuthorEdit = async (author: any) => {
     try {
       const id = author.id;
-      fetchWithAuth(`${config.apiUrl}/library/authors/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(author),
-      }).then(async (res) => {
-        if (res.ok) {
-          const updatedAuthor = await res.json();
-          setAuthors(authors.map((a) => (a.id === id ? updatedAuthor : a)));
+      const updateRes = await fetchWithAuth(
+        `${config.apiUrl}/library/authors/${id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(author),
         }
-      });
+      );
+
+      if (!updateRes.ok) {
+        const errorText = await updateRes.text();
+        console.error("Update failed with response:", errorText); // Debug log
+        throw new Error(errorText || "Failed to update author");
+      }
+
+      // After successful update, fetch fresh data
+      await fetchAllData();
+      return true;
     } catch (error) {
       console.error("Failed to update author:", error);
+      throw error; // Re-throw to handle in the component
     }
   };
 
-  const handlePublisherEdit = (publisher: any) => {
+  const handlePublisherEdit = async (publisher: any) => {
     try {
       const id = publisher.id;
-      fetchWithAuth(`${config.apiUrl}/library/publishers/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(publisher),
-      }).then(async (res) => {
-        if (res.ok) {
-          const updatedPublisher = await res.json();
-          setPublishers(
-            publishers.map((p) => (p.id === id ? updatedPublisher : p))
-          );
+      const updateRes = await fetchWithAuth(
+        `${config.apiUrl}/library/publishers/${id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(publisher),
         }
-      });
+      );
+
+      if (!updateRes.ok) {
+        const errorText = await updateRes.text();
+        console.error("Update failed with response:", errorText); // Debug log
+        throw new Error(errorText || "Failed to update publisher");
+      }
+
+      // After successful update, fetch fresh data
+      await fetchAllData();
+      return true;
     } catch (error) {
-      console.error("Failed to update publisher:", error);
+      console.error("Failed to update author:", error);
     }
   };
 

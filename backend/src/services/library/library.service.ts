@@ -30,6 +30,40 @@ export class LibraryService implements ILibraryService {
     this.#userRepo = userRepo;
     this.#reviewRepo = reviewRepo;
   }
+  async updateAuthor(author: Author): Promise<void> {
+    if (!author.id) {
+      throw new Error("Author ID is required for updates");
+    }
+
+    if (!author.validate()) {
+      throw new Error(serviceConsts.AuthorValidationFailed);
+    }
+
+    const existingAuthor = await this.#authorRepo.getById(author.id);
+    if (!existingAuthor) {
+      throw new Error(serviceConsts.AuthorNotFound);
+    }
+
+    await this.#authorRepo.update(author);
+  }
+
+  async updatePublisher(publisher: Publisher): Promise<void> {
+    if (!publisher.id) {
+      throw new Error("Publisher ID is required for updates");
+    }
+
+    if (!publisher.validate()) {
+      throw new Error(serviceConsts.PublisherValidationFailed);
+    }
+
+    const existingPublisher = await this.#publisherRepo.getById(publisher.id);
+    if (!existingPublisher) {
+      throw new Error(serviceConsts.PublisherNotFound);
+    }
+
+    await this.#publisherRepo.update(publisher);
+  }
+
   async getFilteredBooks(filters: any): Promise<Book[]> {
     return await this.#bookRepo.filter(filters);
   }

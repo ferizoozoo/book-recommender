@@ -23,6 +23,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { AuthorForm } from "./authorForm";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 interface AuthorsTableProps {
   authors: Author[];
@@ -39,6 +41,8 @@ export function AuthorsTable({
   onAdd,
   isLoading = false,
 }: AuthorsTableProps) {
+  const { toast } = useToast();
+  const [addDialog, setAddDialog] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
     author: Author | null;
@@ -66,13 +70,65 @@ export function AuthorsTable({
     }
   };
 
+  const handleAddSubmit = async (data: any) => {
+    try {
+      await onAdd(data);
+      setAddDialog(false);
+      toast({
+        title: "Success",
+        description: "Author added successfully",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to add author",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEditSubmit = async (authorData: any) => {
+    if (!editDialog.author?.id) return;
+
+    try {
+      await onEdit({
+        ...editDialog.author,
+        ...authorData,
+        id: editDialog.author.id,
+        updatedAt: new Date(),
+      });
+      setEditDialog({
+        open: false,
+        author: null,
+      });
+      toast({
+        title: "Success",
+        description: "Author updated successfully",
+        variant: "success",
+      });
+    } catch (error) {
+      setEditDialog({
+        open: false,
+        author: null,
+      });
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to update author",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Authors</CardTitle>
 
-          <Dialog>
+          <Dialog open={addDialog} onOpenChange={setAddDialog}>
             <DialogTrigger>
               <div className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-black bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary cursor-pointer">
                 <Plus className="w-4 h-4 mr-2" />
@@ -81,15 +137,8 @@ export function AuthorsTable({
             </DialogTrigger>
             <DialogContent className="bg-white">
               <AuthorForm
-                onSubmit={onAdd}
-                onCancel={() => {
-                  const trigger = document.querySelector(
-                    '[aria-label="Close"]'
-                  );
-                  if (trigger instanceof HTMLButtonElement) {
-                    trigger.click();
-                  }
-                }}
+                onSubmit={handleAddSubmit}
+                onCancel={() => setAddDialog(false)}
               />
             </DialogContent>
           </Dialog>
@@ -115,7 +164,7 @@ export function AuthorsTable({
                   {authors.map((author) => (
                     <TableRow key={author.id}>
                       <TableCell className="text-start font-medium">
-                        {author.user.firstname} {author.user.lastname}
+                        {author.user?.firstName} {author.user?.lastName}
                       </TableCell>
                       {/* <TableCell>{author.email}</TableCell> */}
                       {/* <TableCell>
@@ -158,20 +207,8 @@ export function AuthorsTable({
                               </DialogHeader>
                               <AuthorForm
                                 author={editDialog.author || undefined}
-                                onSubmit={(authorData) => {
-                                  if (editDialog.author?.id) {
-                                    onEdit({
-                                      ...editDialog.author,
-                                      ...authorData,
-                                      id: editDialog.author.id,
-                                      updatedAt: new Date(),
-                                    });
-                                    setEditDialog({
-                                      open: false,
-                                      author: null,
-                                    });
-                                  }
-                                }}
+                                isLoading={isLoading}
+                                onSubmit={handleEditSubmit}
                                 onCancel={() =>
                                   setEditDialog({ open: false, author: null })
                                 }
@@ -206,6 +243,7 @@ export function AuthorsTable({
         onConfirm={handleDeleteConfirm}
         isLoading={isLoading}
       />
+      <Toaster />
     </>
   );
 }

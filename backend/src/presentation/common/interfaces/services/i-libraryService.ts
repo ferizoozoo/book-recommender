@@ -24,6 +24,8 @@ export interface ILibraryService {
   getFilteredBooks(filters: any): Promise<Book[]>;
   addBook(book: Book): Promise<void>;
   updateBook(book: Book): Promise<void>;
+  updateAuthor(author: Author): Promise<void>;
+  updatePublisher(publisher: Publisher): Promise<void>;
   deleteBook(id: number): Promise<void>;
   addLabelToBook(bookId: number, label: string): Promise<void>;
   removeLabelFromBook(bookId: number, label: string): Promise<void>;

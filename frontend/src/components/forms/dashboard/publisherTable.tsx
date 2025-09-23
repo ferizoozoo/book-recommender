@@ -21,6 +21,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { PublisherForm } from "./publisherForm";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 interface PublishersTableProps {
   publishers: Publisher[];
@@ -37,6 +39,8 @@ export function PublishersTable({
   onAdd,
   isLoading = false,
 }: PublishersTableProps) {
+  const { toast } = useToast();
+  const [addDialog, setAddDialog] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
     publisher: Publisher | null;
@@ -64,13 +68,65 @@ export function PublishersTable({
     }
   };
 
+  const handleAddSubmit = async (data: any) => {
+    try {
+      await onAdd(data);
+      setAddDialog(false);
+      toast({
+        title: "Success",
+        description: "Publisher added successfully",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to add publisher",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEditSubmit = async (publisherData: any) => {
+    if (!editDialog.publisher?.id) return;
+
+    try {
+      await onEdit({
+        ...editDialog.publisher,
+        ...publisherData,
+        id: editDialog.publisher.id,
+        updatedAt: new Date(),
+      });
+      setEditDialog({
+        open: false,
+        publisher: null,
+      });
+      toast({
+        title: "Success",
+        description: "Publisher updated successfully",
+        variant: "success",
+      });
+    } catch (error) {
+      setEditDialog({
+        open: false,
+        publisher: null,
+      });
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to update publisher",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Publishers</CardTitle>
 
-          <Dialog>
+          <Dialog open={addDialog} onOpenChange={setAddDialog}>
             <DialogTrigger>
               <div className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-black bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary cursor-pointer">
                 <Plus className="w-4 h-4 mr-2" />
@@ -79,15 +135,8 @@ export function PublishersTable({
             </DialogTrigger>
             <DialogContent className="bg-white">
               <PublisherForm
-                onSubmit={onAdd}
-                onCancel={() => {
-                  const trigger = document.querySelector(
-                    '[aria-label="Close"]'
-                  );
-                  if (trigger instanceof HTMLButtonElement) {
-                    trigger.click();
-                  }
-                }}
+                onSubmit={handleAddSubmit}
+                onCancel={() => setAddDialog(false)}
               />
             </DialogContent>
           </Dialog>
@@ -170,20 +219,8 @@ export function PublishersTable({
                               </DialogHeader>
                               <PublisherForm
                                 publisher={editDialog.publisher || undefined}
-                                onSubmit={(publisherData) => {
-                                  if (editDialog.publisher?.id) {
-                                    onEdit({
-                                      ...editDialog.publisher,
-                                      ...publisherData,
-                                      id: editDialog.publisher.id,
-                                      updatedAt: new Date(),
-                                    });
-                                    setEditDialog({
-                                      open: false,
-                                      publisher: null,
-                                    });
-                                  }
-                                }}
+                                isLoading={isLoading}
+                                onSubmit={handleEditSubmit}
                                 onCancel={() =>
                                   setEditDialog({
                                     open: false,
@@ -221,6 +258,7 @@ export function PublishersTable({
         onConfirm={handleDeleteConfirm}
         isLoading={isLoading}
       />
+      <Toaster />
     </>
   );
 }
