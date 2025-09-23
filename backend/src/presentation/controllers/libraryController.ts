@@ -361,19 +361,29 @@ export class LibraryController {
         return;
       }
 
-      const { title, author, quantity } = req.body;
+      const {
+        title,
+        author,
+        description,
+        isbn,
+        publisher,
+        year,
+        image,
+        quantity,
+      } = req.body;
 
+      // TODO: this seems sketchy, we should not be creating a new Book instance
       const updatedBook = new Book(
         existingBook.id,
         title || existingBook.title,
         author instanceof Author
           ? author
           : existingBook.author || new Author(0, ""),
-        existingBook.description,
-        existingBook.isbn,
-        existingBook.publisher,
-        existingBook.year,
-        existingBook.image,
+        description || existingBook.description,
+        isbn || existingBook.isbn,
+        publisher || existingBook.publisher,
+        year || existingBook.year,
+        image || existingBook.image,
         existingBook.rating,
         existingBook.numberOfRatings,
         existingBook.numberOfReviews

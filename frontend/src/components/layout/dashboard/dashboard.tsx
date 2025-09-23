@@ -143,6 +143,7 @@ export default function Dashboard() {
   const handleBookEdit = async (book: any) => {
     try {
       const id = book.id;
+
       const updateRes = await fetchWithAuth(
         `${config.apiUrl}/library/books/${id}`,
         {
@@ -150,18 +151,28 @@ export default function Dashboard() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(book),
+          body: JSON.stringify({
+            id: book.id,
+            title: book.title,
+            isbn: book.isbn,
+            authorId: book.authorId,
+            publisherId: book.publisherId,
+            publishedDate: book.publishedDate,
+            genre: book.genre,
+            pages: book.pages,
+            year: book.year,
+          }),
         }
       );
 
       if (!updateRes.ok) {
         const errorText = await updateRes.text();
+        console.error("Update failed with response:", errorText); // Debug log
         throw new Error(errorText || "Failed to update book");
       }
 
       // After successful update, fetch fresh data
       await fetchAllData();
-
       return true;
     } catch (error) {
       console.error("Failed to update book:", error);

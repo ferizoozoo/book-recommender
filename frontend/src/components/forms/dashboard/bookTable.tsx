@@ -72,6 +72,76 @@ export function BooksTable({
     }
   };
 
+  const handleAddSubmit = async (data: any) => {
+    try {
+      await onAdd(data);
+      setAddDialog(false);
+      toast({
+        title: "Success",
+        description: "Book added successfully",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to add book",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEditSubmit = async (bookData: any) => {
+    debugger;
+    if (!editDialog.book?.id) {
+      toast({
+        title: "Error",
+        description: "No book selected for editing",
+        variant: "destructive",
+      });
+      setEditDialog({ open: false, book: null });
+      return;
+    }
+
+    try {
+      const updatedBookData = {
+        id: editDialog.book?.id,
+        title: bookData.title,
+        isbn: bookData.isbn,
+        authorId: bookData.authorId,
+        publisherId: bookData.publisherId,
+        publishedDate: bookData.publishedDate,
+        year: new Date(bookData.publishedDate).getFullYear(),
+        genre: bookData.genre || editDialog.book?.genre,
+        pages: bookData.pages || editDialog.book?.pages,
+        createdAt: editDialog.book?.createdAt,
+        updatedAt: new Date(),
+      };
+
+      await onEdit(updatedBookData);
+      setEditDialog({
+        open: false,
+        book: null,
+      });
+      toast({
+        title: "Success",
+        description: "Book updated successfully",
+        variant: "success",
+      });
+    } catch (error) {
+      setEditDialog({
+        open: false,
+        book: null,
+      });
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to update book",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <>
       <Card>
@@ -91,26 +161,7 @@ export function BooksTable({
               <BookForm
                 authors={authors}
                 publishers={publishers}
-                onSubmit={async (data) => {
-                  try {
-                    await onAdd(data);
-                    setAddDialog(false);
-                    toast({
-                      title: "Success",
-                      description: "Book added successfully",
-                      variant: "success",
-                    });
-                  } catch (error) {
-                    toast({
-                      title: "Error",
-                      description:
-                        error instanceof Error
-                          ? error.message
-                          : "Failed to add book",
-                      variant: "destructive",
-                    });
-                  }
-                }}
+                onSubmit={handleAddSubmit}
                 onCancel={() => setAddDialog(false)}
               />
             </DialogContent>
@@ -163,12 +214,12 @@ export function BooksTable({
                           <div className="flex gap-2 justify-end">
                             <Dialog
                               open={editDialog.open}
-                              onOpenChange={(open) =>
+                              onOpenChange={(open) => {
                                 setEditDialog({
                                   open,
                                   book: open ? book : null,
-                                })
-                              }
+                                });
+                              }}
                             >
                               <DialogTrigger asChild>
                                 <Button
@@ -188,50 +239,7 @@ export function BooksTable({
                                   authors={authors}
                                   publishers={publishers}
                                   isLoading={isLoading}
-                                  onSubmit={async (bookData) => {
-                                    if (editDialog.book?.id) {
-                                      try {
-                                        await onEdit({
-                                          ...editDialog.book, // Keep metadata
-                                          ...bookData, // Apply form updates
-                                          id: editDialog.book.id,
-                                          year: new Date(
-                                            bookData.publishedDate
-                                          ).getFullYear(),
-                                          authorId: bookData.authorId,
-                                          publisherId: bookData.publisherId,
-                                          createdAt: editDialog.book.createdAt,
-                                          updatedAt: new Date(),
-                                        });
-                                        // Ensure we close the dialog first
-                                        setEditDialog({
-                                          open: false,
-                                          book: null,
-                                        });
-                                        // Then show the toast
-                                        toast({
-                                          title: "Success",
-                                          description:
-                                            "Book updated successfully",
-                                          variant: "success",
-                                        });
-                                      } catch (error) {
-                                        // Close dialog even on error
-                                        setEditDialog({
-                                          open: false,
-                                          book: null,
-                                        });
-                                        toast({
-                                          title: "Error",
-                                          description:
-                                            error instanceof Error
-                                              ? error.message
-                                              : "Failed to update book",
-                                          variant: "destructive",
-                                        });
-                                      }
-                                    }
-                                  }}
+                                  onSubmit={handleEditSubmit}
                                   onCancel={() =>
                                     setEditDialog({ open: false, book: null })
                                   }
