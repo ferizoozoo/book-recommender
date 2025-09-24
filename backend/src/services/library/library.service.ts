@@ -105,7 +105,9 @@ export class LibraryService implements ILibraryService {
     }
 
     await this.#authorRepo.save(author);
-    const savedAuthor = await this.#authorRepo.getById(author.id);
+    // After save, we need to find the latest author since we don't know the new ID
+    const authors = await this.#authorRepo.getAll();
+    const savedAuthor = authors[authors.length - 1];
     if (!savedAuthor) {
       throw new Error(serviceConsts.AuthorNotFound);
     }
@@ -125,7 +127,9 @@ export class LibraryService implements ILibraryService {
     }
 
     await this.#publisherRepo.save(publisher);
-    const savedPublisher = await this.#publisherRepo.getById(publisher.id);
+    // After save, we need to find the latest publisher since we don't know the new ID
+    const publishers = await this.#publisherRepo.getAll();
+    const savedPublisher = publishers[publishers.length - 1];
     if (!savedPublisher) {
       throw new Error(serviceConsts.PublisherNotFound);
     }

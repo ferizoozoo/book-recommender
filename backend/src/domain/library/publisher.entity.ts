@@ -5,7 +5,7 @@ import { Book } from "./book.entity";
 // NOTE: the reason I didn't make the fields private and encapsulated is, "what is the point?"
 export class Publisher implements IValidate {
   constructor(
-    public id: number,
+    public id: number | null = null,
     public name: string = "",
     public address: string = "",
     public city: string = "",
@@ -17,7 +17,7 @@ export class Publisher implements IValidate {
 
   // TODO: maybe this validate method should be replaced with decorators.
   validate(): boolean {
-    if (this.id < 0) {
+    if (this.id !== null && this.id < 0) {
       throw new Error(domainConsts.PublisherIdNonNegative);
     }
 

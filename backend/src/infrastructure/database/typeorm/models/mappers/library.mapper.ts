@@ -14,7 +14,10 @@ import { Review } from "../../../../../domain/library/review.entity.ts";
 
 export function mapAuthorDomainToModel(author: Author): AuthorEntity {
   const authorEntity = new AuthorEntity();
-  authorEntity.id = author.id;
+  // Only set ID if it exists and is a positive number
+  if (typeof author.id === "number" && author.id > 0) {
+    authorEntity.id = author.id;
+  }
   authorEntity.bio = author.bio;
   authorEntity.image = author.image;
 
@@ -40,7 +43,10 @@ export function mapAuthorEntityToDomain(authorEntity: AuthorEntity): Author {
 
 export function mapBookDomainToModel(book: Book): BookEntity {
   const bookEntity = new BookEntity();
-  bookEntity.id = book.id;
+  // Only set ID if it exists and is a positive number (not -1, 0, or null)
+  if (book.id && typeof book.id === "number" && book.id > 0) {
+    bookEntity.id = book.id;
+  }
   bookEntity.title = book.title;
   bookEntity.description = book.description;
   bookEntity.isbn = book.isbn;
@@ -51,12 +57,16 @@ export function mapBookDomainToModel(book: Book): BookEntity {
   bookEntity.numberOfReviews = book.numberOfReviews;
 
   // Map the author if it exists
-  if (book.author && book.author.id > 0) {
+  if (book.author && typeof book.author.id === "number" && book.author.id > 0) {
     bookEntity.author = mapAuthorDomainToModel(book.author);
   }
 
   // Map the publisher if it exists
-  if (book.publisher && book.publisher.id > 0) {
+  if (
+    book.publisher &&
+    typeof book.publisher.id === "number" &&
+    book.publisher.id > 0
+  ) {
     bookEntity.publisher = mapPublisherDomainToModel(book.publisher);
   }
 
@@ -89,7 +99,10 @@ export function mapPublisherDomainToModel(
   publisher: Publisher
 ): PublisherEntity {
   const publisherEntity = new PublisherEntity();
-  publisherEntity.id = publisher.id;
+  // Only set ID if it exists and is a positive number
+  if (typeof publisher.id === "number" && publisher.id > 0) {
+    publisherEntity.id = publisher.id;
+  }
   publisherEntity.name = publisher.name;
   publisherEntity.address = publisher.address;
   publisherEntity.city = publisher.city;

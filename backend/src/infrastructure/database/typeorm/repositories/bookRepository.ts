@@ -3,7 +3,6 @@ import {
   UserBookEntity,
   UserBookLikeEntity,
 } from "../models/library.models";
-import AppDataSource from "..";
 import { Like, Repository } from "typeorm";
 import { Book } from "../../../../domain/library/book.entity";
 import { Author } from "../../../../domain/library/author.entity";
@@ -17,6 +16,7 @@ import {
 import { IBookRepository } from "../../../../services/common/interfaces/repositories/i-bookRepository";
 import { UserEntity } from "../models/auth.models";
 import { User } from "../../../../domain/auth/user.entity";
+import AppDataSource from "..";
 
 export class BookRepository implements IBookRepository {
   private bookRepository: Repository<BookEntity>;
@@ -64,6 +64,7 @@ export class BookRepository implements IBookRepository {
   async getAll(): Promise<Book[]> {
     const bookEntities = await this.bookRepository.find({
       relations: ["author", "publisher"],
+      order: { id: "DESC" },
     });
     return bookEntities.map((entity) => mapBookEntityToDomain(entity));
   }
@@ -80,6 +81,7 @@ export class BookRepository implements IBookRepository {
     const bookEntities = await this.bookRepository.find({
       take: limit,
       relations: ["author", "publisher"],
+      order: { id: "DESC" },
     });
 
     return bookEntities.map((entity) => mapBookEntityToDomain(entity));
@@ -102,8 +104,18 @@ export class BookRepository implements IBookRepository {
   }
 
   async save(book: Book): Promise<void> {
+    // Ensure we're not passing a sentinel value (-1) as ID
+    if (book.id && book.id <= 0) {
+      book.id = null;
+    }
     const bookEntity = mapBookDomainToModel(book);
-    await this.bookRepository.save(bookEntity);
+    // Extract everything except id for new books
+    const { id, ...entityWithoutId } = bookEntity;
+    if (id && id > 0) {
+      await this.bookRepository.insert(bookEntity);
+    } else {
+      await this.bookRepository.insert(entityWithoutId);
+    }
   }
 
   async delete(id: number): Promise<void> {
@@ -131,7 +143,7 @@ export class BookRepository implements IBookRepository {
     }
 
     const bookEntity = await this.bookRepository.findOne({
-      where: { id: book.id },
+      where: book.id ? { id: book.id } : undefined,
     });
 
     if (!bookEntity) {

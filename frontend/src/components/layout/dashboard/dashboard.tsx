@@ -119,6 +119,9 @@ export default function Dashboard() {
         const newAuthor = await res.json();
         setAuthors([...authors, newAuthor]);
       }
+
+      // After successful creation, fetch fresh data
+      await fetchAllData();
     } catch (error) {
       console.error("Failed to add author:", error);
     }
@@ -126,14 +129,18 @@ export default function Dashboard() {
 
   const handlePublisherSubmit = async (publisherData: any) => {
     try {
+      debugger;
       const res = await fetchWithAuth(`${config.apiUrl}/library/publishers`, {
         method: "POST",
         body: JSON.stringify(publisherData),
       });
       if (res.ok) {
         const newPublisher = await res.json();
-        setPublishers([...publishers, newPublisher]);
+        setPublishers((publishers) => [...publishers, newPublisher]);
       }
+
+      // After successful creation, fetch fresh data
+      await fetchAllData();
     } catch (error) {
       console.error("Failed to add publisher:", error);
     }

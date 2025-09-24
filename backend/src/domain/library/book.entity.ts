@@ -10,7 +10,7 @@ export class Book implements IValidate {
   public available: boolean = false;
 
   constructor(
-    public id: number,
+    public id: number | null = null,
     public title: string = "",
     public author: Author,
     public description: string = "",
@@ -25,15 +25,15 @@ export class Book implements IValidate {
 
   // TODO: maybe this validate method should be replaced with decorators.
   validate(): boolean {
-    if (this.id < 0) {
+    if (this.id !== null && this.id < 0) {
       throw new Error(domainConsts.BookIdNonNegative);
     }
 
-    if (this.author && this.author.id < 0) {
+    if (this.author && this.author.id !== null && this.author.id < 0) {
       throw new Error(domainConsts.BookAuthorShouldBeValid);
     }
 
-    if (this.publisher && this.publisher.id < 0) {
+    if (this.publisher && this.publisher.id !== null && this.publisher.id < 0) {
       throw new Error(domainConsts.BookPublisherShouldBeValid);
     }
 

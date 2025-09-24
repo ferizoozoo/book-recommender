@@ -31,7 +31,7 @@ export class PublisherRepository implements IPublisherRepository {
 
     // Load books separately to avoid circular references
     const bookEntities = await this.#books.find({
-      where: { publisher: { id } },
+      where: id ? { publisher: { id } } : {},
       relations: ["author"],
     });
 
@@ -41,7 +41,9 @@ export class PublisherRepository implements IPublisherRepository {
   }
 
   async getAll(): Promise<Publisher[]> {
-    const publisherEntities = await this.#publishers.find({});
+    const publisherEntities = await this.#publishers.find({
+      order: { id: "DESC" },
+    });
 
     return Promise.all(
       publisherEntities.map(async (publisherEntity) => {
@@ -49,7 +51,7 @@ export class PublisherRepository implements IPublisherRepository {
 
         // Load books separately for each publisher
         const bookEntities = await this.#books.find({
-          where: { publisher: { id: publisher.id } },
+          where: publisher.id ? { publisher: { id: publisher.id } } : {},
           relations: ["author"],
         });
 
@@ -62,7 +64,9 @@ export class PublisherRepository implements IPublisherRepository {
 
   async save(publisher: Publisher): Promise<void> {
     const publisherEntity = mapPublisherDomainToModel(publisher);
-    await this.#publishers.save(publisherEntity);
+    // Extract everything except id for new publishers
+    const { id, ...entityWithoutId } = publisherEntity;
+    await this.#publishers.insert(entityWithoutId);
   }
 
   async delete(id: number): Promise<void> {
@@ -70,6 +74,9 @@ export class PublisherRepository implements IPublisherRepository {
   }
 
   async update(publisher: Publisher): Promise<void> {
+    if (!publisher.id || publisher.id <= 0) {
+      throw new Error("Cannot update publisher without a valid ID");
+    }
     const publisherEntity = mapPublisherDomainToModel(publisher);
     await this.#publishers.update(publisher.id, publisherEntity);
   }

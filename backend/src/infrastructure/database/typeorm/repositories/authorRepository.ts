@@ -32,7 +32,7 @@ export class AuthorRepository implements IAuthorRepository {
 
     // Load books separately to avoid circular references
     const bookEntities = await this.#books.find({
-      where: { author: { id } },
+      where: id ? { author: { id } } : {},
       relations: ["publisher"],
     });
 
@@ -44,6 +44,7 @@ export class AuthorRepository implements IAuthorRepository {
   async getAll(): Promise<Author[]> {
     const authorEntities = await this.#authors.find({
       relations: ["user"],
+      order: { id: "DESC" },
     });
 
     return Promise.all(
@@ -52,7 +53,7 @@ export class AuthorRepository implements IAuthorRepository {
 
         // Load books separately for each author
         const bookEntities = await this.#books.find({
-          where: { author: { id: author.id } },
+          where: author.id ? { author: { id: author.id } } : {},
           relations: ["publisher"],
         });
 
@@ -77,7 +78,7 @@ export class AuthorRepository implements IAuthorRepository {
 
     // Load books separately
     const bookEntities = await this.#books.find({
-      where: { author: { id: author.id } },
+      where: author.id ? { author: { id: author.id } } : {},
       relations: ["publisher"],
     });
 
@@ -88,7 +89,9 @@ export class AuthorRepository implements IAuthorRepository {
 
   async save(author: Author): Promise<void> {
     const authorEntity = mapAuthorDomainToModel(author);
-    await this.#authors.save(authorEntity);
+    // Extract everything except id for new authors
+    const { id, ...entityWithoutId } = authorEntity;
+    await this.#authors.insert(entityWithoutId);
   }
 
   async delete(id: number): Promise<void> {
@@ -96,6 +99,9 @@ export class AuthorRepository implements IAuthorRepository {
   }
 
   async update(author: Author): Promise<void> {
+    if (!author.id || author.id <= 0) {
+      throw new Error("Cannot update author without a valid ID");
+    }
     const authorEntity = mapAuthorDomainToModel(author);
     await this.#authors.update(author.id, authorEntity);
   }

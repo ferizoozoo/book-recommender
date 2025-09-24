@@ -78,15 +78,15 @@ export class LibraryController {
     nextFunction: NextFunction
   ): Promise<void> {
     try {
-      const { id, name, address } = req.body;
-      if (!id || !name || !address) {
+      const { name, address } = req.body;
+      if (!name || !address) {
         res
           .status(400)
           .json({ message: presentationConsts.LibraryPublisherNotFound });
         return;
       }
 
-      const publisher = new Publisher(id, name, address);
+      const publisher = new Publisher(0, name, address);
       const savedPublisher = await this.#libraryService.addPublisher(publisher);
       res.status(201).json({ publisher: savedPublisher });
     } catch (error) {
