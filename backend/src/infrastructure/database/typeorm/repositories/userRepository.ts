@@ -32,6 +32,11 @@ export class UserRepository implements IUserRepository {
     await this.#users.save(userEntity);
   }
 
+  async updateUser(user: User) {
+    const userEntity = mapUserDomainToModel(user);
+    await this.#users.update(user.id, userEntity);
+  }
+
   async getAllUsers(): Promise<User[]> {
     const userEntities = await this.#users.find();
     const users: User[] = [];

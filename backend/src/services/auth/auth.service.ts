@@ -76,7 +76,19 @@ export class AuthService implements IAuthService {
     };
   }
 
-  async getUsers(): Promise<User[]> {
-    return await this.#userRepo.getAllUsers();
+  async updateProfile(
+    firstName: string,
+    lastName: string,
+    email: string
+  ): Promise<void> {
+    const user = await this.#userRepo.getUserByEmail(email);
+    if (!user) {
+      throw new Error(serviceConsts.AuthUserNotFound);
+    }
+
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.email = email;
+    await this.#userRepo.updateUser(user);
   }
 }

@@ -23,6 +23,14 @@ function App() {
           }
         />
         <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/library/search"
           element={
             <PrivateRoute>

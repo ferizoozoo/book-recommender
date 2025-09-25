@@ -42,8 +42,8 @@ const data = {
       icon: IconDashboard,
     },
     {
-      title: "Users",
-      url: "/users",
+      title: "Profile",
+      url: "/profile",
       icon: IconListDetails,
     },
     {
@@ -53,7 +53,7 @@ const data = {
     },
     {
       title: "Library",
-      url: "#",
+      url: "/library/search",
       icon: IconFolder,
     },
   ],

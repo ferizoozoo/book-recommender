@@ -3,6 +3,7 @@ export const serviceConsts = {
   AuthEmailAndPasswordRequired: "Email and password are required",
   AuthEmailAlreadyRegistered: "Email already registered",
   AuthInvalidEmailAndPassword: "Invalid email and password",
+  AuthUserNotFound: "User not found",
 
   // Book related constants
   BookValidationFailed: "Book validation failed",

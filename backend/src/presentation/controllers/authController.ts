@@ -82,4 +82,27 @@ export class AuthController {
       res.status(400).json({ message: errorMessage });
     }
   }
+
+  async updateProfile(
+    req: Request,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    try {
+      const { firstName, lastName, email } = req.body;
+
+      const token = await this.#authService.updateProfile(
+        firstName,
+        lastName,
+        email
+      );
+      res.status(201).json({ token });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : presentationConsts.AuthRegisterFailed;
+      res.status(400).json({ message: errorMessage });
+    }
+  }
 }

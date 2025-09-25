@@ -16,16 +16,15 @@ import config from "../../../../config";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "@/contexts/auth-context";
 
-// Import dashboard forms and tables
-import { BookForm } from "@/components/forms/dashboard/bookForm";
-import { AuthorForm } from "@/components/forms/dashboard/authorForm";
-import { PublisherForm } from "@/components/forms/dashboard/publisherForm";
 import { BooksTable } from "@/components/forms/dashboard/bookTable";
 import { AuthorsTable } from "@/components/forms/dashboard/authorTable";
 import { PublishersTable } from "@/components/forms/dashboard/publisherTable";
-import { DialogTrigger } from "@radix-ui/react-dialog";
+import { ProfileForm } from "@/components/forms/dashboard/profileForm";
+import { useLocation } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 export default function Dashboard() {
+  const location = useLocation();
   const fetchWithAuth = useFetchWithAuth();
   const { accessToken } = useAuthContext();
   const navigate = useNavigate();
@@ -35,6 +34,8 @@ export default function Dashboard() {
   const [authors, setAuthors] = useState<any[]>([]);
   const [publishers, setPublishers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const user = jwtDecode(accessToken || "");
 
   // Fetch data function that can be called whenever needed
   const fetchAllData = async () => {
@@ -281,6 +282,32 @@ export default function Dashboard() {
     }
   };
 
+  async function handleProfileUpdate(data: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    // bio?: string | undefined;
+  }) {
+    try {
+      const res = await fetchWithAuth(`${config.apiUrl}/auth/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Failed to update profile");
+      }
+      // Optionally, you could refresh user data here or show a success message
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      // Optionally, show error feedback to the user
+    }
+  }
+
   return (
     <SidebarProvider
       style={
@@ -294,65 +321,78 @@ export default function Dashboard() {
       <SidebarInset>
         <div className="flex flex-1 flex-col px-4">
           <div className="@container/main flex flex-1 flex-col gap-2">
-            <Tabs defaultValue="books" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="books">Books</TabsTrigger>
-                <TabsTrigger value="authors">Authors</TabsTrigger>
-                <TabsTrigger value="publishers">Publishers</TabsTrigger>
-              </TabsList>
+            {location.pathname === "/profile" ? (
+              <div className="p-6">
+                <h3 className="text-lg font-medium mb-4">Profile</h3>
+                <ProfileForm
+                  user={user}
+                  onSubmit={handleProfileUpdate}
+                  onCancel={() => navigate("/dashboard")}
+                />
+              </div>
+            ) : (
+              <Tabs defaultValue="books" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="books">Books</TabsTrigger>
+                  <TabsTrigger value="authors">Authors</TabsTrigger>
+                  <TabsTrigger value="publishers">Publishers</TabsTrigger>
+                </TabsList>
 
-              <TabsContent value="books" className="mt-6">
-                <div className="gap-6">
-                  <div className="lg:col-span-3">
-                    <div className="p-6">
-                      <h3 className="text-lg font-medium mb-4">Books List</h3>
-                      <BooksTable
-                        books={books}
-                        authors={authors}
-                        publishers={publishers}
-                        onEdit={handleBookEdit}
-                        onDelete={handleBookDelete}
-                        onAdd={handleBookSubmit}
-                      />
+                <TabsContent value="books" className="mt-6">
+                  <div className="gap-6">
+                    <div className="lg:col-span-3">
+                      <div className="p-6">
+                        <h3 className="text-lg font-medium mb-4">Books List</h3>
+                        <BooksTable
+                          books={books}
+                          authors={authors}
+                          publishers={publishers}
+                          onEdit={handleBookEdit}
+                          onDelete={handleBookDelete}
+                          onAdd={handleBookSubmit}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </TabsContent>
+                </TabsContent>
 
-              <TabsContent value="authors" className="mt-6">
-                <div className="gap-6">
-                  <div className="">
-                    <div className="p-6">
-                      <h3 className="text-lg font-medium mb-4">Authors List</h3>
-                      <AuthorsTable
-                        authors={authors}
-                        onEdit={handleAuthorEdit}
-                        onDelete={handleAuthorDelete}
-                        onAdd={handleAuthorSubmit}
-                      />
+                <TabsContent value="authors" className="mt-6">
+                  <div className="gap-6">
+                    <div className="">
+                      <div className="p-6">
+                        <h3 className="text-lg font-medium mb-4">
+                          Authors List
+                        </h3>
+                        <AuthorsTable
+                          authors={authors}
+                          onEdit={handleAuthorEdit}
+                          onDelete={handleAuthorDelete}
+                          onAdd={handleAuthorSubmit}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </TabsContent>
+                </TabsContent>
 
-              <TabsContent value="publishers" className="mt-6">
-                <div className="gap-6">
-                  <div className="">
-                    <div className="p-6">
-                      <h3 className="text-lg font-medium mb-4">
-                        Publishers List
-                      </h3>
-                      <PublishersTable
-                        publishers={publishers}
-                        onEdit={handlePublisherEdit}
-                        onDelete={handlePublisherDelete}
-                        onAdd={handlePublisherSubmit}
-                      />
+                <TabsContent value="publishers" className="mt-6">
+                  <div className="gap-6">
+                    <div className="">
+                      <div className="p-6">
+                        <h3 className="text-lg font-medium mb-4">
+                          Publishers List
+                        </h3>
+                        <PublishersTable
+                          publishers={publishers}
+                          onEdit={handlePublisherEdit}
+                          onDelete={handlePublisherDelete}
+                          onAdd={handlePublisherSubmit}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </TabsContent>
-            </Tabs>
+                </TabsContent>
+              </Tabs>
+            )}
           </div>
         </div>
       </SidebarInset>

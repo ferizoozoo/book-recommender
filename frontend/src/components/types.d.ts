@@ -32,3 +32,13 @@ export interface Book {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  bio?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

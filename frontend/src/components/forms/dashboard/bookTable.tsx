@@ -125,7 +125,7 @@ export function BooksTable({
       });
       toast({
         title: "Success",
-        description: "Book updated successfully",
+        description: "Profile updated successfully",
         variant: "success",
       });
     } catch (error) {
