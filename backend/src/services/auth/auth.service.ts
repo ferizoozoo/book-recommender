@@ -20,13 +20,47 @@ export class AuthService implements IAuthService {
     this.#hasher = hasher;
     this.#tokenService = tokenService;
   }
+  async updateUser(
+    id: number,
+    firstName: string,
+    lastName: string,
+    email: string,
+    isAdmin: boolean
+  ): Promise<void> {
+    const user = await this.#userRepo.getById(id);
+    if (!user) {
+      throw new Error(serviceConsts.AuthUserNotFound);
+    }
+
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.email = email;
+    user.roles = ["user"];
+    await this.#userRepo.update(user);
+  }
+  async createUser(
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string
+  ): Promise<void> {
+    const user = new User();
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.email = email;
+    await user.savePassword(password, this.#hasher);
+    await this.#userRepo.add(user);
+  }
+  async deleteUser(id: string): Promise<void> {
+    return this.#userRepo.delete(id);
+  }
 
   async register(email: string, password: string): Promise<string> {
     if (!email || !password) {
       throw new Error(serviceConsts.AuthEmailAndPasswordRequired);
     }
 
-    const oldUser = await this.#userRepo.getUserByEmail(email);
+    const oldUser = await this.#userRepo.getByEmail(email);
     if (oldUser !== null) {
       throw new Error(serviceConsts.AuthEmailAndPasswordRequired);
     }
@@ -36,7 +70,7 @@ export class AuthService implements IAuthService {
     user.email = email; // TODO: about encapsulation of entities, it can be discussed if it's necessary or not
     user.roles = ["user"];
     await user.savePassword(password, this.#hasher);
-    await this.#userRepo.addUser(user);
+    await this.#userRepo.add(user);
 
     const userClaims = user.toClaims();
     return this.#tokenService.generateAccessToken(userClaims);
@@ -47,7 +81,7 @@ export class AuthService implements IAuthService {
       throw new Error(serviceConsts.AuthEmailAndPasswordRequired);
     }
 
-    const user = await this.#userRepo.getUserByEmail(email);
+    const user = await this.#userRepo.getByEmail(email);
     if (!user) {
       throw new Error(serviceConsts.AuthInvalidEmailAndPassword);
     }
@@ -81,7 +115,7 @@ export class AuthService implements IAuthService {
     lastName: string,
     email: string
   ): Promise<void> {
-    const user = await this.#userRepo.getUserByEmail(email);
+    const user = await this.#userRepo.getByEmail(email);
     if (!user) {
       throw new Error(serviceConsts.AuthUserNotFound);
     }
@@ -89,6 +123,15 @@ export class AuthService implements IAuthService {
     user.firstName = firstName;
     user.lastName = lastName;
     user.email = email;
-    await this.#userRepo.updateUser(user);
+    await this.#userRepo.update(user);
+  }
+
+  async getAllUsers(): Promise<any[]> {
+    try {
+      const users = await this.#userRepo.getAll();
+      return users;
+    } catch (error) {
+      throw new Error(serviceConsts.AuthGetUsersFailed);
+    }
   }
 }

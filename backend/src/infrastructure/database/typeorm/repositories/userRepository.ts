@@ -14,8 +14,12 @@ export class UserRepository implements IUserRepository {
   constructor() {
     this.#users = AppDataSource.getRepository(UserEntity);
   }
+  delete(id: string): Promise<void> {
+    this.#users.delete(id);
+    return Promise.resolve();
+  }
 
-  async getUserByEmail(email: string): Promise<User | null> {
+  async getByEmail(email: string): Promise<User | null> {
     const userEntity = await this.#users.findOne({
       where: { email: email },
     });
@@ -27,17 +31,17 @@ export class UserRepository implements IUserRepository {
     return mapUserEntityToDomain(userEntity);
   }
 
-  async addUser(user: User) {
+  async add(user: User) {
     const userEntity = mapUserDomainToModel(user);
     await this.#users.save(userEntity);
   }
 
-  async updateUser(user: User) {
+  async update(user: User) {
     const userEntity = mapUserDomainToModel(user);
     await this.#users.update(user.id, userEntity);
   }
 
-  async getAllUsers(): Promise<User[]> {
+  async getAll(): Promise<User[]> {
     const userEntities = await this.#users.find();
     const users: User[] = [];
     userEntities.forEach((user) => {

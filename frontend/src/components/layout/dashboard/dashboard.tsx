@@ -19,6 +19,7 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { BooksTable } from "@/components/forms/dashboard/bookTable";
 import { AuthorsTable } from "@/components/forms/dashboard/authorTable";
 import { PublishersTable } from "@/components/forms/dashboard/publisherTable";
+import { UserTable as UsersTable } from "@/components/forms/dashboard/userTable";
 import { ProfileForm } from "@/components/forms/dashboard/profileForm";
 import { useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
@@ -33,11 +34,14 @@ export default function Dashboard() {
   const [books, setBooks] = useState<any[]>([]);
   const [authors, setAuthors] = useState<any[]>([]);
   const [publishers, setPublishers] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // TODO: should this be in a context? should the profile form have a getById service method
+  //       instead of using the decoded token?
   const user = jwtDecode(accessToken || "");
 
-  // Fetch data function that can be called whenever needed
+  // TODO: calling this function on every render is a performance hit
   const fetchAllData = async () => {
     try {
       setIsLoading(true);
@@ -68,6 +72,13 @@ export default function Dashboard() {
       if (publishersRes.ok) {
         const data = await publishersRes.json();
         setPublishers(data.publishers);
+      }
+
+      // Fetch users
+      const usersRes = await fetchWithAuth(`${config.apiUrl}/auth/users`);
+      if (usersRes.ok) {
+        const data = await usersRes.json();
+        setUsers(data.users);
       }
     } catch (error) {
       console.error("Failed to fetch data:", error);
@@ -282,6 +293,72 @@ export default function Dashboard() {
     }
   };
 
+  // User handlers
+  const handleUserSubmit = async (userData: any) => {
+    try {
+      const res = await fetchWithAuth(`${config.apiUrl}/auth/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Failed to create user");
+      }
+
+      // After successful creation, fetch fresh data
+      await fetchAllData();
+      return true;
+    } catch (error) {
+      console.error("Failed to add user:", error);
+      throw error;
+    }
+  };
+
+  const handleUserEdit = async (user: any) => {
+    try {
+      const updateRes = await fetchWithAuth(`${config.apiUrl}/auth/users`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+
+      if (!updateRes.ok) {
+        const errorText = await updateRes.text();
+        throw new Error(errorText || "Failed to update user");
+      }
+
+      // After successful update, fetch fresh data
+      await fetchAllData();
+      return true;
+    } catch (error) {
+      console.error("Failed to update user:", error);
+      throw error;
+    }
+  };
+
+  const handleUserDelete = (id: string) => {
+    try {
+      fetchWithAuth(`${config.apiUrl}/auth/users`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      }).then((res) => {
+        if (res.ok) {
+          setUsers(users.filter((user) => user.id !== id));
+        }
+      });
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+    }
+  };
+
   async function handleProfileUpdate(data: {
     email: string;
     firstName: string;
@@ -332,12 +409,12 @@ export default function Dashboard() {
               </div>
             ) : (
               <Tabs defaultValue="books" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="books">Books</TabsTrigger>
                   <TabsTrigger value="authors">Authors</TabsTrigger>
                   <TabsTrigger value="publishers">Publishers</TabsTrigger>
-                </TabsList>
-
+                  <TabsTrigger value="users">Users</TabsTrigger>
+                </TabsList>{" "}
                 <TabsContent value="books" className="mt-6">
                   <div className="gap-6">
                     <div className="lg:col-span-3">
@@ -355,7 +432,6 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </TabsContent>
-
                 <TabsContent value="authors" className="mt-6">
                   <div className="gap-6">
                     <div className="">
@@ -373,7 +449,6 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </TabsContent>
-
                 <TabsContent value="publishers" className="mt-6">
                   <div className="gap-6">
                     <div className="">
@@ -386,6 +461,21 @@ export default function Dashboard() {
                           onEdit={handlePublisherEdit}
                           onDelete={handlePublisherDelete}
                           onAdd={handlePublisherSubmit}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+                <TabsContent value="users" className="mt-6">
+                  <div className="gap-6">
+                    <div className="">
+                      <div className="p-6">
+                        <h3 className="text-lg font-medium mb-4">Users List</h3>
+                        <UsersTable
+                          users={users}
+                          onEdit={handleUserEdit}
+                          onDelete={handleUserDelete}
+                          onAdd={handleUserSubmit}
                         />
                       </div>
                     </div>

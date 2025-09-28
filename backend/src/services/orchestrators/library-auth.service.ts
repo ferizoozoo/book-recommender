@@ -13,7 +13,7 @@ export class LibraryAuthService implements ILibraryAuthService {
   }
 
   async getAllForUser(email: string): Promise<Book[]> {
-    const user = await this.#userRepo.getUserByEmail(email);
+    const user = await this.#userRepo.getByEmail(email);
     if (!user || !user.id) {
       throw new Error("User not found");
     }

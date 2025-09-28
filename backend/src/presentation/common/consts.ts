@@ -4,6 +4,12 @@ export const presentationConsts = {
   AuthInvalidCredentials: "Invalid credentials",
   AuthAuthenticationFailed: "Authentication failed",
   AuthRegisterFailed: "Register failed",
+  AuthGetUsersFailed: "Failed to retrieve users",
+  AuthUserIdRequired: "User ID is required",
+  AuthCreateUserFailed: "Failed to create user",
+  AuthUpdateUserFailed: "Failed to update user",
+  AuthDeleteUserFailed: "Failed to delete user",
+  AuthUserNotFound: "User not found",
 
   // Library related constants
   LibraryBookNotFound: "Book not found",

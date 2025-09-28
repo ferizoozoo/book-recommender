@@ -9,4 +9,19 @@ export interface IAuthService {
     lastName: string,
     email: string
   ): Promise<void>;
+  getAllUsers(): Promise<any[]>;
+  updateUser(
+    id: number,
+    firstName: string,
+    lastName: string,
+    email: string,
+    isAdmin: boolean
+  ): Promise<void>;
+  createUser(
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string
+  ): Promise<void>;
+  deleteUser(id: string): Promise<void>;
 }

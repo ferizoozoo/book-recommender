@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { IAuthService } from "../common/interfaces/services/i-authService.ts";
 import { presentationConsts } from "../common/consts.ts";
+import { AuthGuard } from "../common/decorators/auth.decorator.ts";
 
 // TODO: each controller should have its own DTO, for better validation and type safety
 export class AuthController {
@@ -83,6 +84,7 @@ export class AuthController {
     }
   }
 
+  @AuthGuard(["user"])
   async updateProfile(
     req: Request,
     res: Response,
@@ -102,6 +104,107 @@ export class AuthController {
         error instanceof Error
           ? error.message
           : presentationConsts.AuthRegisterFailed;
+      res.status(400).json({ message: errorMessage });
+    }
+  }
+
+  @AuthGuard(["admin"])
+  async getAllUsers(
+    req: Request,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    try {
+      const users = await this.#authService.getAllUsers();
+      res.status(200).json({ users });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : presentationConsts.AuthGetUsersFailed;
+      res.status(400).json({ message: errorMessage });
+    }
+  }
+
+  @AuthGuard(["admin"])
+  async createUser(
+    req: Request,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    try {
+      const { firstName, lastName, email, password } = req.body;
+
+      const token = await this.#authService.createUser(
+        firstName,
+        lastName,
+        email,
+        password
+      );
+      res.status(201).json({ token });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : presentationConsts.AuthCreateUserFailed;
+      res.status(400).json({ message: errorMessage });
+    }
+  }
+
+  @AuthGuard(["admin"])
+  async updateUser(
+    req: Request,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    try {
+      const { id, firstName, lastName, email, password } = req.body;
+      if (!id) {
+        res
+          .status(400)
+          .json({ message: presentationConsts.AuthUserIdRequired });
+        return;
+      }
+
+      const token = await this.#authService.updateUser(
+        id,
+        firstName,
+        lastName,
+        email,
+        password
+      );
+      res.status(201).json({ token });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : presentationConsts.AuthUpdateUserFailed;
+      res.status(400).json({ message: errorMessage });
+    }
+  }
+
+  @AuthGuard(["admin"])
+  async deleteUser(
+    req: Request,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    try {
+      const { id } = req.body;
+      if (!id) {
+        res
+          .status(400)
+          .json({ message: presentationConsts.AuthUserIdRequired });
+        return;
+      }
+
+      const token = await this.#authService.deleteUser(id);
+      res.status(201).json({ token });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : presentationConsts.AuthDeleteUserFailed;
       res.status(400).json({ message: errorMessage });
     }
   }

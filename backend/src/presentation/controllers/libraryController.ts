@@ -54,7 +54,7 @@ export class LibraryController {
       // TODO: DISASTER, this code belongs to the service layer
       //       we should not be creating entities in the controller
       //       also, we should not be using the User entity here at all
-      const user = await userRepository.getUserByEmail(userClaims?.email || "");
+      const user = await userRepository.getByEmail(userClaims?.email || "");
       if (!user) {
         res
           .status(400)
