@@ -4,16 +4,12 @@ import { presentationConsts } from "../common/consts";
 import { Book } from "../../domain/library/book.entity";
 import { Author } from "../../domain/library/author.entity";
 import { Publisher } from "../../domain/library/publisher.entity";
-import { User } from "../../domain/auth/user.entity";
 import { ILibraryAuthService } from "../common/interfaces/services/i-library-authService";
+import { AuthorDto } from "../../services/dtos/library.dtos";
 import {
   AuthGuard,
   AuthenticatedRequest,
 } from "../common/decorators/auth.decorator";
-import { UserClaims } from "../../domain/auth/user-claims.value";
-import { authController, userRepository } from "../di/setup";
-import { mapAuthorDomainToModel } from "../../infrastructure/database/typeorm/models/mappers/library.mapper";
-import { mapUserDomainToModel } from "../../infrastructure/database/typeorm/models/mappers/auth.mapper";
 
 // TODO: each controller should have its own DTO, for better validation and type safety
 
@@ -32,6 +28,7 @@ export class LibraryController {
     this.#libraryAuthService = libraryAuthService;
   }
 
+  // TODO: the addAuthor should go to the orchestrator layer
   @AuthGuard(["admin"])
   async addAuthor(
     req: AuthenticatedRequest,
@@ -47,22 +44,13 @@ export class LibraryController {
         return;
       }
 
-      // Access the authenticated user's claims
+      const authorData = { bio, image: req.body.image || "" };
       const userClaims = req.user;
-      console.log("User adding author:", userClaims?.email, userClaims?.roles);
 
-      // TODO: DISASTER, this code belongs to the service layer
-      //       we should not be creating entities in the controller
-      //       also, we should not be using the User entity here at all
-      const user = await userRepository.getByEmail(userClaims?.email || "");
-      if (!user) {
-        res
-          .status(400)
-          .json({ message: presentationConsts.LibraryAuthorNotFound });
-        return;
-      }
-      const author = new Author(0, bio, "", [], user);
-      const savedAuthor = await this.#libraryService.addAuthor(author);
+      const savedAuthor = await this.#libraryService.addAuthor(
+        authorData,
+        userClaims
+      );
       res.status(201).json({ author: savedAuthor });
     } catch (error) {
       const errorMessage =
@@ -78,15 +66,15 @@ export class LibraryController {
     nextFunction: NextFunction
   ): Promise<void> {
     try {
-      const { name, address } = req.body;
-      if (!name || !address) {
+      const { name, address, city, state, zip, country } = req.body;
+      if (!name || !address || !city || !state || !zip || !country) {
         res
           .status(400)
           .json({ message: presentationConsts.LibraryPublisherNotFound });
         return;
       }
 
-      const publisher = new Publisher(0, name, address);
+      const publisher = { id: 0, name, address, city, state, zip, country };
       const savedPublisher = await this.#libraryService.addPublisher(publisher);
       res.status(201).json({ publisher: savedPublisher });
     } catch (error) {
@@ -269,9 +257,6 @@ export class LibraryController {
     }
   }
 
-  // TODO: for now, we are using the Book entity directly in the controller.
-  //       In a real application, we might want to use a DTO (Data Transfer Object)
-  //       to avoid exposing domain entities directly.
   @AuthGuard(["admin"])
   async addBook(
     req: Request,
@@ -295,37 +280,17 @@ export class LibraryController {
           .json({ message: presentationConsts.LibraryBookDetailsRequired });
         return;
       }
-      const author = await this.#libraryService.getAuthorById(authorId);
-      if (!author) {
-        res
-          .status(404)
-          .json({ message: presentationConsts.LibraryAuthorNotFound });
-        return;
-      }
 
-      const publisher = await this.#libraryService.getPublisherById(
-        publisherId
-      );
-      if (!publisher) {
-        res
-          .status(404)
-          .json({ message: presentationConsts.LibraryPublisherNotFound });
-        return;
-      }
-
-      const book = new Book(
-        0, // ID will be set by the database
-        title || "",
-        author,
-        description || "",
-        isbn || "",
-        publisher,
-        new Date().getFullYear(), // default to current year
-        "", // image
-        0, // rating
-        0, // numberOfRatings
-        0 // numberOfReviews
-      );
+      const book = {
+        title,
+        authorId,
+        publisherId,
+        isbn,
+        quantity,
+        publishedDate,
+        description,
+        labels: [],
+      };
 
       await this.#libraryService.addBook(book);
       res
@@ -346,6 +311,8 @@ export class LibraryController {
   ): Promise<void> {
     try {
       const authorId = parseInt(req.params.id);
+      const { id, bio, image } = req.body;
+
       if (isNaN(authorId)) {
         res
           .status(400)
@@ -353,24 +320,11 @@ export class LibraryController {
         return;
       }
 
-      const existingAuthor = await this.#libraryService.getAuthorById(authorId);
-      if (!existingAuthor) {
-        res
-          .status(404)
-          .json({ message: presentationConsts.LibraryAuthorNotFound });
-        return;
-      }
-
-      const { bio, image } = req.body;
-
-      // TODO: this seems sketchy, we should not be creating a new Author instance
-      const updatedAuthor = new Author(
-        existingAuthor.id,
-        bio || existingAuthor.bio,
-        image || existingAuthor.image
-      );
-
-      console.log("Updated Author:", updatedAuthor);
+      const updatedAuthor = {
+        id: id,
+        bio: bio,
+        image: image,
+      };
 
       await this.#libraryService.updateAuthor(updatedAuthor);
       res
@@ -391,6 +345,8 @@ export class LibraryController {
   ): Promise<void> {
     try {
       const publisherId = parseInt(req.params.id);
+      const { name, address, city, state, zip, country } = req.body;
+
       if (isNaN(publisherId)) {
         res
           .status(400)
@@ -398,29 +354,14 @@ export class LibraryController {
         return;
       }
 
-      const existingPublisher = await this.#libraryService.getPublisherById(
-        publisherId
-      );
-      if (!existingPublisher) {
-        res
-          .status(404)
-          .json({ message: presentationConsts.LibraryPublisherNotFound });
-        return;
-      }
-
-      const { name, address, city, state, zip, country } = req.body;
-
-      // TODO: this seems sketchy, we should not be creating a new Publisher instance
-      const updatedPublisher = new Publisher(
-        existingPublisher.id,
-        name || existingPublisher.name,
-        address || existingPublisher.address,
-        city || existingPublisher.city,
-        state || existingPublisher.state,
-        zip || existingPublisher.zip,
-        country || existingPublisher.country,
-        existingPublisher.books
-      );
+      const updatedPublisher = {
+        name,
+        address,
+        city,
+        state,
+        zip,
+        country,
+      };
 
       await this.#libraryService.updatePublisher(updatedPublisher);
       res
@@ -448,51 +389,31 @@ export class LibraryController {
         return;
       }
 
-      const existingBook = await this.#libraryService.getBookById(bookId);
-      if (!existingBook) {
-        res
-          .status(404)
-          .json({ message: presentationConsts.LibraryBookNotFound });
-        return;
-      }
-
       const {
         title,
-        author,
         description,
         isbn,
-        publisher,
         year,
         image,
         quantity,
+        publishedDate,
+        authorId,
+        publisherId,
       } = req.body;
 
-      // TODO: this seems sketchy, we should not be creating a new Book instance
-      const updatedBook = new Book(
-        existingBook.id,
-        title || existingBook.title,
-        author instanceof Author
-          ? author
-          : existingBook.author || new Author(0, ""),
-        description || existingBook.description,
-        isbn || existingBook.isbn,
-        publisher || existingBook.publisher,
-        year || existingBook.year,
-        image || existingBook.image,
-        existingBook.rating,
-        existingBook.numberOfRatings,
-        existingBook.numberOfReviews
-      );
-
-      if (quantity !== undefined) {
-        updatedBook.quantity = quantity;
-        updatedBook.available = quantity > 0;
-      } else {
-        updatedBook.quantity = existingBook.quantity;
-        updatedBook.available = existingBook.available;
-      }
-
-      updatedBook.labels = existingBook.labels;
+      const updatedBook = {
+        id: bookId,
+        title: title,
+        authorId: authorId,
+        description: description,
+        isbn: isbn,
+        publisherId: publisherId,
+        publishedDate,
+        year: year,
+        image: image,
+        quantity,
+        labels: [],
+      };
 
       await this.#libraryService.updateBook(updatedBook);
       res.status(200).json({ message: presentationConsts.LibraryBookUpdated });

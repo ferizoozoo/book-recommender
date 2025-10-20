@@ -9,6 +9,8 @@ import { serviceConsts } from "../common/consts";
 import { IUserRepository } from "../common/interfaces/repositories/i-userRepository";
 import { Review } from "../../domain/library/review.entity";
 import { IReviewRepository } from "../common/interfaces/repositories/i-reviewRepository";
+import { presentationConsts } from "../../presentation/common/consts";
+import { AuthorDto, BookDto, PublisherDto } from "../dtos/library.dtos";
 
 export class LibraryService implements ILibraryService {
   #bookRepo: IBookRepository;
@@ -30,13 +32,9 @@ export class LibraryService implements ILibraryService {
     this.#userRepo = userRepo;
     this.#reviewRepo = reviewRepo;
   }
-  async updateAuthor(author: Author): Promise<void> {
+  async updateAuthor(author: AuthorDto): Promise<void> {
     if (!author.id) {
       throw new Error("Author ID is required for updates");
-    }
-
-    if (!author.validate()) {
-      throw new Error(serviceConsts.AuthorValidationFailed);
     }
 
     const existingAuthor = await this.#authorRepo.getById(author.id);
@@ -44,16 +42,16 @@ export class LibraryService implements ILibraryService {
       throw new Error(serviceConsts.AuthorNotFound);
     }
 
-    await this.#authorRepo.update(author);
+    // TODO: maybe validation should be done here, but as a function call.
+    existingAuthor.bio = author.bio;
+    existingAuthor.image = author.image;
+
+    await this.#authorRepo.update(existingAuthor);
   }
 
-  async updatePublisher(publisher: Publisher): Promise<void> {
+  async updatePublisher(publisher: PublisherDto): Promise<void> {
     if (!publisher.id) {
       throw new Error("Publisher ID is required for updates");
-    }
-
-    if (!publisher.validate()) {
-      throw new Error(serviceConsts.PublisherValidationFailed);
     }
 
     const existingPublisher = await this.#publisherRepo.getById(publisher.id);
@@ -61,7 +59,11 @@ export class LibraryService implements ILibraryService {
       throw new Error(serviceConsts.PublisherNotFound);
     }
 
-    await this.#publisherRepo.update(publisher);
+    // TODO: maybe validation should be done here, but as a function call.
+    existingPublisher.name = publisher.name;
+    existingPublisher.address = publisher.address;
+
+    await this.#publisherRepo.update(existingPublisher);
   }
 
   async getFilteredBooks(filters: any): Promise<Book[]> {
@@ -99,13 +101,28 @@ export class LibraryService implements ILibraryService {
     return await this.#bookRepo.getTrendingBooks(limit);
   }
 
-  async addAuthor(author: Author): Promise<Author> {
+  async addAuthor(authorData: AuthorDto, userClaims: any): Promise<Author> {
+    const author = new Author(
+      0,
+      authorData.bio,
+      authorData.image,
+      [], // Books will be populated separately if needed
+      undefined // User will be populated separately if needed
+    );
+
     if (!author.validate()) {
       throw new Error(serviceConsts.AuthorValidationFailed);
     }
 
+    const user = await this.#userRepo.getByEmail(userClaims?.email || "");
+    if (!user) {
+      throw new Error(presentationConsts.LibraryAuthorNotFound);
+    }
+
+    author.user = user;
+
     await this.#authorRepo.save(author);
-    // After save, we need to find the latest author since we don't know the new ID
+
     const authors = await this.#authorRepo.getAll();
     const savedAuthor = authors[authors.length - 1];
     if (!savedAuthor) {
@@ -121,13 +138,20 @@ export class LibraryService implements ILibraryService {
     return await this.#authorRepo.getById(authorId);
   }
 
-  async addPublisher(publisher: Publisher): Promise<Publisher> {
+  async addPublisher(publisherDto: PublisherDto): Promise<Publisher> {
+    const publisher = new Publisher(
+      0,
+      publisherDto.name,
+      publisherDto.address,
+      publisherDto.website
+    );
+
     if (!publisher.validate()) {
       throw new Error(serviceConsts.PublisherValidationFailed);
     }
 
     await this.#publisherRepo.save(publisher);
-    // After save, we need to find the latest publisher since we don't know the new ID
+
     const publishers = await this.#publisherRepo.getAll();
     const savedPublisher = publishers[publishers.length - 1];
     if (!savedPublisher) {
@@ -143,12 +167,36 @@ export class LibraryService implements ILibraryService {
     return await this.#publisherRepo.getById(publisherId);
   }
 
-  async addBook(book: Book): Promise<void> {
+  async addBook(bookDto: BookDto): Promise<void> {
+    const author = await this.#authorRepo.getById(bookDto.authorId);
+    if (!author) {
+      throw new Error(presentationConsts.LibraryAuthorNotFound);
+    }
+
+    const publisher = await this.#publisherRepo.getById(bookDto.publisherId);
+    if (!publisher) {
+      throw new Error(presentationConsts.LibraryPublisherNotFound);
+    }
+
+    const book = new Book(
+      0, // ID will be set by the database
+      bookDto.title || "",
+      author,
+      bookDto.description || "",
+      bookDto.isbn || "",
+      publisher,
+      new Date().getFullYear(), // default to current year
+      "", // image
+      0, // rating
+      0, // numberOfRatings
+      0 // numberOfReviews
+    );
+
     if (!book.validate()) {
       throw new Error(serviceConsts.BookValidationFailed);
     }
 
-    const existingBook = await this.#bookRepo.getByIsbn(book.isbn);
+    const existingBook = await this.#bookRepo.getByIsbn(bookDto.isbn);
     if (existingBook) {
       throw new Error(serviceConsts.BookAlreadyExists);
     }
@@ -156,17 +204,22 @@ export class LibraryService implements ILibraryService {
     await this.#bookRepo.save(book);
   }
 
-  async updateBook(book: Book): Promise<void> {
-    if (!book.id) {
+  async updateBook(bookDto: BookDto): Promise<void> {
+    if (!bookDto.id) {
       throw new Error("Book ID is required for updates");
     }
 
-    const existingBook = await this.#bookRepo.getById(book.id);
+    const existingBook = await this.#bookRepo.getById(bookDto.id);
     if (!existingBook) {
       throw new Error("Book not found");
     }
 
-    await this.#bookRepo.update(book);
+    // Update fields
+    existingBook.title = bookDto.title;
+    existingBook.isbn = bookDto.isbn;
+    existingBook.labels = bookDto.labels;
+
+    await this.#bookRepo.update(existingBook);
   }
 
   async deleteBook(id: number): Promise<void> {
