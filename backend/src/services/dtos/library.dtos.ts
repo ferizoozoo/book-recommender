@@ -5,6 +5,7 @@ export type AuthorDto = {
 };
 
 export type PublisherDto = {
+  id?: number;
   name: string;
   address: string;
   city: string;

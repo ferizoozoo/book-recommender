@@ -143,7 +143,10 @@ export class LibraryService implements ILibraryService {
       0,
       publisherDto.name,
       publisherDto.address,
-      publisherDto.website
+      publisherDto.city,
+      publisherDto.state,
+      publisherDto.zip,
+      publisherDto.country
     );
 
     if (!publisher.validate()) {
