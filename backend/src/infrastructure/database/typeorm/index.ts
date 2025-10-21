@@ -1,10 +1,6 @@
 import { DataSource } from "typeorm";
 import typeORMConfig from "../../config/database.config.ts";
 
-// TODO: for now, the db is initialized whenever it is imported anywhere, either in repo or elsewhere.
-//       maybe later, it can be initialized inside the backend/main.ts (where program initialization happens)
-//       and used everywhere.
-
 const AppDataSource = new DataSource({
   ...typeORMConfig,
   entities: [
