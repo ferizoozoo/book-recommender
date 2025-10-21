@@ -131,7 +131,6 @@ export default function Dashboard() {
     [fetchWithAuth]
   );
 
-  // TODO: calling this function on every render is a performance hit
   const fetchAllData = useCallback(
     async (signal?: AbortSignal) => {
       setIsLoading(true);
