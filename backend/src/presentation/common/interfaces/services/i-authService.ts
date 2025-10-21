@@ -2,7 +2,11 @@ import { AuthTokens } from "../../../../services/common/interfaces/types/authTok
 
 export interface IAuthService {
   login(email: string, password: string): Promise<AuthTokens>;
-  register(email: string, password: string): Promise<string>;
+  register(
+    email: string,
+    password: string,
+    retypePassword: string
+  ): Promise<string>;
   refresh(refreshToken: string): Promise<AuthTokens>;
   updateProfile(
     firstName: string,

@@ -55,9 +55,17 @@ export class AuthService implements IAuthService {
     return this.#userRepo.delete(id);
   }
 
-  async register(email: string, password: string): Promise<string> {
-    if (!email || !password) {
+  async register(
+    email: string,
+    password: string,
+    retypePassword: string
+  ): Promise<string> {
+    if (!email || !password || !retypePassword) {
       throw new Error(serviceConsts.AuthEmailAndPasswordRequired);
+    }
+
+    if (password !== retypePassword) {
+      throw new Error(serviceConsts.AuthPasswordsDoNotMatch);
     }
 
     const oldUser = await this.#userRepo.getByEmail(email);
@@ -65,10 +73,11 @@ export class AuthService implements IAuthService {
       throw new Error(serviceConsts.AuthEmailAndPasswordRequired);
     }
 
-    // TODO: is 'new'ing an Entity a good thing or do we need like a static method for creating objects?
     const user = new User();
-    user.email = email; // TODO: about encapsulation of entities, it can be discussed if it's necessary or not
+    user.email = email;
     user.roles = ["user"];
+    user.validate();
+
     await user.savePassword(password, this.#hasher);
     await this.#userRepo.add(user);
 

@@ -19,7 +19,6 @@ authRouter.put("/profile", async (req, res, next) => {
   await authController.updateProfile(req, res, next);
 });
 
-// TODO: should it be here or put in user routes?
 authRouter.get("/users", async (req, res, next) => {
   await authController.getAllUsers(req, res, next);
 });

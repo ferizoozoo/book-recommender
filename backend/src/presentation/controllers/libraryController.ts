@@ -24,7 +24,6 @@ export class LibraryController {
     this.#libraryAuthService = libraryAuthService;
   }
 
-  // TODO: the addAuthor should go to the orchestrator layer
   @AuthGuard(["admin"])
   async addAuthor(
     req: AuthenticatedRequest,

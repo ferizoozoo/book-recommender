@@ -52,8 +52,7 @@ const SignupForm = ({ className, ...props }: SignupFormProps) => {
       return;
     }
     setError(null);
-    // TODO: retype password should be also checked in the server
-    await handleregister({ email, password, retypePassword: null });
+    await handleregister({ email, password, retypePassword });
   };
 
   return (

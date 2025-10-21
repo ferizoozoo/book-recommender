@@ -56,9 +56,9 @@ export class LibraryService implements ILibraryService {
       throw new Error(serviceConsts.PublisherNotFound);
     }
 
-    // TODO: maybe validation should be done here, but as a function call.
     existingPublisher.name = publisher.name;
     existingPublisher.address = publisher.address;
+    existingPublisher.validate();
 
     await this.#publisherRepo.update(existingPublisher);
   }

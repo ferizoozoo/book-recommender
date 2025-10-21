@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
 import config from "../../../../config";
 import { useNavigate } from "react-router-dom";
@@ -39,53 +39,107 @@ export default function Dashboard() {
 
   // TODO: should this be in a context? should the profile form have a getById service method
   //       instead of using the decoded token?
-  const user = jwtDecode(accessToken || "");
+  const user = jwtDecode(accessToken || "") as unknown as any;
+
+  // Stable, targeted fetchers to avoid re-creating on every render
+  const fetchBooks = useCallback(
+    async (signal?: AbortSignal) => {
+      try {
+        const booksRes = await fetchWithAuth(`${config.apiUrl}/library/books`, {
+          signal,
+        });
+        if (booksRes.ok) {
+          const data = await booksRes.json();
+          setBooks(data.books || []);
+        } else {
+          setBooks([]);
+          console.error("Failed to fetch books:", await booksRes.text());
+        }
+      } catch (error) {
+        if ((error as any).name !== "AbortError") {
+          console.error("Failed to fetch books:", error);
+        }
+      }
+    },
+    [fetchWithAuth]
+  );
+
+  const fetchAuthors = useCallback(
+    async (signal?: AbortSignal) => {
+      try {
+        const res = await fetchWithAuth(`${config.apiUrl}/library/authors`, {
+          signal,
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setAuthors(data.authors || []);
+        }
+      } catch (error) {
+        if ((error as any).name !== "AbortError") {
+          console.error("Failed to fetch authors:", error);
+        }
+      }
+    },
+    [fetchWithAuth]
+  );
+
+  const fetchPublishers = useCallback(
+    async (signal?: AbortSignal) => {
+      try {
+        const res = await fetchWithAuth(`${config.apiUrl}/library/publishers`, {
+          signal,
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setPublishers(data.publishers || []);
+        }
+      } catch (error) {
+        if ((error as any).name !== "AbortError") {
+          console.error("Failed to fetch publishers:", error);
+        }
+      }
+    },
+    [fetchWithAuth]
+  );
+
+  const fetchUsers = useCallback(
+    async (signal?: AbortSignal) => {
+      try {
+        const res = await fetchWithAuth(`${config.apiUrl}/auth/users`, {
+          signal,
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUsers(data.users || []);
+        }
+      } catch (error) {
+        if ((error as any).name !== "AbortError") {
+          console.error("Failed to fetch users:", error);
+        }
+      }
+    },
+    [fetchWithAuth]
+  );
 
   // TODO: calling this function on every render is a performance hit
-  const fetchAllData = async () => {
-    try {
+  const fetchAllData = useCallback(
+    async (signal?: AbortSignal) => {
       setIsLoading(true);
-      // Fetch books
-      const booksRes = await fetchWithAuth(`${config.apiUrl}/library/books`);
-      if (booksRes.ok) {
-        const data = await booksRes.json();
-        const booksData = data.books;
-        setBooks(booksData || []);
-      } else {
-        setBooks([]);
-        console.error("Failed to fetch books:", await booksRes.text());
+      try {
+        await Promise.allSettled([
+          fetchBooks(signal),
+          fetchAuthors(signal),
+          fetchPublishers(signal),
+          fetchUsers(signal),
+        ]);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setIsLoading(false);
       }
-
-      // Fetch authors
-      const authorsRes = await fetchWithAuth(
-        `${config.apiUrl}/library/authors`
-      );
-      if (authorsRes.ok) {
-        const data = await authorsRes.json();
-        setAuthors(data.authors);
-      }
-
-      // Fetch publishers
-      const publishersRes = await fetchWithAuth(
-        `${config.apiUrl}/library/publishers`
-      );
-      if (publishersRes.ok) {
-        const data = await publishersRes.json();
-        setPublishers(data.publishers);
-      }
-
-      // Fetch users
-      const usersRes = await fetchWithAuth(`${config.apiUrl}/auth/users`);
-      if (usersRes.ok) {
-        const data = await usersRes.json();
-        setUsers(data.users);
-      }
-    } catch (error) {
-      console.error("Failed to fetch data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [fetchBooks, fetchAuthors, fetchPublishers, fetchUsers]
+  );
 
   // Initial data fetch
   useEffect(() => {
@@ -294,7 +348,7 @@ export default function Dashboard() {
   };
 
   // User handlers
-  const handleUserSubmit = async (userData: any) => {
+  const handleUserSubmit = async (userData: any): Promise<void> => {
     try {
       const res = await fetchWithAuth(`${config.apiUrl}/auth/users`, {
         method: "POST",
@@ -310,14 +364,13 @@ export default function Dashboard() {
 
       // After successful creation, fetch fresh data
       await fetchAllData();
-      return true;
     } catch (error) {
       console.error("Failed to add user:", error);
       throw error;
     }
   };
 
-  const handleUserEdit = async (user: any) => {
+  const handleUserEdit = async (user: any): Promise<void> => {
     try {
       const updateRes = await fetchWithAuth(`${config.apiUrl}/auth/users`, {
         method: "PUT",
@@ -334,28 +387,28 @@ export default function Dashboard() {
 
       // After successful update, fetch fresh data
       await fetchAllData();
-      return true;
     } catch (error) {
       console.error("Failed to update user:", error);
       throw error;
     }
   };
 
-  const handleUserDelete = (id: string) => {
+  const handleUserDelete = async (id: string): Promise<void> => {
     try {
-      fetchWithAuth(`${config.apiUrl}/auth/users`, {
+      const res = await fetchWithAuth(`${config.apiUrl}/auth/users`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ id }),
-      }).then((res) => {
-        if (res.ok) {
-          setUsers(users.filter((user) => user.id !== id));
-        }
       });
+
+      if (res.ok) {
+        setUsers((prev) => prev.filter((user) => user.id !== id));
+      }
     } catch (error) {
       console.error("Failed to delete user:", error);
+      throw error;
     }
   };
 
