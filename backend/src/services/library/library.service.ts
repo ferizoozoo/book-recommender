@@ -86,6 +86,7 @@ export class LibraryService implements ILibraryService {
   async getAllAuthors(): Promise<Author[]> {
     return await this.#authorRepo.getAll();
   }
+
   async getBookById(id: number): Promise<Book | null> {
     return await this.#bookRepo.getById(id);
   }
@@ -135,7 +136,11 @@ export class LibraryService implements ILibraryService {
     if (authorId < 0) {
       throw new Error(serviceConsts.AuthorIdNonNegative);
     }
-    return await this.#authorRepo.getById(authorId);
+    const author = await this.#authorRepo.getById(authorId);
+    const authorsBooks = await this.#bookRepo.getByAuthorId(authorId);
+
+    author!.books = authorsBooks;
+    return author;
   }
 
   async addPublisher(publisherDto: PublisherDto): Promise<Publisher> {

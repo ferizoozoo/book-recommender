@@ -6,60 +6,37 @@ import {
   mapPublisherDomainToModel,
   mapPublisherEntityToDomain,
   mapBookEntitiesToDomain,
+  mapPublisherEntitiesToDomain,
 } from "../models/mappers/library.mapper.ts";
 import { IPublisherRepository } from "../../../../services/common/interfaces/repositories/i-publisherRepository.ts";
 
 export class PublisherRepository implements IPublisherRepository {
   #publishers: Repository<PublisherEntity>;
-  #books: Repository<BookEntity>; // TODO: this violates DDD, and for fetching books, we should use an orchestrator
 
   constructor() {
     this.#publishers = AppDataSource.getRepository(PublisherEntity);
-    this.#books = AppDataSource.getRepository(BookEntity);
   }
 
   async getById(id: number): Promise<Publisher | null> {
     const publisherEntity = await this.#publishers.findOne({
       where: { id },
+      relations: ["books"],
     });
 
     if (!publisherEntity) {
       return null;
     }
 
-    const publisher = mapPublisherEntityToDomain(publisherEntity);
-
-    // Load books separately to avoid circular references
-    const bookEntities = await this.#books.find({
-      where: id ? { publisher: { id } } : {},
-      relations: ["author"],
-    });
-
-    publisher.books = mapBookEntitiesToDomain(bookEntities);
-
-    return publisher;
+    return mapPublisherEntityToDomain(publisherEntity);
   }
 
   async getAll(): Promise<Publisher[]> {
     const publisherEntities = await this.#publishers.find({
       order: { id: "DESC" },
+      relations: ["books"],
     });
 
-    return Promise.all(
-      publisherEntities.map(async (publisherEntity) => {
-        const publisher = mapPublisherEntityToDomain(publisherEntity);
-
-        // Load books separately for each publisher
-        const bookEntities = await this.#books.find({
-          where: publisher.id ? { publisher: { id: publisher.id } } : {},
-          relations: ["author"],
-        });
-
-        publisher.books = mapBookEntitiesToDomain(bookEntities);
-
-        return publisher;
-      })
-    );
+    return mapPublisherEntitiesToDomain(publisherEntities);
   }
 
   async save(publisher: Publisher): Promise<void> {
