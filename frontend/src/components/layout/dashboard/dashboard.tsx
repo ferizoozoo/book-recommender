@@ -1,14 +1,6 @@
 import { AppSidebar } from "@/components/blocks/app-sidebar";
-import { SiteHeader } from "@/components/blocks/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 import { useCallback, useEffect, useState } from "react";
 import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
@@ -22,7 +14,6 @@ import { PublishersTable } from "@/components/forms/dashboard/publisherTable";
 import { UserTable as UsersTable } from "@/components/forms/dashboard/userTable";
 import { ProfileForm } from "@/components/forms/dashboard/profileForm";
 import { useLocation } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 
 export default function Dashboard() {
   const location = useLocation();
@@ -35,11 +26,8 @@ export default function Dashboard() {
   const [authors, setAuthors] = useState<any[]>([]);
   const [publishers, setPublishers] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  // TODO: should this be in a context? should the profile form have a getById service method
-  //       instead of using the decoded token?
-  const user = jwtDecode(accessToken || "") as unknown as any;
 
   // Stable, targeted fetchers to avoid re-creating on every render
   const fetchBooks = useCallback(
@@ -121,6 +109,28 @@ export default function Dashboard() {
     [fetchWithAuth]
   );
 
+  const fetchLoggedInUser = useCallback(
+    async (signal?: AbortSignal) => {
+      try {
+        const res = await fetchWithAuth(`${config.apiUrl}/auth/user`, {
+          signal,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user || null);
+        }
+      } catch (error) {
+        if ((error as any).name !== "AbortError") {
+          console.error("Failed to fetch user:", error);
+        }
+      }
+    },
+    [fetchWithAuth]
+  );
+
   // TODO: calling this function on every render is a performance hit
   const fetchAllData = useCallback(
     async (signal?: AbortSignal) => {
@@ -131,6 +141,7 @@ export default function Dashboard() {
           fetchAuthors(signal),
           fetchPublishers(signal),
           fetchUsers(signal),
+          fetchLoggedInUser(signal),
         ]);
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -138,7 +149,7 @@ export default function Dashboard() {
         setIsLoading(false);
       }
     },
-    [fetchBooks, fetchAuthors, fetchPublishers, fetchUsers]
+    [fetchBooks, fetchAuthors, fetchPublishers, fetchUsers, fetchLoggedInUser]
   );
 
   // Initial data fetch
