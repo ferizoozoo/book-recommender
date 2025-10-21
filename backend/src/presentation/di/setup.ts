@@ -35,13 +35,13 @@ const reviewRepository = new ReviewRepository();
 // Orchestrator
 const libraryAuthService = new LibraryAuthService(
   userRepository,
-  bookRepository
+  bookRepository,
+  authorRepository
 );
 const libraryService = new LibraryService(
   bookRepository,
   authorRepository,
   publisherRepository,
-  userRepository,
   reviewRepository
 );
 const libraryController = new LibraryController(

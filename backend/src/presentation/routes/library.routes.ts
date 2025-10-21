@@ -16,7 +16,6 @@ libraryRouter.get("/publishers", async (req, res, next) => {
   await libraryController.getAllPublishers(req, res, next);
 });
 
-// TODO: this is for the 'what readers say?' section
 libraryRouter.get("/readers-review", async (req, res, next) => {
   await libraryController.getReadersReviewBooks(req, res, next);
 });
@@ -32,10 +31,6 @@ libraryRouter.get("/trending", async (req, res, next) => {
 libraryRouter.get("/label", async (req, res, next) => {
   await libraryController.getBooksByLabel(req, res, next);
 });
-
-// libraryRouter.get("/:id", async (req, res, next) => {
-//   await libraryController.getBookById(req, res, next);
-// });
 
 libraryRouter.get("/isbn/:isbn", async (req, res, next) => {
   await libraryController.getBookByIsbn(req, res, next);

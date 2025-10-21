@@ -22,4 +22,7 @@ export const serviceConsts = {
   PublisherNotFound: "Publisher not found",
   PublisherAlreadyExists: "Publisher already exists",
   PublisherIdNonNegative: "Publisher ID must be non-negative",
+
+  // Library related constants
+  LibraryAuthorNotFound: "Library author not found",
 };

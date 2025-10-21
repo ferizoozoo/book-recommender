@@ -16,20 +16,17 @@ export class LibraryService implements ILibraryService {
   #bookRepo: IBookRepository;
   #authorRepo: IAuthorRepository;
   #publisherRepo: IPublisherRepository;
-  #userRepo: IUserRepository; // TODO: here the user repository from the auth context is used, it should be used in the related orchestrator
   #reviewRepo: IReviewRepository;
 
   constructor(
     bookRepo: IBookRepository,
     authorRepo: IAuthorRepository,
     publisherRepo: IPublisherRepository,
-    userRepo: IUserRepository,
     reviewRepo: IReviewRepository
   ) {
     this.#bookRepo = bookRepo;
     this.#authorRepo = authorRepo;
     this.#publisherRepo = publisherRepo;
-    this.#userRepo = userRepo;
     this.#reviewRepo = reviewRepo;
   }
   async updateAuthor(author: AuthorDto): Promise<void> {
@@ -100,36 +97,6 @@ export class LibraryService implements ILibraryService {
 
   async getTrendingBooks(limit: number): Promise<Book[]> {
     return await this.#bookRepo.getTrendingBooks(limit);
-  }
-
-  async addAuthor(authorData: AuthorDto, userClaims: any): Promise<Author> {
-    const author = new Author(
-      0,
-      authorData.bio,
-      authorData.image,
-      [], // Books will be populated separately if needed
-      undefined // User will be populated separately if needed
-    );
-
-    if (!author.validate()) {
-      throw new Error(serviceConsts.AuthorValidationFailed);
-    }
-
-    const user = await this.#userRepo.getByEmail(userClaims?.email || "");
-    if (!user) {
-      throw new Error(presentationConsts.LibraryAuthorNotFound);
-    }
-
-    author.user = user;
-
-    await this.#authorRepo.save(author);
-
-    const authors = await this.#authorRepo.getAll();
-    const savedAuthor = authors[authors.length - 1];
-    if (!savedAuthor) {
-      throw new Error(serviceConsts.AuthorNotFound);
-    }
-    return savedAuthor;
   }
 
   async getAuthorById(authorId: number): Promise<Author | null> {
@@ -313,21 +280,5 @@ export class LibraryService implements ILibraryService {
     await this.#bookRepo.update(book);
 
     // In a real implementation, you would update the order status
-  }
-
-  // TODO: maybe we should use a separate service for user-related operations
-  // to avoid tight coupling between library and user services.
-  async likeBook(userId: number, bookId: number): Promise<void> {
-    const book = await this.#bookRepo.getById(bookId);
-    if (!book) {
-      throw new Error("Book not found");
-    }
-
-    const user = await this.#userRepo.getById(userId);
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    await this.#bookRepo.likeBook(user, book);
   }
 }

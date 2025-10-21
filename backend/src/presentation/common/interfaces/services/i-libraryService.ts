@@ -15,7 +15,6 @@ import {
 // but it can lead to tight coupling between the presentation and domain layers,
 // which can make the code harder to maintain and test.
 export interface ILibraryService {
-  addAuthor(author: AuthorDto, userClaims: any): Promise<Author>;
   getAuthorById(authorId: number): Promise<Author | null>;
   addPublisher(publisher: PublisherDto): Promise<Publisher>;
   getPublisherById(publisherId: number): Promise<Publisher | null>;
@@ -37,5 +36,4 @@ export interface ILibraryService {
   getBooksByLabel(label: string): Promise<Book[]>;
   orderBook(bookId: number, userId: string): Promise<void>;
   returnBook(bookId: number): Promise<void>;
-  likeBook(userId: number, bookId: number): Promise<void>;
 }

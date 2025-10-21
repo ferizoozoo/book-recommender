@@ -43,7 +43,7 @@ export class LibraryController {
       const authorData = { bio, image: req.body.image || "" };
       const userClaims = req.user;
 
-      const savedAuthor = await this.#libraryService.addAuthor(
+      const savedAuthor = await this.#libraryAuthService.addAuthor(
         authorData,
         userClaims
       );
@@ -557,7 +557,7 @@ export class LibraryController {
         return;
       }
 
-      await this.#libraryService.likeBook(bookId, userId);
+      await this.#libraryAuthService.likeBook(userId, bookId);
       res.status(200).json({ message: presentationConsts.LibraryBookLiked });
     } catch (error) {
       const errorMessage =
