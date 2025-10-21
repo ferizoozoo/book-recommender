@@ -1,7 +1,7 @@
 import {
   BookEntity,
   UserBookEntity,
-  UserBookLikeEntity,
+  LikeEntity,
 } from "../models/library.models";
 import { Like, Repository } from "typeorm";
 import { Book } from "../../../../domain/library/book.entity";
@@ -20,15 +20,16 @@ import AppDataSource from "..";
 
 export class BookRepository implements IBookRepository {
   private bookRepository: Repository<BookEntity>;
-  private readonly bookLikeRepository: Repository<UserBookLikeEntity>; // TODO: this violates DDD, and for fetching books, we should use an orchestrator
+  private readonly bookLikeRepository: Repository<LikeEntity>; // TODO: this violates DDD, and for fetching books, we should use an orchestrator
   private readonly bookUserRepository: Repository<UserBookEntity>; // TODO: this violates DDD, and for fetching books, we should use an orchestrator
   private readonly userRepository: Repository<UserEntity>; // TODO: this violates DDD, and for fetching books, we should use an orchestrator
 
   // TODO: use the di to use the repositories, instead of creating them here
   constructor() {
     this.bookRepository = AppDataSource.getRepository(BookEntity);
-    this.bookLikeRepository = AppDataSource.getRepository(UserBookLikeEntity);
+    this.bookLikeRepository = AppDataSource.getRepository(LikeEntity);
     this.bookUserRepository = AppDataSource.getRepository(UserBookEntity);
+    this.userRepository = AppDataSource.getRepository(UserEntity);
   }
   async filter(filters: any): Promise<Book[]> {
     const query = this.bookRepository.createQueryBuilder("book");
@@ -132,7 +133,7 @@ export class BookRepository implements IBookRepository {
       throw new Error("User and Book are required to like a book");
     }
 
-    const like = new UserBookLikeEntity();
+    const like = new LikeEntity();
 
     const userEntity = await this.userRepository.findOne({
       where: { id: user.id },

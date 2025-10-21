@@ -112,13 +112,14 @@ export class BookEntity {
   userBooks: UserBookEntity[];
 }
 
-// TODO: maybe we should use a separate entity for user-related operations
-// like/dislike, to avoid tight coupling between library and user entities.
-// this is a simple implementation for demonstration purposes and an ACL between users and books
-// could be implemented later.
-// TODO: maybe this entity and UserBookEntity should be merged
-@Entity("UserBookLikes")
-export class UserBookLikeEntity {
+// NOTE: although the LikeEntity and UserBookEntity are similar, they serve different purposes.
+// The LikeEntity is specifically for tracking likes on books by users,
+// while the UserBookEntity is for tracking which books have been ordered/borrowed by users.
+// if we were to combine them, then we would have an extra boolean field in the UserBookEntity
+// to indicate whether the user liked the book or not, which could lead to confusion
+// and make the table get more space than necessary.
+@Entity("likes")
+export class LikeEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -152,7 +153,6 @@ export class ReviewEntity {
   comment: string;
 }
 
-// TODO: refactor this and UserBookLikeEntity into a single entity
 @Entity("user_books")
 export class UserBookEntity {
   @PrimaryGeneratedColumn()

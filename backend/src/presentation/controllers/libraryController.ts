@@ -11,11 +11,7 @@ import {
   AuthenticatedRequest,
 } from "../common/decorators/auth.decorator";
 
-// TODO: each controller should have its own DTO, for better validation and type safety
-
-// TODO: this controller methods have a lot of code that should be done at the
-//        service/application layer. A refactor is needed to move this logic
-//        into the appropriate layer.
+// TODO: the try catch blocks can be moved to a middleware
 export class LibraryController {
   #libraryService: ILibraryService;
   #libraryAuthService: ILibraryAuthService;
