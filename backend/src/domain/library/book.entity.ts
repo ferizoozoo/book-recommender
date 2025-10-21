@@ -23,7 +23,6 @@ export class Book implements IValidate {
     public numberOfReviews: number = 0
   ) {}
 
-  // TODO: maybe this validate method should be replaced with decorators.
   validate(): boolean {
     if (this.id !== null && this.id < 0) {
       throw new Error(domainConsts.BookIdNonNegative);

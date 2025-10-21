@@ -15,7 +15,6 @@ export class Publisher implements IValidate {
     public books: Book[] = []
   ) {}
 
-  // TODO: maybe this validate method should be replaced with decorators.
   validate(): boolean {
     if (this.id !== null && this.id < 0) {
       throw new Error(domainConsts.PublisherIdNonNegative);

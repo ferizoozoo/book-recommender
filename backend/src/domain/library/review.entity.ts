@@ -14,7 +14,6 @@ export class Review implements IValidate {
     public comment: string
   ) {}
 
-  // TODO: maybe this validate method should be replaced with decorators.
   validate(): boolean {
     if (this.id < 0) {
       throw new Error(domainConsts.ReviewIdNonNegative);
