@@ -8,7 +8,6 @@ const PrivateRoute = ({
 }: {
   children: JSX.Element;
 }): React.ReactElement => {
-  //TODO: this isn't very safe, but for now, we consider any truthy value as valid.
   const { accessToken } = useAuthContext();
   return accessToken ? children : <Navigate to="/login" />;
 };
