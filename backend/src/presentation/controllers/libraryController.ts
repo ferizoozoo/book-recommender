@@ -11,7 +11,6 @@ import {
   AuthenticatedRequest,
 } from "../common/decorators/auth.decorator";
 
-// TODO: the try catch blocks can be moved to a middleware
 export class LibraryController {
   #libraryService: ILibraryService;
   #libraryAuthService: ILibraryAuthService;
