@@ -135,7 +135,7 @@ export function mapReviewDomainToModel(review: Review): ReviewEntity {
   reviewEntity.id = review.id;
   reviewEntity.book = mapBookDomainToModel(review.book);
   reviewEntity.user = mapUserDomainToModel(review.user);
-  reviewEntity.comment = review.comment;
+  reviewEntity.rating = review.rating;
 
   return reviewEntity;
 }
@@ -145,7 +145,7 @@ export function mapReviewEntityToDomain(reviewEntity: ReviewEntity): Review {
     reviewEntity.id,
     mapBookEntityToDomain(reviewEntity.book),
     mapUserEntityToDomain(reviewEntity.user),
-    reviewEntity.comment
+    reviewEntity.rating
   );
 
   return review;

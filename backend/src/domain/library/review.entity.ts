@@ -9,9 +9,7 @@ export class Review implements IValidate {
     public id: number,
     public book: Book,
     public user: User,
-    // TODO: the decision to have the rating here, in the book entity or even having it in the review entity, must be done later
-    // public rating: number,
-    public comment: string
+    public rating: number
   ) {}
 
   validate(): boolean {

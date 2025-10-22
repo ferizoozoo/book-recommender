@@ -145,12 +145,8 @@ export class ReviewEntity {
   @JoinColumn({ name: "userId" })
   user: UserEntity;
 
-  // TODO: see the Review entity todo
-  // @Column({ type: "int", default: 0 })
-  // rating: number;
-
-  @Column({ type: "text", nullable: true })
-  comment: string;
+  @Column({ type: "int", default: 0 })
+  rating: number;
 }
 
 @Entity("user_books")
