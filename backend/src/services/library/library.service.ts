@@ -6,7 +6,6 @@ import { Author } from "../../domain/library/author.entity";
 import { Publisher } from "../../domain/library/publisher.entity";
 import { ILibraryService } from "../../presentation/common/interfaces/services/i-libraryService";
 import { serviceConsts } from "../common/consts";
-import { IUserRepository } from "../common/interfaces/repositories/i-userRepository";
 import { Review } from "../../domain/library/review.entity";
 import { IReviewRepository } from "../common/interfaces/repositories/i-reviewRepository";
 import { presentationConsts } from "../../presentation/common/consts";
@@ -39,9 +38,10 @@ export class LibraryService implements ILibraryService {
       throw new Error(serviceConsts.AuthorNotFound);
     }
 
-    // TODO: maybe validation should be done here, but as a function call.
     existingAuthor.bio = author.bio;
     existingAuthor.image = author.image;
+
+    existingAuthor.validate();
 
     await this.#authorRepo.update(existingAuthor);
   }
@@ -247,38 +247,5 @@ export class LibraryService implements ILibraryService {
     return allBooks.filter(
       (book) => book.labels && book.labels.includes(label)
     );
-  }
-
-  async orderBook(bookId: number, userId: string): Promise<void> {
-    const book = await this.#bookRepo.getById(bookId);
-    if (!book) {
-      throw new Error("Book not found");
-    }
-
-    if (!book.available || book.quantity < 1) {
-      throw new Error("Book is not available for ordering");
-    }
-
-    // Update book quantity and availability
-    book.quantity--;
-    book.available = book.quantity > 0;
-    await this.#bookRepo.update(book);
-
-    // In a real implementation, you would save the order to an order repository
-    // For now, we're just updating the book quantity
-  }
-
-  async returnBook(bookId: number): Promise<void> {
-    const book = await this.#bookRepo.getById(bookId);
-    if (!book) {
-      throw new Error("Book not found");
-    }
-
-    // Update book quantity and availability
-    book.quantity++;
-    book.available = true;
-    await this.#bookRepo.update(book);
-
-    // In a real implementation, you would update the order status
   }
 }
