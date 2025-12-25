@@ -72,6 +72,13 @@ export class LibraryService implements ILibraryService {
     return bookReviews!;
   }
 
+  async getUserReviewForBook(
+    bookId: number,
+    userId: number
+  ): Promise<Review | null> {
+    return await this.#reviewRepo.getByBookAndUser(bookId, userId);
+  }
+
   async getAllBooks(): Promise<Book[]> {
     return await this.#bookRepo.getAll();
   }
@@ -161,10 +168,7 @@ export class LibraryService implements ILibraryService {
       bookDto.isbn || "",
       publisher,
       new Date().getFullYear(), // default to current year
-      "", // image
-      0, // rating
-      0, // numberOfRatings
-      0 // numberOfReviews
+      "" // image
     );
 
     if (!book.validate()) {

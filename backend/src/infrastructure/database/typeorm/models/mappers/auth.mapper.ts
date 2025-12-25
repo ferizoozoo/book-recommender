@@ -1,8 +1,12 @@
 import { User } from "../../../../../domain/auth/user.entity.ts";
 import { UserEntity } from "../auth.models.ts";
 
-export function mapUserDomainToModel(user: User): UserEntity {
+export function mapUserDomainToModel(
+  user: User,
+  isUpdate: boolean = false
+): UserEntity {
   const userEntity = new UserEntity();
+  userEntity.id = user.id;
   userEntity.firstName = user.firstName;
   userEntity.lastName = user.lastName;
   userEntity.email = user.email;

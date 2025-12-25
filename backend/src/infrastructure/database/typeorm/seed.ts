@@ -116,13 +116,10 @@ async function createBooks(AppDataSource: DataSource) {
     book.description = faker.lorem.paragraph();
     book.isbn = faker.string.alphanumeric(13);
     book.quantity = faker.number.int({ min: 1, max: 100 });
-    book.rating = faker.number.float({ min: 1, max: 5, fractionDigits: 1 });
     book.image = faker.image.url();
     book.labels = [faker.lorem.word(), faker.lorem.word(), faker.lorem.word()];
     book.available = faker.datatype.boolean();
     book.year = faker.number.int({ min: 1900, max: 2023 });
-    book.numberOfRatings = faker.number.int({ min: 0, max: 1000 });
-    book.numberOfReviews = faker.number.int({ min: 0, max: 1000 });
     book.publisher = await publisherRepository.findOneOrFail({
       where: {},
       order: { id: "ASC" },

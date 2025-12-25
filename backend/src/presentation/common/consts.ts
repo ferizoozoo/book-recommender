@@ -39,4 +39,5 @@ export const presentationConsts = {
   LibraryAuthorUpdated: "Author updated successfully",
   LibraryPublisherUpdated: "Publisher updated successfully",
   LibraryInvalidPublisherId: "Invalid publisher ID",
+  LibraryReviewAddedSuccessfully: "Review added successfully",
 };

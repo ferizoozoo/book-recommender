@@ -11,6 +11,7 @@ import {
 } from "../library.models.ts";
 import { mapUserDomainToModel, mapUserEntityToDomain } from "./auth.mapper.ts";
 import { Review } from "../../../../../domain/library/review.entity.ts";
+import { r } from "@faker-js/faker/dist/airline-CHFQMWko";
 
 export function mapAuthorDomainToModel(author: Author): AuthorEntity {
   const authorEntity = new AuthorEntity();
@@ -52,9 +53,6 @@ export function mapBookDomainToModel(book: Book): BookEntity {
   bookEntity.isbn = book.isbn;
   bookEntity.year = book.year;
   bookEntity.image = book.image;
-  bookEntity.rating = book.rating;
-  bookEntity.numberOfRatings = book.numberOfRatings;
-  bookEntity.numberOfReviews = book.numberOfReviews;
 
   // Map the author if it exists
   if (book.author && typeof book.author.id === "number" && book.author.id > 0) {
@@ -86,10 +84,7 @@ export function mapBookEntityToDomain(bookEntity: BookEntity): Book {
       ? mapPublisherEntityToDomain(bookEntity.publisher)
       : new Publisher(0),
     bookEntity.year,
-    bookEntity.image,
-    bookEntity.rating,
-    bookEntity.numberOfRatings,
-    bookEntity.numberOfReviews
+    bookEntity.image
   );
 
   return book;
@@ -130,11 +125,17 @@ export function mapPublisherEntityToDomain(
   return publisher;
 }
 
-export function mapReviewDomainToModel(review: Review): ReviewEntity {
+export function mapReviewDomainToModel(
+  review: Review,
+  isUpdate: boolean = false
+): ReviewEntity {
   const reviewEntity = new ReviewEntity();
-  reviewEntity.id = review.id;
+  if (isUpdate && review.id > 0) {
+    reviewEntity.id = review.id;
+  }
   reviewEntity.book = mapBookDomainToModel(review.book);
   reviewEntity.user = mapUserDomainToModel(review.user);
+  reviewEntity.review = review.review;
   reviewEntity.rating = review.rating;
 
   return reviewEntity;
@@ -145,7 +146,8 @@ export function mapReviewEntityToDomain(reviewEntity: ReviewEntity): Review {
     reviewEntity.id,
     mapBookEntityToDomain(reviewEntity.book),
     mapUserEntityToDomain(reviewEntity.user),
-    reviewEntity.rating
+    reviewEntity.rating,
+    reviewEntity.review
   );
 
   return review;
@@ -193,10 +195,7 @@ export function mapUserBookEntitiesToBookDomain(
       userBook.book.isbn,
       mapPublisherEntityToDomain(userBook.book.publisher),
       userBook.book.year,
-      userBook.book.image,
-      userBook.book.rating,
-      userBook.book.numberOfRatings,
-      userBook.book.numberOfReviews
+      userBook.book.image
     );
     return book;
   });

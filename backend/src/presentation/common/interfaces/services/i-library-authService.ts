@@ -7,4 +7,10 @@ export interface ILibraryAuthService {
   getAllForUser(email: string): Promise<Book[]>;
   addAuthor(authorData: AuthorDto, userClaims: any): Promise<Author>;
   likeBook(userId: number, bookId: number): Promise<void>;
+  addReview(
+    bookId: number,
+    rating: number,
+    review: string,
+    userId: number
+  ): Promise<void>;
 }

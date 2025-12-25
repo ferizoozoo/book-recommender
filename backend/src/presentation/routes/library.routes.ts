@@ -20,6 +20,10 @@ libraryRouter.get("/readers-review", async (req, res, next) => {
   await libraryController.getReadersReviewBooks(req, res, next);
 });
 
+libraryRouter.get("/user-review/:bookId", async (req, res, next) => {
+  await libraryController.getUserReviewForBook(req, res, next);
+});
+
 libraryRouter.post("/search", async (req, res, next) => {
   await libraryController.getFilteredBooks(req, res, next);
 });
@@ -75,6 +79,10 @@ libraryRouter.put("/authors/:id", async (req, res, next) => {
 
 libraryRouter.put("/publishers/:id", async (req, res, next) => {
   await libraryController.updatePublisher(req, res, next);
+});
+
+libraryRouter.post("/reviews/:bookId", async (req, res, next) => {
+  await libraryController.addReviews(req, res, next);
 });
 
 export default libraryRouter;

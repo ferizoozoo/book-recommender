@@ -26,4 +26,5 @@ export const serviceConsts = {
 
   // Library related constants
   LibraryAuthorNotFound: "Library author not found",
+  ReviewValidationFailed: "Review validation failed",
 };

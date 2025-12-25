@@ -163,6 +163,35 @@ export class LibraryController {
   }
 
   @AuthGuard(["user", "admin"])
+  async getUserReviewForBook(
+    req: AuthenticatedRequest,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    const bookId = parseInt(req.params.bookId);
+    if (isNaN(bookId)) {
+      res
+        .status(400)
+        .json({ message: presentationConsts.LibraryInvalidBookId });
+      return;
+    }
+
+    if (!req.user) {
+      res
+        .status(401)
+        .json({ message: presentationConsts.LibraryUserIdRequired });
+      return;
+    }
+
+    const userReview = await this.#libraryService.getUserReviewForBook(
+      bookId,
+      req.user.userId
+    );
+
+    res.status(200).json({ review: userReview });
+  }
+
+  @AuthGuard(["user", "admin"])
   async getFilteredBooks(
     req: Request,
     res: Response,
@@ -443,5 +472,35 @@ export class LibraryController {
     const books = await this.#libraryAuthService.getAllForUser(req.user!.email);
     res.status(200).json({ books });
     return books;
+  }
+
+  @AuthGuard(["user", "admin"])
+  async addReviews(
+    req: AuthenticatedRequest,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    const bookId = parseInt(req.params.bookId);
+    if (isNaN(bookId)) {
+      res
+        .status(400)
+        .json({ message: presentationConsts.LibraryInvalidBookId });
+      return;
+    }
+
+    const userId = req.user?.userId;
+
+    const { rating, review } = req.body;
+    if (!userId) {
+      res
+        .status(400)
+        .json({ message: presentationConsts.LibraryUserIdRequired });
+      return;
+    }
+
+    await this.#libraryAuthService.addReview(bookId, rating, review, userId);
+    res
+      .status(200)
+      .json({ message: presentationConsts.LibraryReviewAddedSuccessfully });
   }
 }

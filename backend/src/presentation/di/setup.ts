@@ -36,7 +36,8 @@ const reviewRepository = new ReviewRepository();
 const libraryAuthService = new LibraryAuthService(
   userRepository,
   bookRepository,
-  authorRepository
+  authorRepository,
+  reviewRepository
 );
 const libraryService = new LibraryService(
   bookRepository,

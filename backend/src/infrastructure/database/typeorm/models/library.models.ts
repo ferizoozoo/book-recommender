@@ -11,7 +11,7 @@ import { UserEntity } from "./auth.models.ts";
 
 @Entity("authors")
 export class AuthorEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("increment")
   id: number;
 
   @Column({ type: "text", nullable: true })
@@ -30,7 +30,7 @@ export class AuthorEntity {
 
 @Entity("publishers")
 export class PublisherEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("increment")
   id: number;
 
   @Column()
@@ -57,7 +57,7 @@ export class PublisherEntity {
 
 @Entity("books")
 export class BookEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("increment")
   id: number;
 
   @Column()
@@ -91,15 +91,6 @@ export class BookEntity {
   })
   labels: string[];
 
-  @Column({ type: "float", default: 0 })
-  rating: number;
-
-  @Column({ type: "int", default: 0 })
-  numberOfRatings: number;
-
-  @Column({ type: "int", default: 0 })
-  numberOfReviews: number;
-
   @ManyToOne(() => AuthorEntity, (author) => author.books)
   @JoinColumn({ name: "authorId" })
   author: AuthorEntity;
@@ -120,7 +111,7 @@ export class BookEntity {
 // and make the table get more space than necessary.
 @Entity("likes")
 export class LikeEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("increment")
   id: number;
 
   @ManyToOne(() => UserEntity)
@@ -134,7 +125,7 @@ export class LikeEntity {
 
 @Entity("reviews")
 export class ReviewEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("increment")
   id: number;
 
   @ManyToOne(() => BookEntity)
@@ -147,11 +138,14 @@ export class ReviewEntity {
 
   @Column({ type: "int", default: 0 })
   rating: number;
+
+  @Column({ type: "text", default: "" })
+  review: string;
 }
 
 @Entity("user_books")
 export class UserBookEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("increment")
   id: number;
 
   @Column()

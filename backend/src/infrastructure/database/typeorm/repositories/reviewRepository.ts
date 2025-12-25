@@ -19,6 +19,7 @@ export class ReviewRepository implements IReviewRepository {
   async getById(id: number): Promise<Review | null> {
     const reviewEntity = await this.#reviews.findOne({
       where: { id },
+      relations: ["book", "user"],
     });
 
     if (!reviewEntity) {
@@ -31,6 +32,7 @@ export class ReviewRepository implements IReviewRepository {
   async getBookReviews(bookId: number): Promise<Review[] | null> {
     const reviewEntities = await this.#reviews.find({
       where: { book: { id: bookId } },
+      relations: ["book", "user"],
     });
 
     if (!reviewEntities) {
@@ -40,9 +42,27 @@ export class ReviewRepository implements IReviewRepository {
     return reviewEntities.map(mapReviewEntityToDomain);
   }
 
+  async getByBookAndUser(
+    bookId: number,
+    userId: number
+  ): Promise<Review | null> {
+    const reviewEntity = await this.#reviews.findOne({
+      where: { book: { id: bookId }, user: { id: userId } },
+      relations: ["book", "user"],
+    });
+
+    if (!reviewEntity) {
+      return null;
+    }
+
+    return mapReviewEntityToDomain(reviewEntity);
+  }
+
   async save(review: Review): Promise<void> {
     const reviewEntity = mapReviewDomainToModel(review);
-    await this.#reviews.save(reviewEntity);
+    let res = await this.#reviews.create(reviewEntity);
+    console.log({ res });
+    await this.#reviews.save(res);
   }
 
   async delete(id: number): Promise<void> {
@@ -50,7 +70,7 @@ export class ReviewRepository implements IReviewRepository {
   }
 
   async update(review: Review): Promise<void> {
-    const reviewEntity = mapReviewDomainToModel(review);
-    await this.#reviews.update(review.id, reviewEntity);
+    const reviewEntity = mapReviewDomainToModel(review, true);
+    await this.#reviews.save(reviewEntity);
   }
 }

@@ -37,7 +37,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async update(user: User) {
-    const userEntity = mapUserDomainToModel(user);
+    const userEntity = mapUserDomainToModel(user, true);
     await this.#users.update(user.id, userEntity);
   }
 

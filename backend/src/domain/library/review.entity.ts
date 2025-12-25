@@ -9,10 +9,13 @@ export class Review implements IValidate {
     public id: number,
     public book: Book,
     public user: User,
-    public rating: number
+    public rating: number,
+    public review: string = ""
   ) {}
 
   validate(): boolean {
+    // Allow 0 for new records that haven't been saved yet
+    // Only enforce non-negative for existing records
     if (this.id < 0) {
       throw new Error(domainConsts.ReviewIdNonNegative);
     }

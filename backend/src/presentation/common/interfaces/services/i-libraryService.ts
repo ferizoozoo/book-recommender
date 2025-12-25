@@ -19,6 +19,7 @@ export interface ILibraryService {
   getBookById(id: number): Promise<Book | null>;
   getBookByIsbn(isbn: string): Promise<Book | null>;
   getReadersReviewBooks(bookId: number): Promise<Review[]>;
+  getUserReviewForBook(bookId: number, userId: number): Promise<Review | null>;
   getTrendingBooks(limit: number): Promise<Book[]>;
   getFilteredBooks(filters: any): Promise<Book[]>;
   addBook(book: BookDto): Promise<void>;

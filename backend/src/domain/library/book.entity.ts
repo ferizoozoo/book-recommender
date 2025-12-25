@@ -17,10 +17,7 @@ export class Book implements IValidate {
     public isbn: string = "",
     public publisher: Publisher,
     public year: number = 0,
-    public image: string = "",
-    public rating: number = 0,
-    public numberOfRatings: number = 0,
-    public numberOfReviews: number = 0
+    public image: string = ""
   ) {}
 
   validate(): boolean {
@@ -61,14 +58,6 @@ export class Book implements IValidate {
     const urlRegex = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))$/i;
     if (this.image && !urlRegex.test(this.image)) {
       throw new Error(domainConsts.BookImageUrlShouldBeValid);
-    }
-
-    if (this.rating < 0 || this.rating > 5) {
-      throw new Error(domainConsts.BookRatingShouldBeValid);
-    }
-
-    if (this.numberOfRatings < 0 || this.numberOfReviews < 0) {
-      throw new Error(domainConsts.BookNumberOfRatingsReviewsShouldBeValid);
     }
 
     return true;
