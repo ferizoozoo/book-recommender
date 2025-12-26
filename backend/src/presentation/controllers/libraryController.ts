@@ -438,32 +438,6 @@ export class LibraryController {
   }
 
   @AuthGuard(["user", "admin"])
-  async likeBook(
-    req: Request,
-    res: Response,
-    nextFunction: NextFunction
-  ): Promise<void> {
-    const bookId = parseInt(req.params.id);
-    if (isNaN(bookId)) {
-      res
-        .status(400)
-        .json({ message: presentationConsts.LibraryInvalidBookId });
-      return;
-    }
-
-    const { userId } = req.body;
-    if (!userId) {
-      res
-        .status(400)
-        .json({ message: presentationConsts.LibraryUserIdRequired });
-      return;
-    }
-
-    await this.#libraryAuthService.likeBook(userId, bookId);
-    res.status(200).json({ message: presentationConsts.LibraryBookLiked });
-  }
-
-  @AuthGuard(["user", "admin"])
   async getAllBooksForUser(
     req: AuthenticatedRequest,
     res: Response,
@@ -502,5 +476,49 @@ export class LibraryController {
     res
       .status(200)
       .json({ message: presentationConsts.LibraryReviewAddedSuccessfully });
+  }
+
+  @AuthGuard(["user", "admin"])
+  async likeToggle(
+    req: AuthenticatedRequest,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    const userId = req.user?.userId;
+
+    const bookId = parseInt(req.body.bookId);
+
+    if (!userId) {
+      res
+        .status(400)
+        .json({ message: presentationConsts.LibraryUserIdRequired });
+      return;
+    }
+
+    await this.#libraryAuthService.likeToggle(userId, bookId);
+    res
+      .status(200)
+      .json({ message: presentationConsts.LibraryLikedOrDislikedSuccessfully });
+  }
+
+  @AuthGuard(["user", "admin"])
+  async getUserLikedBooks(
+    req: AuthenticatedRequest,
+    res: Response,
+    nextFunction: NextFunction
+  ): Promise<void> {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      res
+        .status(400)
+        .json({ message: presentationConsts.LibraryUserIdRequired });
+      return;
+    }
+
+    const likedBookIds = await this.#libraryAuthService.getUserLikedBooks(
+      userId
+    );
+    res.status(200).json({ likedBookIds });
   }
 }

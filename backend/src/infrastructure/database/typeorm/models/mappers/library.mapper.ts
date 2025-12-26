@@ -5,6 +5,7 @@ import { User } from "../../../../../domain/auth/user.entity.ts";
 import {
   AuthorEntity,
   BookEntity,
+  LikeEntity,
   PublisherEntity,
   ReviewEntity,
   UserBookEntity,
@@ -12,6 +13,7 @@ import {
 import { mapUserDomainToModel, mapUserEntityToDomain } from "./auth.mapper.ts";
 import { Review } from "../../../../../domain/library/review.entity.ts";
 import { r } from "@faker-js/faker/dist/airline-CHFQMWko";
+import { Like } from "../../../../../domain/library/like.entity.ts";
 
 export function mapAuthorDomainToModel(author: Author): AuthorEntity {
   const authorEntity = new AuthorEntity();
@@ -151,6 +153,36 @@ export function mapReviewEntityToDomain(reviewEntity: ReviewEntity): Review {
   );
 
   return review;
+}
+
+export function mapLikeDomainToModel(
+  like: Like,
+  isUpdate: boolean = false
+): LikeEntity {
+  const likeEntity = new LikeEntity();
+  if (isUpdate && like.id > 0) {
+    likeEntity.id = like.id;
+  }
+  likeEntity.book = mapBookDomainToModel(like.book);
+  likeEntity.user = mapUserDomainToModel(like.user);
+
+  return likeEntity;
+}
+
+export function mapLikeEntityToDomain(likeEntity: LikeEntity): Like {
+  const like = new Like(
+    likeEntity.id,
+    mapBookEntityToDomain(likeEntity.book),
+    mapUserEntityToDomain(likeEntity.user)
+  );
+
+  return like;
+}
+
+export function mapLikeEntitiesToDomain(likeEntities: LikeEntity[]): Like[] {
+  return likeEntities
+    ? likeEntities.map((entity) => mapLikeEntityToDomain(entity))
+    : [];
 }
 
 export function mapBookEntitiesToDomain(bookEntities: BookEntity[]): Book[] {

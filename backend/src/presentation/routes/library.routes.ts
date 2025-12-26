@@ -85,4 +85,12 @@ libraryRouter.post("/reviews/:bookId", async (req, res, next) => {
   await libraryController.addReviews(req, res, next);
 });
 
+libraryRouter.post("/like", async (req, res, next) => {
+  await libraryController.likeToggle(req, res, next);
+});
+
+libraryRouter.get("/user/liked-books", async (req, res, next) => {
+  await libraryController.getUserLikedBooks(req, res, next);
+});
+
 export default libraryRouter;

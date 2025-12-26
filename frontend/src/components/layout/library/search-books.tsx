@@ -22,8 +22,7 @@ export default function SearchPage() {
   const { accessToken } = useAuthContext();
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredBooks, setFilteredBooks] = useState<any[]>([]);
-  const [liked, setLiked] = useState(false);
-  const [selectedBook, setSelectedBook] = useState<number | null>(null);
+  const [likedBooks, setLikedBooks] = useState<Set<number>>(new Set());
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
   const [selectedBookForRating, setSelectedBookForRating] = useState<
     any | null
@@ -83,13 +82,20 @@ export default function SearchPage() {
     }
   };
 
-  const handleLike = async ({ id, userId }: { id: number; userId: number }) => {
+  const handleLike = async ({ id }: { id: number }) => {
     // Placeholder for like functionality
-    console.log(`Liked book with ID: ${id} by user ID: ${userId}`);
-    setLiked(!liked);
-    const res = await fetchWithAuth(`${config.apiUrl}/library/like`, {
+    setLikedBooks((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+    await fetchWithAuth(`${config.apiUrl}/library/like`, {
       method: "POST",
-      body: JSON.stringify({ bookId: id, userId }),
+      body: JSON.stringify({ bookId: id }),
     });
   };
 
@@ -104,14 +110,11 @@ export default function SearchPage() {
     if (selectedBookForRating && userRating > 0) {
       try {
         // Decode JWT to get userId
-        const decodedToken = JSON.parse(atob(accessToken!.split(".")[1]));
-        const userId = decodedToken.userId;
         const res = await fetchWithAuth(
           `${config.apiUrl}/library/reviews/${selectedBookForRating.id}`,
           {
             method: "POST",
             body: JSON.stringify({
-              userId,
               rating: userRating,
               review: reviewText,
             }),
@@ -153,6 +156,31 @@ export default function SearchPage() {
     if (searchQuery.length <= 3) setFilteredBooks([]);
     else handleSearch();
   }, [searchQuery]);
+
+  // Fetch user's liked books on component mount
+  useEffect(() => {
+    const fetchLikedBooks = async () => {
+      if (accessToken) {
+        try {
+          // TODO: that takes all the liked books IDs and can become slow with many books (needs to be optimized)
+          const likedRes = await fetchWithAuth(
+            `${config.apiUrl}/library/user/liked-books`,
+            {
+              method: "GET",
+            }
+          );
+          if (likedRes.ok) {
+            const likedData = await likedRes.json();
+            setLikedBooks(new Set(likedData.likedBookIds));
+          }
+        } catch (error) {
+          console.error("Error fetching liked books:", error);
+        }
+      }
+    };
+
+    fetchLikedBooks();
+  }, [accessToken, fetchWithAuth]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -235,11 +263,9 @@ export default function SearchPage() {
                         </div>
                       )}
                       <Heart
-                        onClick={() =>
-                          handleLike({ id: book.id, userId: book.userId })
-                        }
+                        onClick={() => handleLike({ id: book.id })}
                         className={`h-5 w-5 cursor-pointer transition-all ${
-                          liked && book.id === book.id
+                          likedBooks.has(book.id)
                             ? "fill-red-500 text-red-500"
                             : "text-muted-foreground hover:text-red-500"
                         }`}
@@ -274,7 +300,7 @@ export default function SearchPage() {
               Try adjusting your search criteria or browse our featured
               recommendations
             </p>
-            <Link href="/">
+            <Link to="/">
               <Button variant="outline">Browse Featured Books</Button>
             </Link>
           </div>

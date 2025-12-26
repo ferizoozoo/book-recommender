@@ -19,10 +19,12 @@ import { mapUserDomainToModel } from "../models/mappers/auth.mapper";
 export class BookRepository implements IBookRepository {
   #books: Repository<BookEntity>;
   #userBooks: Repository<UserBookEntity>;
+  #likes: Repository<LikeEntity>;
 
   constructor() {
     this.#books = AppDataSource.getRepository(BookEntity);
     this.#userBooks = AppDataSource.getRepository(UserBookEntity);
+    this.#likes = AppDataSource.getRepository(LikeEntity);
   }
 
   async filter(filters: any): Promise<Book[]> {
@@ -122,7 +124,8 @@ export class BookRepository implements IBookRepository {
     await this.#books.save(bookEntity);
   }
 
-  async likeBook(user: User, book: Book): Promise<void> {
+  // NOTE: should this method be in LikeRepository?
+  async addLike(user: User, book: Book): Promise<void> {
     if (!user || !book) {
       throw new Error("User and Book are required to like a book");
     }
@@ -131,6 +134,10 @@ export class BookRepository implements IBookRepository {
 
     like.user = mapUserDomainToModel(user);
     like.book = mapBookDomainToModel(book);
-    await this.#books.save(like);
+    await this.#likes.save(like);
+  }
+
+  async removeLike(id: number): Promise<void> {
+    await this.#likes.delete(id);
   }
 }

@@ -5,6 +5,7 @@ import { ILibraryAuthService } from "../../presentation/common/interfaces/servic
 import { serviceConsts } from "../common/consts";
 import { IAuthorRepository } from "../common/interfaces/repositories/i-authorRepository";
 import { IBookRepository } from "../common/interfaces/repositories/i-bookRepository";
+import { ILikeRepository } from "../common/interfaces/repositories/i-likeRepository";
 import { IReviewRepository } from "../common/interfaces/repositories/i-reviewRepository";
 import { IUserRepository } from "../common/interfaces/repositories/i-userRepository";
 import { AuthorDto } from "../dtos/library.dtos";
@@ -14,17 +15,20 @@ export class LibraryAuthService implements ILibraryAuthService {
   #bookRepo: IBookRepository;
   #authorRepo: IAuthorRepository;
   #reviewRepo: IReviewRepository;
+  #likeRepo: ILikeRepository;
 
   constructor(
     userRepo: IUserRepository,
     bookRepo: IBookRepository,
     authorRepo: IAuthorRepository,
-    reviewRepo: IReviewRepository
+    reviewRepo: IReviewRepository,
+    likeRepo: ILikeRepository
   ) {
     this.#userRepo = userRepo;
     this.#bookRepo = bookRepo;
     this.#authorRepo = authorRepo;
     this.#reviewRepo = reviewRepo;
+    this.#likeRepo = likeRepo;
   }
 
   async getAllForUser(email: string): Promise<Book[]> {
@@ -66,8 +70,9 @@ export class LibraryAuthService implements ILibraryAuthService {
     return savedAuthor;
   }
 
-  async likeBook(userId: number, bookId: number): Promise<void> {
+  async likeToggle(userId: number, bookId: number): Promise<void> {
     const book = await this.#bookRepo.getById(bookId);
+    console.log("Book fetched for liking:", bookId);
     if (!book) {
       throw new Error("Book not found");
     }
@@ -77,7 +82,17 @@ export class LibraryAuthService implements ILibraryAuthService {
       throw new Error("User not found");
     }
 
-    await this.#bookRepo.likeBook(user, book);
+    const like = await this.#likeRepo.getByUserAndBook(user.id, book.id!);
+    if (!like) {
+      await this.#likeRepo.add(user, book);
+    } else {
+      await this.#likeRepo.remove(like.id!);
+    }
+  }
+
+  async getUserLikedBooks(userId: number): Promise<number[]> {
+    const likes = await this.#likeRepo.getByUserId(userId);
+    return likes.map((like) => like.book.id || 0);
   }
 
   async addReview(
