@@ -61,7 +61,6 @@ export class ReviewRepository implements IReviewRepository {
   async save(review: Review): Promise<void> {
     const reviewEntity = mapReviewDomainToModel(review);
     let res = await this.#reviews.create(reviewEntity);
-    console.log({ res });
     await this.#reviews.save(res);
   }
 

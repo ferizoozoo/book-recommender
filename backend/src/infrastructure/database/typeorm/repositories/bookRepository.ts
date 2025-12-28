@@ -77,7 +77,12 @@ export class BookRepository implements IBookRepository {
   async getTrendingBooks(limit: number): Promise<Book[]> {
     const bookEntities = await this.#books.find({
       take: limit,
-      relations: ["author", "publisher"],
+      relations: {
+        author: {
+          user: true,
+        },
+        publisher: true,
+      },
       order: { id: "DESC" },
     });
 

@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import { ILibraryService } from "../common/interfaces/services/i-libraryService";
 import { presentationConsts } from "../common/consts";
-import { Book } from "../../domain/library/book.entity";
-import { Author } from "../../domain/library/author.entity";
-import { Publisher } from "../../domain/library/publisher.entity";
 import { ILibraryAuthService } from "../common/interfaces/services/i-library-authService";
-import { AuthorDto } from "../../services/dtos/library.dtos";
+import {
+  AuthorDto,
+  BookDto,
+  PublisherDto,
+} from "../../services/dtos/library.dtos";
 import {
   AuthGuard,
   AuthenticatedRequest,
@@ -235,6 +236,8 @@ export class LibraryController {
       title,
       authorId,
       publisherId,
+      author: {} as AuthorDto,
+      publisher: {} as PublisherDto,
       isbn,
       quantity,
       publishedDate,
@@ -335,6 +338,8 @@ export class LibraryController {
       id: bookId,
       title: title,
       authorId: authorId,
+      author: null,
+      publisher: null,
       description: description,
       isbn: isbn,
       publisherId: publisherId,
@@ -442,7 +447,7 @@ export class LibraryController {
     req: AuthenticatedRequest,
     res: Response,
     nextFunction: NextFunction
-  ): Promise<Book[]> {
+  ): Promise<BookDto[]> {
     const books = await this.#libraryAuthService.getAllForUser(req.user!.email);
     res.status(200).json({ books });
     return books;

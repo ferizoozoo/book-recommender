@@ -1,5 +1,4 @@
 import { Author } from "../../domain/library/author.entity";
-import { Book } from "../../domain/library/book.entity";
 import { Review } from "../../domain/library/review.entity";
 import { ILibraryAuthService } from "../../presentation/common/interfaces/services/i-library-authService";
 import { serviceConsts } from "../common/consts";
@@ -8,7 +7,11 @@ import { IBookRepository } from "../common/interfaces/repositories/i-bookReposit
 import { ILikeRepository } from "../common/interfaces/repositories/i-likeRepository";
 import { IReviewRepository } from "../common/interfaces/repositories/i-reviewRepository";
 import { IUserRepository } from "../common/interfaces/repositories/i-userRepository";
-import { AuthorDto } from "../dtos/library.dtos";
+import { AuthorDto, BookDto } from "../dtos/library.dtos";
+import {
+  mapAuthorDomainToDto,
+  mapBookDomainsToDtos,
+} from "../dtos/mappers/library.mapper";
 
 export class LibraryAuthService implements ILibraryAuthService {
   #userRepo: IUserRepository;
@@ -31,16 +34,16 @@ export class LibraryAuthService implements ILibraryAuthService {
     this.#likeRepo = likeRepo;
   }
 
-  async getAllForUser(email: string): Promise<Book[]> {
+  async getAllForUser(email: string): Promise<BookDto[]> {
     const user = await this.#userRepo.getByEmail(email);
     if (!user || !user.id) {
       throw new Error("User not found");
     }
 
-    return await this.#bookRepo.getAllForUser(user.id);
+    return mapBookDomainsToDtos(await this.#bookRepo.getAllForUser(user.id));
   }
 
-  async addAuthor(authorData: AuthorDto, userClaims: any): Promise<Author> {
+  async addAuthor(authorData: AuthorDto, userClaims: any): Promise<AuthorDto> {
     const author = new Author(
       0,
       authorData.bio,
@@ -67,12 +70,12 @@ export class LibraryAuthService implements ILibraryAuthService {
     if (!savedAuthor) {
       throw new Error(serviceConsts.AuthorNotFound);
     }
-    return savedAuthor;
+
+    return mapAuthorDomainToDto(savedAuthor);
   }
 
   async likeToggle(userId: number, bookId: number): Promise<void> {
     const book = await this.#bookRepo.getById(bookId);
-    console.log("Book fetched for liking:", bookId);
     if (!book) {
       throw new Error("Book not found");
     }

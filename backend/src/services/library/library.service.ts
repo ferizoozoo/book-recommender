@@ -9,7 +9,23 @@ import { serviceConsts } from "../common/consts";
 import { Review } from "../../domain/library/review.entity";
 import { IReviewRepository } from "../common/interfaces/repositories/i-reviewRepository";
 import { presentationConsts } from "../../presentation/common/consts";
-import { AuthorDto, BookDto, PublisherDto } from "../dtos/library.dtos";
+import {
+  AuthorDto,
+  BookDto,
+  BookUpdateDto,
+  PublisherDto,
+  ReviewDto,
+} from "../dtos/library.dtos";
+import {
+  mapAuthorDomainsToDtos,
+  mapAuthorDomainToDto,
+  mapBookDomainsToDtos,
+  mapBookDomainToDto,
+  mapPublisherDomainsToDtos,
+  mapPublisherDomainToDto,
+  mapReviewDomainsToDtos,
+  mapReviewDomainToDto,
+} from "../dtos/mappers/library.mapper";
 
 export class LibraryService implements ILibraryService {
   #bookRepo: IBookRepository;
@@ -63,50 +79,60 @@ export class LibraryService implements ILibraryService {
     await this.#publisherRepo.update(existingPublisher);
   }
 
-  async getFilteredBooks(filters: any): Promise<Book[]> {
-    return await this.#bookRepo.filter(filters);
+  async getFilteredBooks(filters: any): Promise<BookDto[]> {
+    const books = await this.#bookRepo.filter(filters);
+    const res = mapBookDomainsToDtos(books);
+    return res;
   }
 
-  async getReadersReviewBooks(bookId: number): Promise<Review[]> {
+  async getReadersReviewBooks(bookId: number): Promise<ReviewDto[]> {
     const bookReviews = await this.#reviewRepo.getBookReviews(bookId);
-    return bookReviews!;
+    const res = mapReviewDomainsToDtos(bookReviews!);
+    return res;
   }
 
   async getUserReviewForBook(
     bookId: number,
     userId: number
-  ): Promise<Review | null> {
-    return await this.#reviewRepo.getByBookAndUser(bookId, userId);
+  ): Promise<ReviewDto | null> {
+    const res = await this.#reviewRepo.getByBookAndUser(bookId, userId);
+    return res ? mapReviewDomainToDto(res) : null;
   }
 
-  async getAllBooks(): Promise<Book[]> {
-    return await this.#bookRepo.getAll();
+  async getAllBooks(): Promise<BookDto[]> {
+    const res = await this.#bookRepo.getAll();
+    return mapBookDomainsToDtos(res);
   }
 
-  async getAllPublishers(): Promise<Publisher[]> {
-    return await this.#publisherRepo.getAll();
+  async getAllPublishers(): Promise<PublisherDto[]> {
+    const res = await this.#publisherRepo.getAll();
+    return mapPublisherDomainsToDtos(res);
   }
 
-  async getAllAuthors(): Promise<Author[]> {
-    return await this.#authorRepo.getAll();
+  async getAllAuthors(): Promise<AuthorDto[]> {
+    const res = await this.#authorRepo.getAll();
+    return mapAuthorDomainsToDtos(res);
   }
 
-  async getBookById(id: number): Promise<Book | null> {
-    return await this.#bookRepo.getById(id);
+  async getBookById(id: number): Promise<BookDto | null> {
+    const res = await this.#bookRepo.getById(id);
+    return res ? mapBookDomainToDto(res) : null;
   }
 
-  async getBookByIsbn(isbn: string): Promise<Book | null> {
+  async getBookByIsbn(isbn: string): Promise<BookDto | null> {
     if (!isbn) {
       throw new Error("ISBN is required");
     }
-    return await this.#bookRepo.getByIsbn(isbn);
+    const res = await this.#bookRepo.getByIsbn(isbn);
+    return res ? mapBookDomainToDto(res) : null;
   }
 
-  async getTrendingBooks(limit: number): Promise<Book[]> {
-    return await this.#bookRepo.getTrendingBooks(limit);
+  async getTrendingBooks(limit: number): Promise<BookDto[]> {
+    const res = await this.#bookRepo.getTrendingBooks(limit);
+    return mapBookDomainsToDtos(res);
   }
 
-  async getAuthorById(authorId: number): Promise<Author | null> {
+  async getAuthorById(authorId: number): Promise<AuthorDto | null> {
     if (authorId < 0) {
       throw new Error(serviceConsts.AuthorIdNonNegative);
     }
@@ -114,10 +140,10 @@ export class LibraryService implements ILibraryService {
     const authorsBooks = await this.#bookRepo.getByAuthorId(authorId);
 
     author!.books = authorsBooks;
-    return author;
+    return mapAuthorDomainToDto(author!);
   }
 
-  async addPublisher(publisherDto: PublisherDto): Promise<Publisher> {
+  async addPublisher(publisherDto: PublisherDto): Promise<PublisherDto> {
     const publisher = new Publisher(
       0,
       publisherDto.name,
@@ -139,14 +165,15 @@ export class LibraryService implements ILibraryService {
     if (!savedPublisher) {
       throw new Error(serviceConsts.PublisherNotFound);
     }
-    return savedPublisher;
+    return mapPublisherDomainToDto(savedPublisher);
   }
 
-  async getPublisherById(publisherId: number): Promise<Publisher | null> {
+  async getPublisherById(publisherId: number): Promise<PublisherDto | null> {
     if (publisherId < 0) {
       throw new Error(serviceConsts.PublisherIdNonNegative);
     }
-    return await this.#publisherRepo.getById(publisherId);
+    const publisher = await this.#publisherRepo.getById(publisherId);
+    return publisher ? mapPublisherDomainToDto(publisher) : null;
   }
 
   async addBook(bookDto: BookDto): Promise<void> {
@@ -183,7 +210,7 @@ export class LibraryService implements ILibraryService {
     await this.#bookRepo.save(book);
   }
 
-  async updateBook(bookDto: BookDto): Promise<void> {
+  async updateBook(bookDto: BookUpdateDto): Promise<void> {
     if (!bookDto.id) {
       throw new Error("Book ID is required for updates");
     }
@@ -194,8 +221,8 @@ export class LibraryService implements ILibraryService {
     }
 
     // Update fields
-    existingBook.title = bookDto.title;
-    existingBook.isbn = bookDto.isbn;
+    existingBook.title = bookDto.title!;
+    existingBook.isbn = bookDto.isbn!;
     existingBook.labels = bookDto.labels;
 
     await this.#bookRepo.update(existingBook);
@@ -242,14 +269,14 @@ export class LibraryService implements ILibraryService {
     }
   }
 
-  async getBooksByLabel(label: string): Promise<Book[]> {
+  async getBooksByLabel(label: string): Promise<BookDto[]> {
     if (!label) {
       throw new Error("Label is required");
     }
 
     const allBooks = await this.#bookRepo.getAll();
-    return allBooks.filter(
-      (book) => book.labels && book.labels.includes(label)
+    return mapBookDomainsToDtos(allBooks).filter((book) =>
+      book.labels.includes(label)
     );
   }
 }
