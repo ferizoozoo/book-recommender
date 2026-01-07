@@ -12,3 +12,9 @@ build/
 .env
 
 .vscode/
+
+
+# Exclude venv folder for Python virtual environments
+.venv/
+__pycache__/
+*.pyc
