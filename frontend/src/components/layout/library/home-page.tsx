@@ -88,7 +88,11 @@ export default function HomePage() {
   };
 
   const getTrendingBooks = async () => {
-    const res = await fetch(`${config.apiUrl}/library/trending?limit=4`);
+    // todo: replace with default book title for the page
+    const hardcodedBook = encodeURIComponent("Harry Potter and the Half-Blood Prince (Harry Potter  #6)");
+    const url = `${config.recommendationUrl}/recommendations/${hardcodedBook}`;
+    const res = await fetch(url);
+
     if (!res.ok) {
       throw new Error("Failed to fetch trending books");
     }
@@ -98,7 +102,10 @@ export default function HomePage() {
   useEffect(() => {
     async function fetchTrendingBooks() {
       const data = await getTrendingBooks();
-      const books = data.books;
+      // todo: get metadata for each book title returned by the recommendation engine (data is response from the eingine)
+      const books = data.recommendations.map((book: any) => ({
+        title: book
+      }));
       setTrendingBooks(books);
     }
     fetchTrendingBooks();
@@ -176,10 +183,10 @@ export default function HomePage() {
                       {book.title}
                     </h3>
                     <p className="text-muted-foreground text-sm mb-2">
-                      by{" "}
+                      {/* by{" "}
                       {book.author.user.firstname +
                         " " +
-                        book.author.user.lastname}
+                        book.author.user.lastname} */}
                     </p>
                     <div className="flex items-center justify-between">
                       <Badge variant="outline" className="text-xs">
