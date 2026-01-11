@@ -34,8 +34,6 @@ export class User implements IValidate {
       throw new Error(domainConsts.UserEmailCannotExceedLimit);
     }
 
-    console.log("Validating password:", this.password);
-
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
     if (!this.password && !passwordRegex.test(this.password)) {
       throw new Error(domainConsts.UserInvalidPassword);
