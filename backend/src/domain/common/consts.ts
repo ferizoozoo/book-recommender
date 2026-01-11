@@ -8,6 +8,7 @@ export const domainConsts = {
   UserPasswordShouldBeValid:
     "Password must be between 8 and 50 characters and contain valid characters.",
   UserEmailCannotExceedLimit: "Email cannot exceed 254 characters.",
+  UserInvalidPassword: "Invalid password",
   UserInvalidHashPassword: "Invalid hash password",
   UserInvalidSalt: "Invalid salt",
   BookIdNonNegative: "Book id must be a non negative number",

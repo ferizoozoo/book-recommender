@@ -74,8 +74,10 @@ export class AuthService implements IAuthService {
     }
 
     const user = new User();
+    user.firstName = email;
     user.email = email;
     user.roles = ["user"];
+    user.password = password;
     user.validate();
 
     await user.savePassword(password, this.#hasher);

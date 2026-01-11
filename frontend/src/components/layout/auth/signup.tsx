@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 export interface SignUpData {
   email: string;
   password: string;
+  retypePassword: string;
 }
 
 const Signup: React.FC = () => {
@@ -13,7 +14,7 @@ const Signup: React.FC = () => {
   const navigate = useNavigate();
 
   const handleRegister = async (signUpData: SignUpData) => {
-    const { email, password } = signUpData;
+    const { email, password, retypePassword } = signUpData;
     const url = import.meta.env.VITE_API_URL;
 
     console.log("Registering user:", email);
@@ -24,7 +25,7 @@ const Signup: React.FC = () => {
         Accept: "application/json",
       },
       credentials: "include",
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, retypePassword }),
     });
 
     console.log("Response:", res);

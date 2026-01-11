@@ -24,15 +24,6 @@ export class User implements IValidate {
       throw new Error(domainConsts.UserIdNonNegative);
     }
 
-    const nameRegex = /^[a-zA-Z' -]{2,50}$/;
-    if (!this.firstName || !nameRegex.test(this.firstName)) {
-      throw new Error(domainConsts.UserFirstnameShouldBeValid);
-    }
-
-    if (!this.lastName || !nameRegex.test(this.lastName)) {
-      throw new Error(domainConsts.UserLastnameShouldBeValid);
-    }
-
     const emailRegex = /^[a-zA-Z0-9._%+-]{1,64}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!this.email || !emailRegex.test(this.email)) {
       throw new Error(domainConsts.UserEmailShouldBeValid);
@@ -43,14 +34,11 @@ export class User implements IValidate {
       throw new Error(domainConsts.UserEmailCannotExceedLimit);
     }
 
-    const hashedPasswordRegex = /^.{60}$/; // Example for bcrypt
-    if (!this.password || !hashedPasswordRegex.test(this.password)) {
-      throw new Error(domainConsts.UserInvalidHashPassword);
-    }
+    console.log("Validating password:", this.password);
 
-    const saltRegex = /^\$[2BCYbc][a-zA-Z0-9./]{29}$/;
-    if (!this.salt || !saltRegex.test(this.salt)) {
-      throw new Error(domainConsts.UserInvalidSalt);
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+    if (!this.password && !passwordRegex.test(this.password)) {
+      throw new Error(domainConsts.UserInvalidPassword);
     }
 
     return true;
