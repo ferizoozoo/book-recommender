@@ -33,5 +33,16 @@ services:
     # volumes: # Optional: For development, you might mount source code for live reload
     #   - ./frontend:/usr/share/nginx/html # Or similar for dev
       # - /usr/src/app/node_modules # Prevents host node_modules from overriding container's
+  recommendation-engine:
+    build: ./recommendation-engine
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+    volumes:
+      - ./recommendation-engine:/app
+      - /app/node_modules # Prevents local node_modules from overwriting container ones
+    environment:
+      NODE_ENV: development
 volumes:
   db-data:
