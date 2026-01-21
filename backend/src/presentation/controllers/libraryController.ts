@@ -18,7 +18,7 @@ export class LibraryController {
 
   constructor(
     libraryService: ILibraryService,
-    libraryAuthService: ILibraryAuthService
+    libraryAuthService: ILibraryAuthService,
   ) {
     this.#libraryService = libraryService;
     this.#libraryAuthService = libraryAuthService;
@@ -28,7 +28,7 @@ export class LibraryController {
   async addAuthor(
     req: AuthenticatedRequest,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const { bio } = req.body;
     if (!bio) {
@@ -43,7 +43,7 @@ export class LibraryController {
 
     const savedAuthor = await this.#libraryAuthService.addAuthor(
       authorData,
-      userClaims
+      userClaims,
     );
     res.status(201).json({ author: savedAuthor });
   }
@@ -52,7 +52,7 @@ export class LibraryController {
   async addPublisher(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const { name, address, city, state, zip, country } = req.body;
     if (!name || !address || !city || !state || !zip || !country) {
@@ -71,7 +71,7 @@ export class LibraryController {
   async getAllBooks(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const books = await this.#libraryService.getAllBooks();
     res.status(200).json({ books });
@@ -81,7 +81,7 @@ export class LibraryController {
   async getAllAuthors(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const authors = await this.#libraryService.getAllAuthors();
     res.status(200).json({ authors });
@@ -91,17 +91,17 @@ export class LibraryController {
   async getAllPublishers(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const publishers = await this.#libraryService.getAllPublishers();
     res.status(200).json({ publishers });
   }
 
-  @AuthGuard(["user", "admin"])
+  // @AuthGuard(["user", "admin"])
   async getBookById(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const bookId = parseInt(req.params.id);
     if (isNaN(bookId)) {
@@ -124,7 +124,7 @@ export class LibraryController {
   async getBookByIsbn(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const { isbn } = req.params;
     if (!isbn) {
@@ -144,7 +144,7 @@ export class LibraryController {
   async getTrendingBooks(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const limit = parseInt(req.query.limit as string) || 10;
     const books = await this.#libraryService.getTrendingBooks(limit);
@@ -155,7 +155,7 @@ export class LibraryController {
   async getReadersReviewBooks(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const { book } = req.params;
     const bookId = parseInt(book);
@@ -167,7 +167,7 @@ export class LibraryController {
   async getUserReviewForBook(
     req: AuthenticatedRequest,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const bookId = parseInt(req.params.bookId);
     if (isNaN(bookId)) {
@@ -186,7 +186,7 @@ export class LibraryController {
 
     const userReview = await this.#libraryService.getUserReviewForBook(
       bookId,
-      req.user.userId
+      req.user.userId,
     );
 
     res.status(200).json({ review: userReview });
@@ -196,7 +196,7 @@ export class LibraryController {
   async getFilteredBooks(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const { year, author, title } = req.body;
 
@@ -213,7 +213,7 @@ export class LibraryController {
   async addBook(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const {
       title,
@@ -255,7 +255,7 @@ export class LibraryController {
   async updateAuthor(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const authorId = parseInt(req.params.id);
     const { id, bio, image } = req.body;
@@ -281,7 +281,7 @@ export class LibraryController {
   async updatePublisher(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const publisherId = parseInt(req.params.id);
     const { name, address, city, state, zip, country } = req.body;
@@ -312,7 +312,7 @@ export class LibraryController {
   async updateBook(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const bookId = parseInt(req.params.id);
     if (isNaN(bookId)) {
@@ -358,7 +358,7 @@ export class LibraryController {
   async deleteBook(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const bookId = parseInt(req.params.id);
     if (isNaN(bookId)) {
@@ -376,7 +376,7 @@ export class LibraryController {
   async addLabelToBook(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const bookId = parseInt(req.params.id);
     if (isNaN(bookId)) {
@@ -402,7 +402,7 @@ export class LibraryController {
   async removeLabelFromBook(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const bookId = parseInt(req.params.id);
     if (isNaN(bookId)) {
@@ -428,7 +428,7 @@ export class LibraryController {
   async getBooksByLabel(
     req: Request,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const { label } = req.query;
     if (!label || typeof label !== "string") {
@@ -446,7 +446,7 @@ export class LibraryController {
   async getAllBooksForUser(
     req: AuthenticatedRequest,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<BookDto[]> {
     const books = await this.#libraryAuthService.getAllForUser(req.user!.email);
     res.status(200).json({ books });
@@ -457,7 +457,7 @@ export class LibraryController {
   async addReviews(
     req: AuthenticatedRequest,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const bookId = parseInt(req.params.bookId);
     if (isNaN(bookId)) {
@@ -487,7 +487,7 @@ export class LibraryController {
   async likeToggle(
     req: AuthenticatedRequest,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const userId = req.user?.userId;
 
@@ -510,7 +510,7 @@ export class LibraryController {
   async getUserLikedBooks(
     req: AuthenticatedRequest,
     res: Response,
-    nextFunction: NextFunction
+    nextFunction: NextFunction,
   ): Promise<void> {
     const userId = req.user?.userId;
 
@@ -521,9 +521,8 @@ export class LibraryController {
       return;
     }
 
-    const likedBookIds = await this.#libraryAuthService.getUserLikedBooks(
-      userId
-    );
+    const likedBookIds =
+      await this.#libraryAuthService.getUserLikedBooks(userId);
     res.status(200).json({ likedBookIds });
   }
 }

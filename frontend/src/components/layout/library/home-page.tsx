@@ -37,7 +37,7 @@ export default function HomePage() {
       title: string;
       author: string;
       genre: string;
-      rating: number;
+      average_rating: number;
     }[]
   >([]);
 
@@ -88,8 +88,10 @@ export default function HomePage() {
   };
 
   const getTrendingBooks = async () => {
-    // todo: replace with default book title for the page
-    const hardcodedBook = encodeURIComponent("Harry Potter and the Half-Blood Prince (Harry Potter  #6)");
+    // TODO: replace with default book title for the page
+    const hardcodedBook = encodeURIComponent(
+      "Harry Potter and the Half-Blood Prince (Harry Potter  #6)",
+    );
     const url = `${config.recommendationUrl}/recommendations/${hardcodedBook}`;
     const res = await fetch(url);
 
@@ -102,10 +104,8 @@ export default function HomePage() {
   useEffect(() => {
     async function fetchTrendingBooks() {
       const data = await getTrendingBooks();
-      // todo: get metadata for each book title returned by the recommendation engine (data is response from the eingine)
-      const books = data.recommendations.map((book: any) => ({
-        title: book
-      }));
+      // TODO: get metadata for each book title returned by the recommendation engine (data is response from the eingine)
+      const books = data.recommendations;
       setTrendingBooks(books);
     }
     fetchTrendingBooks();
@@ -174,6 +174,7 @@ export default function HomePage() {
                 <Card
                   key={index}
                   className="group hover:shadow-lg transition-all duration-300 cursor-pointer"
+                  onClick={() => navigate(`/books/${book.id}`)}
                 >
                   <CardContent className="p-6">
                     <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg mb-4 flex items-center justify-center">
@@ -189,13 +190,13 @@ export default function HomePage() {
                         book.author.user.lastname} */}
                     </p>
                     <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="text-xs">
+                      {/* <Badge variant="outline" className="text-xs">
                         {book.genre}
-                      </Badge>
+                      </Badge> */}
                       <div className="flex items-center gap-1">
                         <Star className="h-4 w-4 fill-accent text-accent" />
                         <span className="text-sm font-medium">
-                          {book.rating}
+                          {book.average_rating}
                         </span>
                       </div>
                     </div>

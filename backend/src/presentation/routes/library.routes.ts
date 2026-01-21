@@ -44,6 +44,10 @@ libraryRouter.get("/user", async (req, res, next) => {
   await libraryController.getAllBooksForUser(req, res, next);
 });
 
+libraryRouter.get("/books/:id", async (req, res, next) => {
+  await libraryController.getBookById(req, res, next);
+});
+
 libraryRouter.post("/books", async (req, res, next) => {
   await libraryController.addBook(req, res, next);
 });

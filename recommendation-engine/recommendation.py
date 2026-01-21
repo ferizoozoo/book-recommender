@@ -38,4 +38,6 @@ def get_recommendations(title):
     sim_scores = sim_scores[1:6]
     book_indices = [i[0] for i in sim_scores]
 
-    return df['title'].iloc[book_indices].tolist()
+    selected_columns_df = df[['title', 'authors', 'publisher', 'publication_date', 'isbn', 'num_pages', 'average_rating']]
+
+    return selected_columns_df.iloc[book_indices].to_dict('records')

@@ -6,11 +6,13 @@ import Dashboard from "./components/layout/dashboard/dashboard";
 import HomePage from "./components/layout/library/home-page";
 import SearchPage from "./components/layout/library/search-books";
 import PrivateRoute from "./routing/private-route";
+import { BookDetailPage } from "./components/layout/library/book";
 
 function App() {
   return (
     <div className="m-auto">
       <Routes>
+        <Route path="/books/:id" element={<BookDetailPage />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<Signup />} />
         <Route path="/login" element={<Login />} />
