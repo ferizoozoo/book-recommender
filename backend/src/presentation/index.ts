@@ -1,24 +1,30 @@
+import cors from "cors";
 import "dotenv/config";
-import "reflect-metadata";
-import applicationConfig from "../infrastructure/config/application.config.ts";
 import express from "express";
-import appRouter from "./routes/index.ts";
+import "reflect-metadata";
+import swaggerUi from "swagger-ui-express";
+import applicationConfig from "../infrastructure/config/application.config.ts";
+import swaggerSpec from "../infrastructure/config/swagger.config.ts";
 import AppDataSource from "../infrastructure/database/typeorm/index.ts";
 import { errorHandler } from "./common/middlewares/errorHandler.middleware.ts";
-import cors from "cors";
+import appRouter from "./routes/index.ts";
 
 const app = express();
 const PORT = applicationConfig.port || 5000;
 
 const corsOpts = {
-  origin: process.env.FRONTEND_URL || "http://localhost:5173", // Vite's default port
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173', // Vite's default port
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
 
 // Middleware
 app.use(express.json());
+
+// Swagger documentation (before CORS so it's accessible from browser)
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 app.use(cors(corsOpts));
 
 AppDataSource.initialize()
