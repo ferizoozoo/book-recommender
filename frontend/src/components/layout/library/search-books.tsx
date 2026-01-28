@@ -29,7 +29,7 @@ export default function SearchPage() {
   >(null);
   const [userRating, setUserRating] = useState<number>(0);
   const [userRatings, setUserRatings] = useState<Map<number, number>>(
-    new Map()
+    new Map(),
   );
   const [userReviews, setUserReviews] = useState<Map<number, any>>(new Map());
   const [reviewText, setReviewText] = useState<string>("");
@@ -57,7 +57,7 @@ export default function SearchPage() {
             `${config.apiUrl}/library/user-review/${book.id}`,
             {
               method: "GET",
-            }
+            },
           );
           if (reviewRes.ok) {
             const reviewData = await reviewRes.json();
@@ -65,13 +65,13 @@ export default function SearchPage() {
             if (reviewData.review) {
               console.log(
                 `Setting review for book ${book.id}:`,
-                reviewData.review
+                reviewData.review,
               );
               setUserReviews((prev) =>
-                new Map(prev).set(book.id, reviewData.review)
+                new Map(prev).set(book.id, reviewData.review),
               );
               setUserRatings((prev) =>
-                new Map(prev).set(book.id, reviewData.review.rating)
+                new Map(prev).set(book.id, reviewData.review.rating),
               );
             }
           }
@@ -118,7 +118,7 @@ export default function SearchPage() {
               rating: userRating,
               review: reviewText,
             }),
-          }
+          },
         );
 
         if (res.ok) {
@@ -127,19 +127,19 @@ export default function SearchPage() {
             filteredBooks.map((book) =>
               book.id === selectedBookForRating.id
                 ? { ...book, rating: userRating }
-                : book
-            )
+                : book,
+            ),
           );
           // Store user's rating
           setUserRatings(
-            new Map(userRatings).set(selectedBookForRating.id, userRating)
+            new Map(userRatings).set(selectedBookForRating.id, userRating),
           );
           // Store user's review
           setUserReviews(
             new Map(userReviews).set(selectedBookForRating.id, {
               rating: userRating,
               review: reviewText,
-            })
+            }),
           );
           setRatingModalOpen(false);
           setSelectedBookForRating(null);
@@ -150,6 +150,10 @@ export default function SearchPage() {
         console.error("Error submitting rating:", error);
       }
     }
+  };
+
+  const goToBook = (bookId: number) => {
+    window.location.href = `/books/${bookId}`;
   };
 
   useEffect(() => {
@@ -167,7 +171,7 @@ export default function SearchPage() {
             `${config.apiUrl}/library/user/liked-books`,
             {
               method: "GET",
-            }
+            },
           );
           if (likedRes.ok) {
             const likedData = await likedRes.json();
@@ -217,7 +221,8 @@ export default function SearchPage() {
             filteredBooks?.map((book) => (
               <Card
                 key={book.id}
-                className="group hover:shadow-xl transition-all duration-300 overflow-hidden border-0 bg-card/50 backdrop-blur"
+                className="group hover:shadow-xl hover:cursor-pointer transition-all duration-300 overflow-hidden border-0 bg-card/50 backdrop-blur"
+                onClick={() => goToBook(book.id)}
               >
                 <CardContent className="p-5">
                   <div className="aspect-[3/4] bg-gradient-to-br from-primary/30 via-accent/20 to-primary/10 rounded-lg mb-4 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
