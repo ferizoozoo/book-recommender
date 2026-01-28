@@ -6,6 +6,18 @@ import appRouter from "./routes/index.ts";
 import AppDataSource from "../infrastructure/database/typeorm/index.ts";
 import { errorHandler } from "./common/middlewares/errorHandler.middleware.ts";
 import cors from "cors";
+import swaggerUi from "swagger-ui-express";
+import * as fs from "fs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load swagger document
+const swaggerDocument = JSON.parse(
+  fs.readFileSync(join(__dirname, "swagger-output.json"), "utf8"),
+);
 
 const app = express();
 const PORT = applicationConfig.port || 5000;
@@ -20,6 +32,9 @@ const corsOpts = {
 // Middleware
 app.use(express.json());
 app.use(cors(corsOpts));
+
+// Swagger UI
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 AppDataSource.initialize()
   .then(() => {

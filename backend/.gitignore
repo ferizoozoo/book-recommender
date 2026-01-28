@@ -52,3 +52,6 @@ Thumbs.db
 # WebStorm's backend specific configuration (if you were to open backend as a separate project)
 # You might not even need this if you only open the root project in WebStorm
 #.idea/
+
+# Swagger generated files
+swagger-output.json
