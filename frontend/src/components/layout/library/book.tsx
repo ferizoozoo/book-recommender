@@ -9,6 +9,7 @@ import {
 import { useParams } from "react-router";
 import config from "@/../config";
 import { useEffect, useState } from "react";
+import Header from "@/components/blocks/header";
 
 interface BookWithDetails extends Book {
   author: Author;
@@ -85,6 +86,9 @@ export function BookDetailPage() {
 
   return (
     <div className="container max-w-6xl mx-auto py-8 px-4">
+      <div className="mb-6">
+        <Header />
+      </div>
       {/* Book Details Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
         {/* Book Cover */}

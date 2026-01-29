@@ -1,6 +1,9 @@
+import { useLocalStorage } from "@/hooks/use-local-storage";
 import { BookOpen } from "lucide-react";
 
 export default function Header() {
+  const [user, _] = useLocalStorage("user", null);
+
   return (
     <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -23,18 +26,29 @@ export default function Header() {
           >
             Search
           </a>
-          <a
-            href="/login"
-            className="text-foreground hover:text-primary transition-colors"
-          >
-            Sign In
-          </a>
-          <a
-            href="/register"
-            className="text-foreground hover:text-primary transition-colors"
-          >
-            Register
-          </a>
+          {!user ? (
+            <>
+              <a
+                href="/login"
+                className="text-foreground hover:text-primary transition-colors"
+              >
+                Sign In
+              </a>
+              <a
+                href="/register"
+                className="text-foreground hover:text-primary transition-colors"
+              >
+                Register
+              </a>
+            </>
+          ) : (
+            <a
+              href="/profile"
+              className="text-foreground hover:text-primary transition-colors"
+            >
+              Profile
+            </a>
+          )}
         </nav>
       </div>
     </header>
