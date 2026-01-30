@@ -3,17 +3,18 @@ import { BookOpen } from "lucide-react";
 
 export default function Header() {
   const [user, _] = useLocalStorage("user", null);
+  const isAdmin = user?.roles?.includes("admin") === true;
 
   return (
-    <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+    <header className="border-b border-border fixed w-full top-0 left-0 right-0 z-50">
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex items-center gap-2">
           <BookOpen className="h-8 w-8 text-primary" />
           <span className="text-2xl font-serif font-bold text-foreground">
             Bookrec
           </span>
         </div>
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="flex items-center gap-6">
           <a
             href="/"
             className="text-foreground hover:text-primary transition-colors"
@@ -42,12 +43,22 @@ export default function Header() {
               </a>
             </>
           ) : (
-            <a
-              href="/profile"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Profile
-            </a>
+            <>
+              <a
+                href="/profile"
+                className="text-foreground hover:text-primary transition-colors"
+              >
+                Profile
+              </a>
+              {isAdmin && (
+                <a
+                  href="/admin"
+                  className="text-foreground hover:text-primary transition-colors"
+                >
+                  Admin
+                </a>
+              )}
+            </>
           )}
         </nav>
       </div>

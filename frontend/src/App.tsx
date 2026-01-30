@@ -10,7 +10,7 @@ import { BookDetailPage } from "./components/layout/library/book";
 
 function App() {
   return (
-    <div className="m-auto">
+    <div className="pt-16 m-auto">
       <Routes>
         <Route path="/books/:id" element={<BookDetailPage />} />
         <Route path="/" element={<HomePage />} />
